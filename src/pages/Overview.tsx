@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { KpiCard } from '../components/KpiCard';
+import { AiRecommendationPanel } from '../components/AiRecommendationPanel';
 import { ShoppingCart, DollarSign, Package, MapPin } from 'lucide-react';
 
 const Overview: React.FC = () => {
@@ -63,25 +64,7 @@ const Overview: React.FC = () => {
           </div>
         </div>
         
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <h3 className="text-lg font-semibold mb-4 text-gray-900">AI Recommendations</h3>
-          <div className="space-y-4">
-            <div className="p-4 bg-gradient-to-r from-blue-50 to-teal-50 rounded-lg">
-              <h4 className="font-medium text-gray-900 mb-2">Peak Hour Optimization</h4>
-              <p className="text-sm text-gray-600">Consider increasing staff during 2-4 PM for 23% better service.</p>
-            </div>
-            
-            <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg">
-              <h4 className="font-medium text-gray-900 mb-2">Category Growth</h4>
-              <p className="text-sm text-gray-600">Electronics showing 18% growth. Consider expanding inventory.</p>
-            </div>
-            
-            <div className="p-4 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg">
-              <h4 className="font-medium text-gray-900 mb-2">Regional Insights</h4>
-              <p className="text-sm text-gray-600">Quezon City stores outperforming by 12%. Analyze best practices.</p>
-            </div>
-          </div>
-        </div>
+        <AiRecommendationPanel />
       </div>
 
       {/* Regional Performance */}
