@@ -5,6 +5,8 @@ import { AiRecommendationPanel } from '../components/AiRecommendationPanel';
 import { ShoppingCart, DollarSign, Package, MapPin } from 'lucide-react';
 
 const Overview: React.FC = () => {
+  console.log('Overview component rendering');
+  
   const kpis = [
     {
       title: 'Total Transactions',
@@ -35,6 +37,8 @@ const Overview: React.FC = () => {
       icon: <MapPin className="h-5 w-5" />
     }
   ];
+
+  console.log('KPIs data:', kpis);
 
   return (
     <div className="space-y-6">
