@@ -1,10 +1,10 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { MapPin } from 'lucide-react';
 import { useFilterStore } from '../state/useFilterStore';
 import { useDrillDownStore } from '../state/useDrillDownStore';
+import { regions, mockTransactions } from '../data/mockData';
 
 interface RegionData {
   location: string;
@@ -16,155 +16,44 @@ interface RegionData {
   parent?: string;
 }
 
+// Real Philippine region coordinates with realistic transaction data
 const mockRegionData: RegionData[] = [
-  // Region level
-  {
-    location: 'Metro Manila',
-    coordinates: [121.0244, 14.6042],
-    revenue: 4200000,
-    transactions: 53247,
-    growth: 12.3,
-    level: 'region'
-  },
-  {
-    location: 'Cebu',
-    coordinates: [123.8854, 10.3157],
-    revenue: 2800000,
-    transactions: 36089,
-    growth: 8.7,
-    level: 'region'
-  },
-  {
-    location: 'Davao',
-    coordinates: [125.6144, 7.0731],
-    revenue: 1900000,
-    transactions: 24561,
-    growth: 18.2,
-    level: 'region'
-  },
-  // City level - Metro Manila
-  {
-    location: 'Quezon City',
-    coordinates: [121.0437, 14.6760],
-    revenue: 1800000,
-    transactions: 23000,
-    growth: 15.5,
-    level: 'city',
-    parent: 'Metro Manila'
-  },
-  {
-    location: 'Manila',
-    coordinates: [120.9842, 14.5995],
-    revenue: 1200000,
-    transactions: 15500,
-    growth: 10.2,
-    level: 'city',
-    parent: 'Metro Manila'
-  },
-  {
-    location: 'Makati',
-    coordinates: [121.0164, 14.5547],
-    revenue: 1400000,
-    transactions: 18200,
-    growth: 8.9,
-    level: 'city',
-    parent: 'Metro Manila'
-  },
-  // City level - Cebu
-  {
-    location: 'Cebu City',
-    coordinates: [123.8854, 10.3157],
-    revenue: 1600000,
-    transactions: 20500,
-    growth: 9.5,
-    level: 'city',
-    parent: 'Cebu'
-  },
-  {
-    location: 'Mandaue',
-    coordinates: [123.9194, 10.3233],
-    revenue: 800000,
-    transactions: 10200,
-    growth: 7.2,
-    level: 'city',
-    parent: 'Cebu'
-  },
-  // City level - Davao
-  {
-    location: 'Davao City',
-    coordinates: [125.6144, 7.0731],
-    revenue: 1500000,
-    transactions: 19000,
-    growth: 20.1,
-    level: 'city',
-    parent: 'Davao'
-  },
-  // Barangay level - Quezon City
-  {
-    location: 'Barangay Commonwealth',
-    coordinates: [121.0500, 14.6900],
-    revenue: 450000,
-    transactions: 5800,
-    growth: 18.5,
-    level: 'barangay',
-    parent: 'Quezon City'
-  },
-  {
-    location: 'Barangay Diliman',
-    coordinates: [121.0600, 14.6500],
-    revenue: 520000,
-    transactions: 6700,
-    growth: 12.8,
-    level: 'barangay',
-    parent: 'Quezon City'
-  },
-  {
-    location: 'Barangay Fairview',
-    coordinates: [121.0300, 14.7100],
-    revenue: 380000,
-    transactions: 4900,
-    growth: 14.2,
-    level: 'barangay',
-    parent: 'Quezon City'
-  },
-  // Barangay level - Manila
-  {
-    location: 'Barangay Ermita',
-    coordinates: [120.9800, 14.5900],
-    revenue: 350000,
-    transactions: 4500,
-    growth: 8.9,
-    level: 'barangay',
-    parent: 'Manila'
-  },
-  {
-    location: 'Barangay Malate',
-    coordinates: [120.9900, 14.5700],
-    revenue: 420000,
-    transactions: 5400,
-    growth: 11.5,
-    level: 'barangay',
-    parent: 'Manila'
-  },
-  // Barangay level - Cebu City
-  {
-    location: 'Barangay Lahug',
-    coordinates: [123.9000, 10.3400],
-    revenue: 480000,
-    transactions: 6200,
-    growth: 10.8,
-    level: 'barangay',
-    parent: 'Cebu City'
-  },
-  {
-    location: 'Barangay Capitol Site',
-    coordinates: [123.8900, 10.3200],
-    revenue: 390000,
-    transactions: 5000,
-    growth: 8.5,
-    level: 'barangay',
-    parent: 'Cebu City'
-  }
+  // Major regions
+  { location: 'National Capital Region', coordinates: [121.0244, 14.6042], revenue: 4200000, transactions: 53247, growth: 12.3, level: 'region' },
+  { location: 'Central Luzon', coordinates: [120.8, 15.3], revenue: 2800000, transactions: 36089, growth: 8.7, level: 'region' },
+  { location: 'CALABARZON', coordinates: [121.2, 14.2], revenue: 3100000, transactions: 39500, growth: 15.2, level: 'region' },
+  { location: 'Central Visayas', coordinates: [123.8854, 10.3157], revenue: 1900000, transactions: 24561, growth: 18.2, level: 'region' },
+  { location: 'Western Visayas', coordinates: [122.5, 10.7], revenue: 1400000, transactions: 18200, growth: 9.5, level: 'region' },
+  { location: 'Davao Region', coordinates: [125.6144, 7.0731], revenue: 1200000, transactions: 15600, growth: 20.1, level: 'region' },
+  { location: 'Northern Mindanao', coordinates: [124.5, 8.5], revenue: 850000, transactions: 11000, growth: 14.8, level: 'region' },
+  { location: 'Ilocos Region', coordinates: [120.4, 17.6], revenue: 650000, transactions: 8400, growth: 6.2, level: 'region' },
+  { location: 'Bicol Region', coordinates: [123.4, 13.6], revenue: 720000, transactions: 9300, growth: 11.5, level: 'region' },
+  
+  // NCR Cities
+  { location: 'Quezon City', coordinates: [121.0437, 14.6760], revenue: 1800000, transactions: 23000, growth: 15.5, level: 'city', parent: 'National Capital Region' },
+  { location: 'Manila', coordinates: [120.9842, 14.5995], revenue: 1200000, transactions: 15500, growth: 10.2, level: 'city', parent: 'National Capital Region' },
+  { location: 'Makati', coordinates: [121.0164, 14.5547], revenue: 1400000, transactions: 18200, growth: 8.9, level: 'city', parent: 'National Capital Region' },
+  
+  // Central Visayas Cities
+  { location: 'Cebu City', coordinates: [123.8854, 10.3157], revenue: 1200000, transactions: 15500, growth: 19.2, level: 'city', parent: 'Central Visayas' },
+  { location: 'Mandaue', coordinates: [123.9194, 10.3233], revenue: 450000, transactions: 5800, growth: 16.8, level: 'city', parent: 'Central Visayas' },
+  
+  // CALABARZON Cities
+  { location: 'Calamba', coordinates: [121.1654, 14.2119], revenue: 850000, transactions: 11000, growth: 13.5, level: 'city', parent: 'CALABARZON' },
+  { location: 'Antipolo', coordinates: [121.1758, 14.5995], revenue: 720000, transactions: 9300, growth: 17.2, level: 'city', parent: 'CALABARZON' },
+  
+  // Central Luzon Cities
+  { location: 'Angeles', coordinates: [120.5892, 15.1450], revenue: 680000, transactions: 8800, growth: 12.1, level: 'city', parent: 'Central Luzon' },
+  { location: 'San Fernando', coordinates: [120.6890, 15.0349], revenue: 590000, transactions: 7600, growth: 9.8, level: 'city', parent: 'Central Luzon' },
+  
+  // Barangays in Quezon City
+  { location: 'Barangay Commonwealth', coordinates: [121.0500, 14.6900], revenue: 450000, transactions: 5800, growth: 18.5, level: 'barangay', parent: 'Quezon City' },
+  { location: 'Barangay Diliman', coordinates: [121.0600, 14.6500], revenue: 520000, transactions: 6700, growth: 12.8, level: 'barangay', parent: 'Quezon City' },
+  { location: 'Barangay Fairview', coordinates: [121.0300, 14.7100], revenue: 380000, transactions: 4900, growth: 14.2, level: 'barangay', parent: 'Quezon City' },
+  
+  // Barangays in Cebu City
+  { location: 'Barangay Lahug', coordinates: [123.9000, 10.3400], revenue: 480000, transactions: 6200, growth: 20.8, level: 'barangay', parent: 'Cebu City' },
+  { location: 'Barangay Capitol Site', coordinates: [123.8900, 10.3200], revenue: 390000, transactions: 5000, growth: 18.5, level: 'barangay', parent: 'Cebu City' }
 ];
 
 export const GeoMap: React.FC = () => {
@@ -185,7 +74,6 @@ export const GeoMap: React.FC = () => {
     const lastDrillLevel = drillPath[drillPath.length - 1];
     const childRegions = mockRegionData.filter(region => region.parent === lastDrillLevel.label);
     
-    // If no children found, return the current level data
     if (childRegions.length === 0) {
       return mockRegionData.filter(region => region.location === lastDrillLevel.label);
     }
@@ -196,7 +84,6 @@ export const GeoMap: React.FC = () => {
   const handleRegionClick = (regionName: string, regionLevel: string) => {
     console.log('Region clicked:', regionName, 'Level:', regionLevel);
     
-    // Drill down if possible (regions can drill to cities, cities to barangays)
     if (regionLevel === 'region' || regionLevel === 'city') {
       drillDown({
         type: regionLevel as any,
@@ -205,7 +92,6 @@ export const GeoMap: React.FC = () => {
       });
     }
     
-    // Also apply as filter for cross-filtering
     const currentRegions = barangays.includes(regionName) 
       ? barangays.filter(r => r !== regionName)
       : [...barangays, regionName];
