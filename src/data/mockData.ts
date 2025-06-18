@@ -62,50 +62,90 @@ export const regions: Region[] = [
   { code: "BARMM", name: "Bangsamoro Autonomous Region", weight: 0.015, major_cities: ["Marawi", "Cotabato City"] }
 ];
 
-export const brands: Brand[] = [
+// TBWA Client Brands (60% of transactions)
+export const tbwaClientBrands: Brand[] = [
   {
     name: "Alaska Milk Corporation",
     is_client: true,
-    categories: ["Dairy", "Creamer"],
-    skus: ["Alaska Evaporated Milk", "Alaska Condensed Milk", "Alaska Powdered Milk", "Krem-Top (Coffee Creamer)", "Alpine (Evaporated & Condensed Milk)", "Cow Bell (Powdered Milk)"]
+    categories: ["Dairy"],
+    skus: ["Alaska Evaporated Milk", "Alaska Condensed Milk", "Alaska Powdered Milk", "Krem-Top Coffee Creamer", "Alpine Evaporated Milk", "Alpine Condensed Milk", "Cow Bell Powdered Milk"]
   },
   {
-    name: "Oishi (Liwayway Marketing Corporation)",
+    name: "Oishi",
     is_client: true,
     categories: ["Snacks", "Beverages"],
-    skus: ["Oishi Prawn Crackers", "Oishi Pillows", "Oishi Marty's", "Oishi Ridges", "Oishi Bread Pan", "Gourmet Picks", "Crispy Patata", "Smart C+ (Vitamin Drinks)", "Oaties", "Hi-Ho", "Rinbee", "Deli Mex"]
+    skus: ["Oishi Prawn Crackers", "Oishi Pillows", "Oishi Marty's", "Oishi Ridges", "Oishi Bread Pan", "Gourmet Picks", "Crispy Patata", "Smart C+ Vitamin Drinks", "Oaties", "Hi-Ho", "Rinbee", "Deli Mex"]
   },
   {
-    name: "Peerless Products Manufacturing Corporation",
+    name: "Champion",
     is_client: true,
-    categories: ["Laundry", "Personal Care", "Home Care"],
-    skus: ["Champion (Detergent)", "Champion (Fabric Conditioner)", "Calla (Personal Care)", "Hana (Shampoo and Conditioner)", "Cyclone (Bleach)", "Pride (Dishwashing Liquid)", "Care Plus (Alcohol and Hand Sanitizer)"]
+    categories: ["Home Care", "Personal Care"],
+    skus: ["Champion Detergent", "Champion Fabric Conditioner", "Calla Personal Care", "Hana Shampoo", "Hana Conditioner", "Cyclone Bleach", "Pride Dishwashing Liquid", "Care Plus Alcohol", "Care Plus Hand Sanitizer"]
   },
   {
-    name: "Del Monte Philippines",
+    name: "Del Monte",
     is_client: true,
-    categories: ["Juice", "Sauces", "Pasta", "Fruit", "Beverages"],
-    skus: ["Del Monte Pineapple Juice", "Del Monte Pineapple Chunks", "Del Monte Pineapple Slices", "Del Monte Tomato Sauce", "Del Monte Ketchup", "Del Monte Spaghetti Sauce", "Del Monte Fruit Cocktail", "Del Monte Pasta", "S&W (Premium Fruit & Vegetable Products)", "Today's (Budget-Friendly Product Line)", "Fit 'n Right (Juice Drinks)"]
+    categories: ["Food & Beverages"],
+    skus: ["Del Monte Pineapple Juice", "Del Monte Pineapple Chunks", "Del Monte Pineapple Slices", "Del Monte Tomato Sauce", "Del Monte Ketchup", "Del Monte Spaghetti Sauce", "Del Monte Fruit Cocktail", "Del Monte Pasta", "S&W Premium Fruit", "Today's Budget Line", "Fit 'n Right Juice Drinks"]
   },
   {
-    name: "Japan Tobacco International (JTI)",
+    name: "Winston",
     is_client: true,
     categories: ["Tobacco"],
-    skus: ["Winston", "Camel", "Mevius", "LD", "Mighty", "Caster", "Glamour"]
+    skus: ["Winston Red", "Winston Blue", "Camel", "Mevius", "LD", "Mighty", "Caster", "Glamour"]
   }
 ];
 
-export const channels = ["Sari-Sari Store", "Convenience Store", "Modern Trade"];
+// Competitor Brands (40% of transactions)
+export const competitorBrands: Brand[] = [
+  {
+    name: "Nestlé",
+    is_client: false,
+    categories: ["Dairy", "Food & Beverages"],
+    skus: ["Bear Brand Milk", "Nestlé Condensed Milk", "Nescafé Coffee", "Maggi Noodles", "KitKat", "Milo"]
+  },
+  {
+    name: "Unilever",
+    is_client: false,
+    categories: ["Personal Care", "Home Care"],
+    skus: ["Surf Detergent", "Dove Soap", "Clear Shampoo", "Cream Silk", "Cif Cleaner", "Sunsilk"]
+  },
+  {
+    name: "Procter & Gamble",
+    is_client: false,
+    categories: ["Personal Care", "Home Care"],
+    skus: ["Head & Shoulders", "Pantene", "Tide Detergent", "Ariel", "Safeguard Soap", "Oral-B"]
+  },
+  {
+    name: "Jack 'n Jill",
+    is_client: false,
+    categories: ["Snacks"],
+    skus: ["Piattos", "Nova", "Chippy", "Roller Coaster", "Chiz Curls", "Cream-O"]
+  },
+  {
+    name: "Universal Robina",
+    is_client: false,
+    categories: ["Snacks", "Food & Beverages"],
+    skus: ["Ricoa Chocolate", "C2 Green Tea", "Great Taste Coffee", "Payless Noodles", "SkyFlakes"]
+  },
+  {
+    name: "Philip Morris",
+    is_client: false,
+    categories: ["Tobacco"],
+    skus: ["Marlboro", "Parliament", "L&M", "Chesterfield"]
+  },
+  {
+    name: "Colgate-Palmolive",
+    is_client: false,
+    categories: ["Personal Care"],
+    skus: ["Colgate Toothpaste", "Palmolive Soap", "Mennen", "Softlan"]
+  }
+];
 
-export const competitors = {
-  Dairy: ["Nestlé", "Bear Brand", "Magnolia"],
-  Snacks: ["Jack n' Jill", "Lays", "Piattos", "Nova"],
-  Juice: ["Zest-O", "Minute Maid", "Tang"],
-  Pasta: ["Royal", "Fiesta"],
-  Laundry: ["Surf", "Tide", "Ariel"],
-  PersonalCare: ["Palmolive", "Sunsilk", "Head & Shoulders"],
-  Tobacco: ["Philip Morris", "Fortune", "Marlboro"]
-};
+// Combined brands array
+export const brands: Brand[] = [...tbwaClientBrands, ...competitorBrands];
+
+export const channels = ["Sari-Sari Store"];
 
 // Generate sample transactions based on realistic patterns
 export const generateMockTransactions = (count: number = 1000): Transaction[] => {
@@ -118,15 +158,19 @@ export const generateMockTransactions = (count: number = 1000): Transaction[] =>
   for (let i = 0; i < count; i++) {
     const region = regions[Math.floor(Math.random() * regions.length)];
     const city = region.major_cities[Math.floor(Math.random() * region.major_cities.length)];
-    const channel = channels[Math.floor(Math.random() * channels.length)];
+    const channel = "Sari-Sari Store";
+    
+    // 60% TBWA clients, 40% competitors
+    const isClientTransaction = Math.random() < 0.6;
+    const availableBrands = isClientTransaction ? tbwaClientBrands : competitorBrands;
     
     // Generate realistic basket (1-4 items)
-    const basketSize = Math.random() < 0.38 ? 1 : Math.random() < 0.67 ? 2 : Math.floor(Math.random() * 3) + 3;
+    const basketSize = Math.random() < 0.4 ? 1 : Math.random() < 0.7 ? 2 : Math.floor(Math.random() * 3) + 3;
     const basket: BasketItem[] = [];
     let total = 0;
 
     for (let j = 0; j < basketSize; j++) {
-      const brand = brands[Math.floor(Math.random() * brands.length)];
+      const brand = availableBrands[Math.floor(Math.random() * availableBrands.length)];
       const sku = brand.skus[Math.floor(Math.random() * brand.skus.length)];
       const category = brand.categories[Math.floor(Math.random() * brand.categories.length)];
       const units = Math.floor(Math.random() * 3) + 1;
@@ -144,9 +188,9 @@ export const generateMockTransactions = (count: number = 1000): Transaction[] =>
       total += price;
     }
 
-    // Generate random date within last 30 days
+    // Generate random date within last 360 days
     const date = new Date();
-    date.setDate(date.getDate() - Math.floor(Math.random() * 30));
+    date.setDate(date.getDate() - Math.floor(Math.random() * 360));
     const time = `${Math.floor(Math.random() * 24).toString().padStart(2, '0')}:${Math.floor(Math.random() * 60).toString().padStart(2, '0')}`;
 
     transactions.push({
@@ -194,7 +238,7 @@ export const getRegionalData = () => {
 };
 
 export const getTopBrands = () => {
-  return brands.filter(b => b.is_client).map(brand => ({
+  return tbwaClientBrands.map(brand => ({
     name: brand.name,
     revenue: Math.floor(Math.random() * 5000000) + 1000000,
     transactions: Math.floor(Math.random() * 50000) + 10000,
