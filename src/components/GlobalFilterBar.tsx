@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Calendar, X, Filter, RotateCcw, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useFilterStore } from '../state/useFilterStore';
@@ -32,7 +31,11 @@ export const GlobalFilterBar: React.FC = () => {
   const regionOptions = ['NCR', 'Region 3', 'Region 4A', 'Visayas', 'Mindanao'];
   const allBrands = [...tbwaClientBrands, ...competitorBrands];
   const brandOptions = [...new Set(allBrands.map(b => b.name))].sort();
-  const categoryOptions = ['Groceries', 'Health & Beauty', 'Tobacco'];
+  const categoryOptions = [
+    'Dairy', 'Snacks', 'Beverages', 'Home Care', 'Personal Care', 
+    'Condiments', 'Canned Fruit', 'Pasta', 'Premium Produce', 
+    'Budget', 'Tobacco', 'Food'
+  ];
   const storeOptions = ['Store A', 'Store B', 'Store C', 'Store D', 'Store E'];
   const channelOptions = ['Traditional', 'Modern Trade'];
 
