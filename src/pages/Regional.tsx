@@ -1,9 +1,11 @@
-
 import React from 'react';
 import { Globe, MapPin, TrendingUp, BarChart3 } from 'lucide-react';
 import { GeoMap } from '../components/GeoMap';
 import { ActiveFilters } from '../components/ActiveFilters';
+import { DrillDownBreadcrumb } from '../components/DrillDownBreadcrumb';
+import { DrillDownPanel } from '../components/DrillDownPanel';
 import { useFilterStore } from '../state/useFilterStore';
+import { useDrillDownStore } from '../state/useDrillDownStore';
 
 interface RegionData {
   region: string;
@@ -53,8 +55,9 @@ const allRegionData: RegionData[] = [
 
 const Regional: React.FC = () => {
   const { barangays, setFilter } = useFilterStore();
+  const { drillPath, getCurrentContext } = useDrillDownStore();
 
-  // Filter data based on selected regions
+  // Filter data based on selected regions and drill-down context
   const filteredRegionData = barangays.length > 0 
     ? allRegionData.filter(region => barangays.includes(region.region))
     : allRegionData;
@@ -73,12 +76,17 @@ const Regional: React.FC = () => {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Regional Analytics</h1>
-          <p className="text-gray-600 mt-1">Geographic performance and market insights</p>
+          <p className="text-gray-600 mt-1">
+            Geographic performance and market insights - {getCurrentContext()}
+          </p>
         </div>
         <div className="text-sm text-gray-500 bg-white px-4 py-2 rounded-lg border">
           Last updated: {new Date().toLocaleString('en-PH')}
         </div>
       </div>
+
+      {/* Drill-Down Breadcrumb Navigation */}
+      <DrillDownBreadcrumb />
 
       {/* Active Filters */}
       <ActiveFilters />
@@ -88,11 +96,13 @@ const Regional: React.FC = () => {
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Top Region</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {filteredRegionData.length > 0 ? filteredRegionData[0].region : 'Metro Manila'}
+              <p className="text-sm font-medium text-gray-600">Current Context</p>
+              <p className="text-lg font-bold text-gray-900">
+                {getCurrentContext()}
               </p>
-              <p className="text-sm text-green-600">34% of total sales</p>
+              <p className="text-sm text-blue-600">
+                Drill Level: {drillPath.length > 0 ? drillPath[drillPath.length - 1].type : 'Region'}
+              </p>
             </div>
             <Globe className="h-8 w-8 text-blue-600" />
           </div>
@@ -136,6 +146,9 @@ const Regional: React.FC = () => {
         </div>
       </div>
 
+      {/* Drill-Down Control Panel */}
+      <DrillDownPanel />
+
       {/* Geospatial Map */}
       <GeoMap />
 
@@ -145,8 +158,8 @@ const Regional: React.FC = () => {
           <h3 className="text-lg font-semibold text-gray-900">Regional Performance</h3>
           <p className="text-sm text-gray-600">
             {barangays.length > 0 
-              ? `Showing ${filteredRegionData.length} filtered regions - click rows to toggle selection`
-              : 'Click rows to filter by region - side-by-side comparison of regional metrics'
+              ? `Showing ${filteredRegionData.length} filtered regions in ${getCurrentContext()}`
+              : `Showing all regions in ${getCurrentContext()} - click rows to filter by region`
             }
           </p>
         </div>
@@ -193,10 +206,10 @@ const Regional: React.FC = () => {
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Export Regional Data</h3>
         <div className="flex gap-4">
           <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-            Export to Excel
+            Export Current View to Excel
           </button>
           <button className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
-            Export to PDF
+            Export Drill-Down Path to PDF
           </button>
         </div>
       </div>
