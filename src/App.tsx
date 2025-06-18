@@ -13,6 +13,8 @@ import Overview from './pages/Overview';
 import TransactionTrends from './pages/TransactionTrends';
 import ProductMix from './pages/ProductMix';
 import ConsumerInsights from './pages/ConsumerInsights';
+import Regional from './pages/Regional';
+import BrandAnalytics from './pages/BrandAnalytics';
 import RetailBot from './pages/RetailBot';
 import AiAssist from './pages/AiAssist';
 import VibeCheck from './pages/VibeCheck';
@@ -45,6 +47,8 @@ const AppContent: React.FC = () => {
               <Route path="/transaction-trends" element={<TransactionTrends />} />
               <Route path="/product-mix" element={<ProductMix />} />
               <Route path="/consumer-insights" element={<ConsumerInsights />} />
+              <Route path="/regional" element={<Regional />} />
+              <Route path="/brand-analytics" element={<BrandAnalytics />} />
               <Route path="/retailbot" element={<RetailBot />} />
               <Route path="/ai-assist" element={<AiAssist />} />
               <Route path="/vibe-check" element={<VibeCheck />} />
