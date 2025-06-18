@@ -12,6 +12,8 @@ interface FilterState {
   categories: string[];
   brands: string[];
   skus: string[];
+  stores: string[];
+  channels: string[];
   setFilter: <K extends keyof Omit<FilterState, 'setFilter' | 'reset' | 'getQueryString'>>(
     key: K, 
     value: FilterState[K]
@@ -25,7 +27,9 @@ const defaultState = {
   barangays: [],
   categories: [],
   brands: [],
-  skus: []
+  skus: [],
+  stores: [],
+  channels: []
 };
 
 export const useFilterStore = create<FilterState>((set, get) => ({
@@ -58,6 +62,12 @@ export const useFilterStore = create<FilterState>((set, get) => ({
     }
     if (filters.skus.length > 0) {
       params.set('skus', filters.skus.join(','));
+    }
+    if (filters.stores.length > 0) {
+      params.set('stores', filters.stores.join(','));
+    }
+    if (filters.channels.length > 0) {
+      params.set('channels', filters.channels.join(','));
     }
     
     return params.toString();

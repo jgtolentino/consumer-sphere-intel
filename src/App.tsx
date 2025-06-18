@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -12,12 +11,9 @@ import { useSyncFilters } from './hooks/useSyncFilters';
 import Overview from './pages/Overview';
 import TransactionTrends from './pages/TransactionTrends';
 import ProductMix from './pages/ProductMix';
-import ConsumerInsights from './pages/ConsumerInsights';
 import Regional from './pages/Regional';
 import BrandAnalytics from './pages/BrandAnalytics';
 import RetailBot from './pages/RetailBot';
-import AiAssist from './pages/AiAssist';
-import VibeCheck from './pages/VibeCheck';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -44,14 +40,11 @@ const AppContent: React.FC = () => {
           <div className="max-w-full">
             <Routes>
               <Route path="/" element={<Overview />} />
-              <Route path="/transaction-trends" element={<TransactionTrends />} />
-              <Route path="/product-mix" element={<ProductMix />} />
-              <Route path="/consumer-insights" element={<ConsumerInsights />} />
+              <Route path="/trends" element={<TransactionTrends />} />
+              <Route path="/products" element={<ProductMix />} />
               <Route path="/regional" element={<Regional />} />
-              <Route path="/brand-analytics" element={<BrandAnalytics />} />
-              <Route path="/retailbot" element={<RetailBot />} />
-              <Route path="/ai-assist" element={<AiAssist />} />
-              <Route path="/vibe-check" element={<VibeCheck />} />
+              <Route path="/brands" element={<BrandAnalytics />} />
+              <Route path="/chat" element={<RetailBot />} />
             </Routes>
           </div>
         </main>
