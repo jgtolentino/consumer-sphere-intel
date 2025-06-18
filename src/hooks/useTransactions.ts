@@ -1,43 +1,28 @@
-
 import { useQuery } from '@tanstack/react-query';
-import { supabase, withLimit } from '../lib/supabase';
+import { useDataService } from '../providers/DataProvider';
 import { useFilterStore } from '../state/useFilterStore';
 
 export const useTransactions = () => {
+  const dataService = useDataService();
   const { dateRange, barangays, categories, brands } = useFilterStore();
 
   return useQuery({
     queryKey: ['transactions', dateRange, barangays, categories, brands],
     queryFn: async () => {
-      let query = withLimit('transactions', supabase
-        .from('transactions')
-        .select(`
-          *,
-          customers(name, barangay, age_group, gender),
-          transaction_items(
-            quantity,
-            unit_price,
-            total_price,
-            products(name, category, brand, sku)
-          )
-        `));
+      const filters = {
+        dateRange,
+        regions: barangays,
+        categories,
+        brands
+      };
 
-      // Apply date range filter
-      if (dateRange.from) {
-        query = query.gte('created_at', dateRange.from.toISOString());
-      }
-      if (dateRange.to) {
-        query = query.lte('created_at', dateRange.to.toISOString());
-      }
-
-      const { data, error } = await query;
+      const transactions = await dataService.getTransactions(filters);
       
-      if (error) throw error;
-
       // Process data for dashboard KPIs
-      const transactions = data || [];
-      const totalValue = transactions.reduce((sum, t) => sum + (t.total_amount || 0), 0);
-      const totalItems = transactions.reduce((sum, t) => sum + (t.items_count || 0), 0);
+      const totalValue = transactions.reduce((sum, t) => sum + (t.total || 0), 0);
+      const totalItems = transactions.reduce((sum, t) => 
+        sum + (t.basket?.reduce((itemSum: number, item: any) => itemSum + item.units, 0) || 0), 0
+      );
 
       return {
         total: transactions.length,
@@ -88,7 +73,7 @@ const processTimeSeriesData = (data: any[]) => {
 };
 
 const processValueDistribution = (data: any[]) => {
-  const values = data.map(d => d.total_amount || 0).sort((a, b) => a - b);
+  const values = data.map(d => d.total || 0).sort((a, b) => a - b);
   const len = values.length;
   
   if (len === 0) return { min: 0, q1: 0, median: 0, q3: 0, max: 0 };

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -16,6 +15,7 @@ import ProductMix from './pages/ProductMix';
 import Regional from './pages/Regional';
 import BrandAnalytics from './pages/BrandAnalytics';
 import RetailBot from './pages/RetailBot';
+import { DataProvider } from './providers/DataProvider';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -62,11 +62,13 @@ const App: React.FC = () => {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
         <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <Router>
-            <AppContent />
-          </Router>
+          <DataProvider>
+            <Toaster />
+            <Sonner />
+            <Router>
+              <AppContent />
+            </Router>
+          </DataProvider>
         </TooltipProvider>
       </ThemeProvider>
     </QueryClientProvider>
