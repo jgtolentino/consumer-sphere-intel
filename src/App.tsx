@@ -37,17 +37,17 @@ const AppContent: React.FC = () => {
       <Navbar />
       
       <div className="flex w-full">
-        {/* Fixed sidebar with proper z-index */}
+        {/* Responsive sidebar with scalable width */}
         <Sidebar />
         
-        {/* Main content area with proper margins */}
-        <div className="flex-1 lg:ml-64">
+        {/* Main content area with responsive left margin */}
+        <div className="flex-1 min-w-0 lg:ml-[18vw] lg:min-[1024px]:ml-[12rem] lg:max-[1440px]:ml-[20rem]">
           {/* Filter bar positioned after sidebar */}
           <GlobalFilterBar />
           
-          {/* Main content with proper padding */}
-          <main className="pt-4 p-4 md:p-6 overflow-x-auto">
-            <div className="max-w-full">
+          {/* Main content with proper padding and overflow handling */}
+          <main className="pt-[1rem] p-[1rem] md:p-[1.5rem] overflow-x-auto">
+            <div className="max-w-full min-w-0">
               <Routes>
                 <Route path="/" element={<Overview />} />
                 <Route path="/trends" element={<TransactionTrends />} />
