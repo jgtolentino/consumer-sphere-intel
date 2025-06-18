@@ -20,39 +20,39 @@ export const KpiCard: React.FC<KpiCardProps> = ({
   const getTrendIcon = () => {
     switch (trend) {
       case 'up':
-        return <TrendingUp className="h-4 w-4 text-green-500" />;
+        return <TrendingUp className="h-4 w-4 text-[#36CFC9]" />;
       case 'down':
         return <TrendingDown className="h-4 w-4 text-red-500" />;
       default:
-        return <Minus className="h-4 w-4 text-gray-500" />;
+        return <Minus className="h-4 w-4 text-[#2F3A4F] dark:text-gray-400" />;
     }
   };
 
   const getTrendColor = () => {
     switch (trend) {
       case 'up':
-        return 'text-green-600';
+        return 'text-[#36CFC9]';
       case 'down':
-        return 'text-red-600';
+        return 'text-red-500';
       default:
-        return 'text-gray-600';
+        return 'text-[#2F3A4F] dark:text-gray-400';
     }
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-200">
+    <div className="scout-kpi-card hover:border-[#36CFC9]/30 transition-all duration-200 dark:bg-[#2F3A4F] dark:border-gray-700">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-medium text-gray-600">{title}</h3>
-        {icon && <div className="text-gray-400">{icon}</div>}
+        <h3 className="text-sm font-semibold text-[#2F3A4F] dark:text-gray-300 uppercase tracking-wide font-inter">{title}</h3>
+        {icon && <div className="text-[#36CFC9]">{icon}</div>}
       </div>
       
       <div className="flex items-end justify-between">
         <div>
-          <p className="text-2xl font-bold text-gray-900">{value}</p>
+          <p className="text-3xl font-bold text-[#0A2540] dark:text-[#F5F6FA] font-inter">{value}</p>
           {change && (
-            <div className={`flex items-center space-x-1 mt-1 ${getTrendColor()}`}>
+            <div className={`flex items-center space-x-1 mt-2 ${getTrendColor()}`}>
               {getTrendIcon()}
-              <span className="text-sm font-medium">{change}</span>
+              <span className="text-sm font-semibold">{change}</span>
             </div>
           )}
         </div>

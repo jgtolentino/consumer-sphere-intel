@@ -33,11 +33,11 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({ trigger }) =
       <DrawerTrigger asChild>
         {trigger}
       </DrawerTrigger>
-      <DrawerContent className="h-[85vh] bg-white">
-        <DrawerHeader className="border-b border-gray-200 pb-4">
+      <DrawerContent className="h-[85vh] bg-white dark:bg-[#2F3A4F]">
+        <DrawerHeader className="border-b border-gray-200 dark:border-gray-700 pb-4">
           <div className="flex items-center justify-between">
-            <DrawerTitle className="text-lg font-semibold text-gray-900">
-              Navigation
+            <DrawerTitle className="text-lg font-bold text-[#0A2540] dark:text-[#F5F6FA] font-inter">
+              Scout Analytics
             </DrawerTitle>
             <DrawerClose asChild>
               <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
@@ -55,10 +55,10 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({ trigger }) =
                 to={item.href}
                 onClick={() => setOpen(false)}
                 className={({ isActive }) =>
-                  `flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 text-base ${
+                  `flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 text-base font-medium ${
                     isActive
-                      ? 'bg-gradient-to-r from-blue-50 to-teal-50 text-blue-700 border-l-4 border-blue-500'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                      ? 'bg-[#36CFC9]/10 text-[#0A2540] dark:text-[#36CFC9] border-l-4 border-[#36CFC9]'
+                      : 'text-[#2F3A4F] dark:text-gray-300 hover:bg-[#F5F6FA] dark:hover:bg-[#0A2540]/50 hover:text-[#0A2540] dark:hover:text-white'
                   }`
                 }
               >
@@ -68,20 +68,20 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({ trigger }) =
             ))}
           </nav>
           
-          <div className="mt-8 p-4 bg-gradient-to-r from-blue-50 to-teal-50 rounded-lg">
-            <h3 className="text-sm font-semibold text-gray-900 mb-3">Quick Stats</h3>
-            <div className="space-y-2 text-sm text-gray-600">
+          <div className="mt-8 p-4 bg-[#F5F6FA] dark:bg-[#0A2540] rounded-lg border border-gray-100 dark:border-gray-700">
+            <h3 className="text-sm font-semibold text-[#0A2540] dark:text-[#F5F6FA] mb-3 font-inter">Quick Stats</h3>
+            <div className="space-y-2 text-sm text-[#2F3A4F] dark:text-gray-300">
               <div className="flex justify-between">
                 <span>Active Stores:</span>
-                <span className="font-medium">47</span>
+                <span className="font-medium text-[#36CFC9]">47</span>
               </div>
               <div className="flex justify-between">
                 <span>SKUs Tracked:</span>
-                <span className="font-medium">1,247</span>
+                <span className="font-medium text-[#36CFC9]">1,247</span>
               </div>
               <div className="flex justify-between">
                 <span>Data Points:</span>
-                <span className="font-medium">2.4M</span>
+                <span className="font-medium text-[#36CFC9]">2.4M</span>
               </div>
             </div>
           </div>

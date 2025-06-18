@@ -14,7 +14,7 @@ const navigationItems = [
 
 export const Sidebar: React.FC = () => {
   return (
-    <aside className="fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 bg-white border-r border-gray-200 shadow-sm z-10 hidden lg:block">
+    <aside className="fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 bg-white dark:bg-[#2F3A4F] border-r border-gray-200 dark:border-gray-700 shadow-sm z-10 hidden lg:block">
       <div className="p-4 xl:p-6 h-full overflow-y-auto">
         <nav className="space-y-1 xl:space-y-2">
           {navigationItems.map((item) => (
@@ -22,33 +22,33 @@ export const Sidebar: React.FC = () => {
               key={item.name}
               to={item.href}
               className={({ isActive }) =>
-                `flex items-center space-x-2 xl:space-x-3 px-2 xl:px-4 py-2 xl:py-3 rounded-lg transition-all duration-200 text-sm xl:text-base ${
+                `flex items-center space-x-2 xl:space-x-3 px-3 xl:px-4 py-3 xl:py-3 rounded-lg transition-all duration-200 text-sm xl:text-base font-medium ${
                   isActive
-                    ? 'bg-gradient-to-r from-blue-50 to-teal-50 text-blue-700 border-l-4 border-blue-500'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    ? 'bg-[#36CFC9]/10 text-[#0A2540] dark:text-[#36CFC9] border-l-4 border-[#36CFC9] shadow-none'
+                    : 'text-[#2F3A4F] dark:text-gray-300 hover:bg-[#F5F6FA] dark:hover:bg-[#0A2540]/50 hover:text-[#0A2540] dark:hover:text-white'
                 }`
               }
             >
               <item.icon className="h-4 w-4 xl:h-5 xl:w-5 flex-shrink-0" />
-              <span className="font-medium truncate">{item.name}</span>
+              <span className="truncate">{item.name}</span>
             </NavLink>
           ))}
         </nav>
         
-        <div className="mt-6 xl:mt-8 p-3 xl:p-4 bg-gradient-to-r from-blue-50 to-teal-50 rounded-lg">
-          <h3 className="text-xs xl:text-sm font-semibold text-gray-900 mb-2">Quick Stats</h3>
-          <div className="space-y-1 xl:space-y-2 text-xs xl:text-sm text-gray-600">
+        <div className="mt-6 xl:mt-8 p-3 xl:p-4 bg-[#F5F6FA] dark:bg-[#0A2540] rounded-lg border border-gray-100 dark:border-gray-700">
+          <h3 className="text-xs xl:text-sm font-semibold text-[#0A2540] dark:text-[#F5F6FA] mb-2 font-inter">Quick Stats</h3>
+          <div className="space-y-1 xl:space-y-2 text-xs xl:text-sm text-[#2F3A4F] dark:text-gray-300">
             <div className="flex justify-between">
               <span>Active Stores:</span>
-              <span className="font-medium">47</span>
+              <span className="font-medium text-[#36CFC9]">47</span>
             </div>
             <div className="flex justify-between">
               <span>SKUs Tracked:</span>
-              <span className="font-medium">1,247</span>
+              <span className="font-medium text-[#36CFC9]">1,247</span>
             </div>
             <div className="flex justify-between">
               <span>Data Points:</span>
-              <span className="font-medium">2.4M</span>
+              <span className="font-medium text-[#36CFC9]">2.4M</span>
             </div>
           </div>
         </div>

@@ -1,6 +1,8 @@
+
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ThemeProvider } from 'next-themes';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -30,7 +32,7 @@ const AppContent: React.FC = () => {
   console.log('AppContent rendering - route should work');
   
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-screen bg-[#F5F6FA] dark:bg-[#0A2540]">
       <Navbar />
       <GlobalFilterBar />
       
@@ -58,13 +60,15 @@ const App: React.FC = () => {
   
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <Router>
-          <AppContent />
-        </Router>
-      </TooltipProvider>
+      <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <Router>
+            <AppContent />
+          </Router>
+        </TooltipProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 };

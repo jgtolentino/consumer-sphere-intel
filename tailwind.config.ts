@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -18,7 +19,17 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				'inter': ['Inter', 'system-ui', 'sans-serif'],
+				'roboto': ['Roboto', 'system-ui', 'sans-serif'],
+			},
 			colors: {
+				// Scout Analytics brand colors
+				'scout-navy': '#0A2540',
+				'scout-teal': '#36CFC9',
+				'scout-light': '#F5F6FA',
+				'scout-dark': '#2F3A4F',
+				
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',
