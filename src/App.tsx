@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -35,18 +36,20 @@ const AppContent: React.FC = () => {
       <Navbar />
       <GlobalFilterBar />
       
-      <div className="flex">
+      <div className="flex min-h-screen">
         <Sidebar />
-        <main className="flex-1 ml-64 pt-32">
-          <Routes>
-            <Route path="/" element={<Overview />} />
-            <Route path="/transaction-trends" element={<TransactionTrends />} />
-            <Route path="/product-mix" element={<ProductMix />} />
-            <Route path="/consumer-insights" element={<ConsumerInsights />} />
-            <Route path="/retailbot" element={<RetailBot />} />
-            <Route path="/ai-assist" element={<AiAssist />} />
-            <Route path="/vibe-check" element={<VibeCheck />} />
-          </Routes>
+        <main className="flex-1 lg:ml-64 pt-32 p-4 md:p-6 overflow-x-auto">
+          <div className="max-w-full">
+            <Routes>
+              <Route path="/" element={<Overview />} />
+              <Route path="/transaction-trends" element={<TransactionTrends />} />
+              <Route path="/product-mix" element={<ProductMix />} />
+              <Route path="/consumer-insights" element={<ConsumerInsights />} />
+              <Route path="/retailbot" element={<RetailBot />} />
+              <Route path="/ai-assist" element={<AiAssist />} />
+              <Route path="/vibe-check" element={<VibeCheck />} />
+            </Routes>
+          </div>
         </main>
       </div>
     </div>
