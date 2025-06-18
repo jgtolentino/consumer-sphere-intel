@@ -1,27 +1,100 @@
 
-import { useDataService } from '../providers/DataProvider';
+import { MockDataService } from '../services/MockDataService';
+
+const mockDataService = new MockDataService();
 
 // Mock Azure OpenAI client for development
-const mockAzureOpenAI = async (messages: any[]) => {
+const mockAzureOpenAI = async (messages: any[], userPrompt: string) => {
   // Simulate API delay
   await new Promise(resolve => setTimeout(resolve, 1000));
   
-  const userMessage = messages[messages.length - 1]?.content?.toLowerCase() || '';
+  const prompt = userPrompt.toLowerCase();
   
   // Simple intent detection for demo
-  if (userMessage.includes('sales') || userMessage.includes('revenue')) {
-    return "Based on the mock data, I can see sales trends across different regions and brands. Would you like me to show you a specific breakdown?";
+  if (prompt.includes('sales') || prompt.includes('revenue')) {
+    return "I can analyze sales trends from our mock dataset. Let me show you the data breakdown.";
   }
   
-  if (userMessage.includes('brand') || userMessage.includes('alaska') || userMessage.includes('oishi')) {
-    return "I can provide brand performance analysis from our mock dataset. The data shows various brand performances across different categories and regions.";
+  if (prompt.includes('brand') || prompt.includes('alaska') || prompt.includes('oishi')) {
+    return "Here's the brand performance analysis from our mock dataset showing various brand metrics across categories and regions.";
   }
   
-  if (userMessage.includes('region') || userMessage.includes('ncr') || userMessage.includes('manila')) {
-    return "Regional analysis from mock data shows different performance patterns across the 17 Philippine regions. NCR typically shows the highest transaction volumes in our test dataset.";
+  if (prompt.includes('region') || prompt.includes('ncr') || prompt.includes('manila')) {
+    return "I can provide regional analysis from our mock data showing performance patterns across all 17 Philippine regions.";
   }
   
-  return "I'm RetailBot, your retail analytics assistant. I can help you analyze sales data, brand performance, regional trends, and consumer insights. All data I reference comes from our mock test dataset. What would you like to explore?";
+  if (prompt.includes('top') || prompt.includes('best') || prompt.includes('highest')) {
+    return "Here are the top performing items from our mock dataset analysis.";
+  }
+  
+  if (prompt.includes('compare') || prompt.includes('comparison')) {
+    return "I'll compare the performance metrics from our mock dataset for you.";
+  }
+  
+  return "I'm RetailBot, your retail analytics assistant. I can help you analyze mock sales data, brand performance, regional trends, and consumer insights. What would you like to explore?";
+};
+
+const generateChartFromData = async (prompt: string) => {
+  const lowerPrompt = prompt.toLowerCase();
+  
+  try {
+    if (lowerPrompt.includes('brand') || lowerPrompt.includes('alaska') || lowerPrompt.includes('oishi')) {
+      const brandData = await mockDataService.getBrandData();
+      return {
+        type: 'bar',
+        data: brandData.map(brand => ({
+          name: brand.name,
+          value: brand.sales || brand.revenue || 0
+        })),
+        title: 'Brand Performance (Mock Data)'
+      };
+    }
+    
+    if (lowerPrompt.includes('region') || lowerPrompt.includes('ncr') || lowerPrompt.includes('manila')) {
+      const regionalData = await mockDataService.getRegionalData();
+      return {
+        type: 'bar',
+        data: regionalData.map(region => ({
+          name: region.name,
+          value: region.sales || region.transactions || 0
+        })),
+        title: 'Regional Performance (Mock Data)'
+      };
+    }
+    
+    if (lowerPrompt.includes('top') || lowerPrompt.includes('best')) {
+      const productData = await mockDataService.getProductData();
+      return {
+        type: 'bar',
+        data: productData.topSkus?.slice(0, 5).map(sku => ({
+          name: sku.name,
+          value: sku.revenue || sku.sales || 0
+        })) || [],
+        title: 'Top Products (Mock Data)'
+      };
+    }
+    
+    // Default chart with transactions data
+    const transactions = await mockDataService.getTransactions();
+    const categoryStats = transactions.reduce((acc: any, transaction: any) => {
+      transaction.basket.forEach((item: any) => {
+        acc[item.category] = (acc[item.category] || 0) + item.price;
+      });
+      return acc;
+    }, {});
+    
+    return {
+      type: 'bar',
+      data: Object.entries(categoryStats).slice(0, 6).map(([category, value]) => ({
+        name: category,
+        value: value as number
+      })),
+      title: 'Category Performance (Mock Data)'
+    };
+  } catch (error) {
+    console.error('Error generating chart data:', error);
+    return null;
+  }
 };
 
 export const handleRetailBotQuery = async (prompt: string, chatHistory: any[] = []) => {
@@ -34,25 +107,19 @@ export const handleRetailBotQuery = async (prompt: string, chatHistory: any[] = 
 
     // Call mock Azure OpenAI
     const messages = [systemPrompt, ...chatHistory, { role: "user", content: prompt }];
-    const aiReply = await mockAzureOpenAI(messages);
+    const aiReply = await mockAzureOpenAI(messages, prompt);
 
-    // Generate mock chart data if relevant
+    // Generate chart data from actual mock service
     let chartData = null;
     const needsChart = prompt.toLowerCase().includes('chart') || 
                      prompt.toLowerCase().includes('trend') || 
-                     prompt.toLowerCase().includes('show');
+                     prompt.toLowerCase().includes('show') ||
+                     prompt.toLowerCase().includes('brand') ||
+                     prompt.toLowerCase().includes('region') ||
+                     prompt.toLowerCase().includes('top');
     
     if (needsChart) {
-      chartData = {
-        type: 'bar',
-        data: [
-          { name: 'Alaska Milk', value: 45000 },
-          { name: 'Oishi Snacks', value: 38000 },
-          { name: 'Del Monte', value: 32000 },
-          { name: 'Peerless', value: 28000 }
-        ],
-        title: 'Mock Brand Performance (Test Data)'
-      };
+      chartData = await generateChartFromData(prompt);
     }
 
     return {
