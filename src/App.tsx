@@ -36,19 +36,19 @@ const AppContent: React.FC = () => {
     <div className="min-h-screen bg-[#F5F6FA] dark:bg-[#0A2540] w-full">
       <Navbar />
       
-      {/* Push-aside layout: sidebar and main content in flex container */}
+      {/* Fixed layout: sidebar and main content side by side */}
       <div className="flex w-full h-[calc(100vh-4rem)]">
-        {/* Fixed sidebar - always visible on desktop, drawer on mobile */}
+        {/* Sidebar - fixed width, always visible on desktop */}
         <Sidebar />
         
-        {/* Main content area - pushed to the right by sidebar width */}
-        <div className="flex-1 flex flex-col min-w-0 lg:ml-[18vw] lg:min-[1024px]:ml-[12rem] lg:max-[1440px]:ml-[20rem]">
-          {/* Filter bar positioned after sidebar */}
+        {/* Main content container - takes remaining space, never overlapped */}
+        <div className="flex-1 flex flex-col min-w-0 w-full lg:w-[calc(100vw-16rem)]">
+          {/* Filter bar */}
           <GlobalFilterBar />
           
-          {/* Main content with proper padding and overflow handling */}
-          <main className="flex-1 pt-[1rem] p-[1rem] md:p-[1.5rem] overflow-auto">
-            <div className="max-w-full min-w-0">
+          {/* Main content with proper spacing */}
+          <main className="flex-1 p-4 md:p-6 overflow-auto bg-[#F5F6FA] dark:bg-[#0A2540]">
+            <div className="max-w-full min-w-0 w-full">
               <Routes>
                 <Route path="/" element={<Overview />} />
                 <Route path="/trends" element={<TransactionTrends />} />
