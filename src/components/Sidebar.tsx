@@ -15,8 +15,8 @@ const navigationItems = [
 export const Sidebar: React.FC = () => {
   return (
     <aside className="fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 bg-white dark:bg-[#2F3A4F] border-r border-gray-200 dark:border-gray-700 shadow-sm z-10 hidden lg:block">
-      <div className="p-4 xl:p-6 h-full overflow-y-auto">
-        <nav className="space-y-2">
+      <div className="p-4 xl:p-6 h-full overflow-y-auto flex flex-col">
+        <nav className="space-y-2 flex-1">
           {navigationItems.map((item) => (
             <NavLink
               key={item.name}
@@ -35,19 +35,19 @@ export const Sidebar: React.FC = () => {
           ))}
         </nav>
         
-        <div className="mt-8 p-4 bg-[#F5F6FA] dark:bg-[#0A2540] rounded-lg border border-gray-100 dark:border-gray-700">
-          <h3 className="text-sm font-semibold text-[#0A2540] dark:text-[#F5F6FA] mb-2 font-inter">Quick Stats</h3>
-          <div className="space-y-2 text-sm text-[#2F3A4F] dark:text-gray-300">
+        <div className="mt-auto p-3 bg-[#F5F6FA] dark:bg-[#0A2540] rounded-lg border border-gray-100 dark:border-gray-700">
+          <h3 className="text-xs font-semibold text-[#0A2540] dark:text-[#F5F6FA] mb-2 font-inter">Quick Stats</h3>
+          <div className="space-y-1 text-xs text-[#2F3A4F] dark:text-gray-300">
             <div className="flex justify-between">
-              <span>Active Stores:</span>
+              <span>Stores:</span>
               <span className="font-medium text-[#36CFC9]">47</span>
             </div>
             <div className="flex justify-between">
-              <span>SKUs Tracked:</span>
+              <span>SKUs:</span>
               <span className="font-medium text-[#36CFC9]">1,247</span>
             </div>
             <div className="flex justify-between">
-              <span>Data Points:</span>
+              <span>Data:</span>
               <span className="font-medium text-[#36CFC9]">2.4M</span>
             </div>
           </div>
