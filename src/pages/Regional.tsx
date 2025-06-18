@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Globe, MapPin, TrendingUp, BarChart3 } from 'lucide-react';
+import { GeoMap } from '../components/GeoMap';
 
 const Regional: React.FC = () => {
   return (
@@ -61,6 +62,9 @@ const Regional: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Geospatial Map */}
+      <GeoMap />
 
       {/* Regional Performance Table */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100">
