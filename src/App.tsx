@@ -36,17 +36,18 @@ const AppContent: React.FC = () => {
     <div className="min-h-screen bg-[#F5F6FA] dark:bg-[#0A2540] w-full">
       <Navbar />
       
-      <div className="flex w-full">
-        {/* Responsive sidebar with scalable width */}
+      {/* Push-aside layout: sidebar and main content in flex container */}
+      <div className="flex w-full h-[calc(100vh-4rem)]">
+        {/* Fixed sidebar - always visible on desktop, drawer on mobile */}
         <Sidebar />
         
-        {/* Main content area with responsive left margin */}
-        <div className="flex-1 min-w-0 lg:ml-[18vw] lg:min-[1024px]:ml-[12rem] lg:max-[1440px]:ml-[20rem]">
+        {/* Main content area - pushed to the right by sidebar width */}
+        <div className="flex-1 flex flex-col min-w-0 lg:ml-[18vw] lg:min-[1024px]:ml-[12rem] lg:max-[1440px]:ml-[20rem]">
           {/* Filter bar positioned after sidebar */}
           <GlobalFilterBar />
           
           {/* Main content with proper padding and overflow handling */}
-          <main className="pt-[1rem] p-[1rem] md:p-[1.5rem] overflow-x-auto">
+          <main className="flex-1 pt-[1rem] p-[1rem] md:p-[1.5rem] overflow-auto">
             <div className="max-w-full min-w-0">
               <Routes>
                 <Route path="/" element={<Overview />} />
