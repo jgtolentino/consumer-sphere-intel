@@ -1,12 +1,41 @@
 
 import React from 'react';
 import { Calendar, TrendingUp, Clock, BarChart3 } from 'lucide-react';
+import { TimeSeriesChart } from '../components/TimeSeriesChart';
 
 const TransactionTrends: React.FC = () => {
+  console.log('TransactionTrends rendering with full content');
+
   const timeRanges = ['Last 24 hours', 'Last 7 days', 'Last 30 days', 'Last 90 days'];
   
+  // Mock time series data for the line chart
+  const timeSeriesData = [
+    { date: '2024-01-01', volume: 245, value: 18500 },
+    { date: '2024-01-02', volume: 312, value: 23400 },
+    { date: '2024-01-03', volume: 189, value: 14200 },
+    { date: '2024-01-04', volume: 278, value: 20900 },
+    { date: '2024-01-05', volume: 356, value: 26800 },
+    { date: '2024-01-06', volume: 423, value: 31800 },
+    { date: '2024-01-07', volume: 298, value: 22400 }
+  ];
+
+  // Mock distribution data for box plot stats
+  const distributionStats = [
+    { range: '₱0-500', count: 2840, percentage: '18%' },
+    { range: '₱500-1000', count: 4280, percentage: '27%' },
+    { range: '₱1000-2000', count: 5120, percentage: '32%' },
+    { range: '₱2000-5000', count: 2890, percentage: '18%' },
+    { range: '₱5000+', count: 780, percentage: '5%' }
+  ];
+
+  // Mock hourly pattern data
+  const hourlyData = Array.from({ length: 24 }, (_, hour) => ({
+    hour: `${hour}:00`,
+    intensity: Math.floor(Math.random() * 100) + 20
+  }));
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-6">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Transaction Trends</h1>
@@ -80,36 +109,76 @@ const TransactionTrends: React.FC = () => {
         </div>
       </div>
 
+      {/* Time Series Chart */}
+      <TimeSeriesChart data={timeSeriesData} height={400} />
+
       {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <h3 className="text-lg font-semibold mb-4 text-gray-900">Volume & Value Trends</h3>
-          <div className="h-80 flex items-center justify-center bg-gradient-to-br from-blue-50 to-teal-50 rounded-lg">
-            <div className="text-center">
-              <TrendingUp className="h-12 w-12 text-blue-500 mx-auto mb-3" />
-              <p className="text-gray-500">Time series chart showing transaction volume and value over time</p>
-            </div>
+          <h3 className="text-lg font-semibold mb-4 text-gray-900">Revenue Distribution Analysis</h3>
+          <div className="space-y-3">
+            {distributionStats.map((stat, index) => (
+              <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div className="flex items-center space-x-3">
+                  <div className="w-4 h-4 bg-blue-500 rounded" style={{ opacity: 1 - (index * 0.2) }}></div>
+                  <span className="font-medium">{stat.range}</span>
+                </div>
+                <div className="text-right">
+                  <p className="font-semibold">{stat.count.toLocaleString()}</p>
+                  <p className="text-sm text-gray-600">{stat.percentage}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
         
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <h3 className="text-lg font-semibold mb-4 text-gray-900">Value Distribution</h3>
-          <div className="h-80 flex items-center justify-center bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg">
-            <div className="text-center">
-              <BarChart3 className="h-12 w-12 text-green-500 mx-auto mb-3" />
-              <p className="text-gray-500">Box plot showing transaction value distribution and outliers</p>
-            </div>
+          <h3 className="text-lg font-semibold mb-4 text-gray-900">Shopping Time Heatmap</h3>
+          <div className="grid grid-cols-6 gap-1">
+            {hourlyData.map((data, index) => (
+              <div
+                key={index}
+                className="aspect-square rounded text-xs flex items-center justify-center text-white font-medium"
+                style={{
+                  backgroundColor: `rgba(59, 130, 246, ${data.intensity / 100})`,
+                  minHeight: '32px'
+                }}
+                title={`${data.hour}: ${data.intensity}% activity`}
+              >
+                {index % 4 === 0 ? data.hour.split(':')[0] : ''}
+              </div>
+            ))}
+          </div>
+          <div className="flex justify-between items-center mt-4 text-sm text-gray-600">
+            <span>Low Activity</span>
+            <span>High Activity</span>
           </div>
         </div>
       </div>
 
-      {/* Hourly Patterns */}
+      {/* Regional Transaction Performance */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-        <h3 className="text-lg font-semibold mb-4 text-gray-900">Hourly Transaction Patterns</h3>
-        <div className="h-64 flex items-center justify-center bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg">
-          <div className="text-center">
-            <Clock className="h-12 w-12 text-purple-500 mx-auto mb-3" />
-            <p className="text-gray-500">Heatmap showing transaction intensity by hour and day of week</p>
+        <h3 className="text-lg font-semibold mb-4 text-gray-900">Regional Transaction Performance</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg">
+            <h4 className="font-semibold text-blue-900">Metro Manila</h4>
+            <p className="text-2xl font-bold text-blue-700 mt-2">47,892</p>
+            <p className="text-sm text-blue-600">transactions/day</p>
+            <p className="text-xs text-blue-500 mt-1">+15% vs last month</p>
+          </div>
+          
+          <div className="text-center p-4 bg-gradient-to-br from-teal-50 to-teal-100 rounded-lg">
+            <h4 className="font-semibold text-teal-900">Cebu</h4>
+            <p className="text-2xl font-bold text-teal-700 mt-2">28,456</p>
+            <p className="text-sm text-teal-600">transactions/day</p>
+            <p className="text-xs text-teal-500 mt-1">+8% vs last month</p>
+          </div>
+          
+          <div className="text-center p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-lg">
+            <h4 className="font-semibold text-green-900">Davao</h4>
+            <p className="text-2xl font-bold text-green-700 mt-2">19,234</p>
+            <p className="text-sm text-green-600">transactions/day</p>
+            <p className="text-xs text-green-500 mt-1">+12% vs last month</p>
           </div>
         </div>
       </div>
