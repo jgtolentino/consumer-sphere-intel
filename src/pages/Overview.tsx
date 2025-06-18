@@ -1,9 +1,8 @@
-
 import React from 'react';
 import { KpiCard } from '../components/KpiCard';
 import { AiRecommendationPanel } from '../components/AiRecommendationPanel';
 import { TimeSeriesChart } from '../components/TimeSeriesChart';
-import { GeoHeatmap } from '../components/GeoHeatmap';
+import { MapboxBubbleMap } from '../components/MapboxBubbleMap';
 import { ShoppingCart, DollarSign, Package, MapPin } from 'lucide-react';
 
 const Overview: React.FC = () => {
@@ -88,8 +87,8 @@ const Overview: React.FC = () => {
         </div>
       </div>
 
-      {/* Geo Heatmap */}
-      <GeoHeatmap />
+      {/* Mapbox Bubble Map */}
+      <MapboxBubbleMap />
 
       {/* Regional Performance */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 xl:p-6">
