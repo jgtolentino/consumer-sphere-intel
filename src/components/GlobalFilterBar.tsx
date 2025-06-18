@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Calendar, X, Filter, RotateCcw, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useFilterStore } from '../state/useFilterStore';
@@ -9,35 +10,31 @@ export const GlobalFilterBar: React.FC = () => {
     barangays, 
     categories, 
     brands,
-    stores,
-    channels,
     setFilter, 
     reset 
   } = useFilterStore();
 
   const hasActiveFilters = dateRange.from || dateRange.to || 
-    barangays.length || categories.length || brands.length || stores.length || channels.length;
+    barangays.length || categories.length || brands.length;
 
   const activeFilterCount = [
     dateRange.from || dateRange.to ? 1 : 0,
     barangays.length,
     categories.length,
-    brands.length,
-    stores.length,
-    channels.length
+    brands.length
   ].reduce((sum, count) => sum + count, 0);
 
-  // Updated filter options based on new data structure
-  const regionOptions = ['NCR', 'Region 3', 'Region 4A', 'Visayas', 'Mindanao'];
+  // All 17 Philippine regions
+  const regionOptions = [
+    'NCR', 'Ilocos Region', 'Cagayan Valley', 'Central Luzon', 'CALABARZON', 
+    'MIMAROPA', 'Bicol Region', 'Western Visayas', 'Central Visayas', 
+    'Eastern Visayas', 'Zamboanga Peninsula', 'Northern Mindanao', 
+    'Davao Region', 'SOCCSKSARGEN', 'Caraga', 'CAR', 'BARMM'
+  ];
+  
   const allBrands = [...tbwaClientBrands, ...competitorBrands];
   const brandOptions = [...new Set(allBrands.map(b => b.name))].sort();
-  const categoryOptions = [
-    'Dairy', 'Snacks', 'Beverages', 'Home Care', 'Personal Care', 
-    'Condiments', 'Canned Fruit', 'Pasta', 'Premium Produce', 
-    'Budget', 'Tobacco', 'Food'
-  ];
-  const storeOptions = ['Store A', 'Store B', 'Store C', 'Store D', 'Store E'];
-  const channelOptions = ['Traditional', 'Modern Trade'];
+  const categoryOptions = [...new Set(allBrands.map(b => b.category))].sort();
 
   const scrollFilters = (direction: 'left' | 'right') => {
     const container = document.getElementById('filter-scroll-container');
@@ -65,7 +62,6 @@ export const GlobalFilterBar: React.FC = () => {
               )}
             </div>
             
-            {/* Scrollable filter container */}
             <div className="relative flex-1 min-w-0">
               <button 
                 onClick={() => scrollFilters('left')}
@@ -138,29 +134,6 @@ export const GlobalFilterBar: React.FC = () => {
                     <option key={option} value={option}>{option}</option>
                   ))}
                 </select>
-                
-                <select
-                  multiple
-                  value={stores}
-                  onChange={(e) => setFilter('stores', Array.from(e.target.selectedOptions, option => option.value))}
-                  className="border border-gray-300 dark:border-gray-600 rounded px-3 py-1 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent min-w-32 bg-white dark:bg-[#2F3A4F] text-gray-900 dark:text-gray-100 flex-shrink-0"
-                >
-                  <option value="" disabled>Store</option>
-                  {storeOptions.map(option => (
-                    <option key={option} value={option}>{option}</option>
-                  ))}
-                </select>
-                
-                <select
-                  value={channels[0] || ''}
-                  onChange={(e) => setFilter('channels', e.target.value ? [e.target.value] : [])}
-                  className="border border-gray-300 dark:border-gray-600 rounded px-3 py-1 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent min-w-32 bg-white dark:bg-[#2F3A4F] text-gray-900 dark:text-gray-100 flex-shrink-0"
-                >
-                  <option value="">Channel</option>
-                  {channelOptions.map(option => (
-                    <option key={option} value={option}>{option}</option>
-                  ))}
-                </select>
               </div>
               
               <button 
@@ -187,3 +160,4 @@ export const GlobalFilterBar: React.FC = () => {
     </div>
   );
 };
+

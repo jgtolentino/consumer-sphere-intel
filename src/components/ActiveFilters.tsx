@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { X } from 'lucide-react';
 import { useFilterStore } from '../state/useFilterStore';
@@ -9,14 +10,12 @@ export const ActiveFilters: React.FC = () => {
     barangays, 
     categories, 
     brands,
-    stores,
-    channels,
     setFilter, 
     reset 
   } = useFilterStore();
 
   const hasActiveFilters = dateRange.from || dateRange.to || 
-    barangays.length || categories.length || brands.length || stores.length || channels.length;
+    barangays.length || categories.length || brands.length;
 
   if (!hasActiveFilters) return null;
 
@@ -33,12 +32,6 @@ export const ActiveFilters: React.FC = () => {
         break;
       case 'brands':
         setFilter('brands', brands.filter(item => item !== value));
-        break;
-      case 'stores':
-        setFilter('stores', stores.filter(item => item !== value));
-        break;
-      case 'channels':
-        setFilter('channels', channels.filter(item => item !== value));
         break;
     }
   };
@@ -98,30 +91,6 @@ export const ActiveFilters: React.FC = () => {
               </button>
             </div>
           ))}
-          
-          {stores.map(store => (
-            <div key={store} className="flex items-center bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm">
-              <span>Store: {store}</span>
-              <button
-                onClick={() => removeFilter('stores', store)}
-                className="ml-2 hover:bg-indigo-200 rounded-full p-0.5"
-              >
-                <X className="h-3 w-3" />
-              </button>
-            </div>
-          ))}
-          
-          {channels.map(channel => (
-            <div key={channel} className="flex items-center bg-teal-100 text-teal-800 px-3 py-1 rounded-full text-sm">
-              <span>Channel: {channel}</span>
-              <button
-                onClick={() => removeFilter('channels', channel)}
-                className="ml-2 hover:bg-teal-200 rounded-full p-0.5"
-              >
-                <X className="h-3 w-3" />
-              </button>
-            </div>
-          ))}
         </div>
         
         <button
@@ -134,3 +103,4 @@ export const ActiveFilters: React.FC = () => {
     </div>
   );
 };
+

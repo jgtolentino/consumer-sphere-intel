@@ -276,7 +276,7 @@ export const generateMockTransactions = (count: number = 1000): Transaction[] =>
   const genders = ["Male", "Female"];
   const ageBrackets = ["18-24", "25-34", "35-44", "45-54", "55+"];
   const incomeClasses = ["A", "B", "C1", "C2", "D", "E"];
-  const paymentMethods = ["Cash", "GCash", "Utang/Lista"]; // Updated payment methods
+  const paymentMethods = ["Cash", "GCash", "Utang/Lista"]; // Only these 3 payment methods
   const requestedAs = ["branded", "unbranded", "unsure"] as const;
   const requestTypes = ["verbal", "pointing", "indirect"] as const;
 
@@ -285,9 +285,9 @@ export const generateMockTransactions = (count: number = 1000): Transaction[] =>
     const city = region.major_cities[Math.floor(Math.random() * region.major_cities.length)];
     const barangay = region.barangays[Math.floor(Math.random() * region.barangays.length)];
     const locationId = `${region.code}-${city.replace(/\s+/g, '')}-${barangay.replace(/\s+/g, '')}`;
-    const channel = "Sari-Sari Store";
+    const channel = "Sari-Sari Store"; // Only Sari-Sari Store channel
     
-    // 60% TBWA clients, 40% competitors
+    // 60% TBWA clients, 40% competitors - matches your specification
     const isClientTransaction = Math.random() < 0.6;
     const availableBrands = isClientTransaction ? tbwaClientBrands : competitorBrands;
     
@@ -361,7 +361,7 @@ export const generateMockTransactions = (count: number = 1000): Transaction[] =>
         gender: genders[Math.floor(Math.random() * genders.length)],
         age_bracket: ageBrackets[Math.floor(Math.random() * ageBrackets.length)],
         inferred_income: incomeClasses[Math.floor(Math.random() * incomeClasses.length)],
-        payment: paymentMethods[Math.floor(Math.random() * paymentMethods.length)]
+        payment: paymentMethods[Math.floor(Math.random() * paymentMethods.length)] // Only Cash, GCash, Utang/Lista
       },
       substitution_from: substitutionFrom,
       substitution_to: substitutionTo,

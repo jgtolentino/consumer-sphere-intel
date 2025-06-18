@@ -1,4 +1,5 @@
 
+
 import { create } from 'zustand';
 import { tbwaClientBrands, competitorBrands, regions } from '../data/mockData';
 
@@ -13,8 +14,6 @@ interface FilterState {
   categories: string[];
   brands: string[];
   skus: string[];
-  stores: string[];
-  channels: string[];
   setFilter: <K extends keyof Omit<FilterState, 'setFilter' | 'reset' | 'getQueryString' | 'getMasterLists'>>(
     key: K, 
     value: FilterState[K]
@@ -26,7 +25,6 @@ interface FilterState {
     allBrands: string[];
     allCategories: string[];
     allCompanies: string[];
-    allChannels: string[];
   };
 }
 
@@ -35,9 +33,7 @@ const defaultState = {
   barangays: [],
   categories: [],
   brands: [],
-  skus: [],
-  stores: [],
-  channels: []
+  skus: []
 };
 
 export const useFilterStore = create<FilterState>((set, get) => ({
@@ -71,12 +67,6 @@ export const useFilterStore = create<FilterState>((set, get) => ({
     if (filters.skus.length > 0) {
       params.set('skus', filters.skus.join(','));
     }
-    if (filters.stores.length > 0) {
-      params.set('stores', filters.stores.join(','));
-    }
-    if (filters.channels.length > 0) {
-      params.set('channels', filters.channels.join(','));
-    }
     
     return params.toString();
   },
@@ -88,8 +78,8 @@ export const useFilterStore = create<FilterState>((set, get) => ({
       allRegions: regions.map(r => r.name).sort(),
       allBrands: [...new Set(allBrands.map(b => b.name))].sort(),
       allCategories: [...new Set(allBrands.map(b => b.category))].sort(),
-      allCompanies: [...new Set(allBrands.map(b => b.company))].sort(),
-      allChannels: ['Traditional', 'Modern Trade', 'Sari-Sari Store'].sort()
+      allCompanies: [...new Set(allBrands.map(b => b.company))].sort()
     };
   }
 }));
+
