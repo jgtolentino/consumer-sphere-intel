@@ -17,34 +17,46 @@ interface DrillDownState {
   getCurrentContext: () => string;
 }
 
-// Mock hierarchical data structure
+// Enhanced hierarchical data structure with more complete city and barangay data
 const hierarchyData = {
   island_group: [
-    { value: 'luzon', label: 'Luzon', children: ['ncr', 'region-3', 'region-4a'] },
-    { value: 'visayas', label: 'Visayas', children: ['region-7', 'region-8'] },
-    { value: 'mindanao', label: 'Mindanao', children: ['region-11', 'region-12'] }
+    { value: 'luzon', label: 'Luzon', children: ['metro-manila', 'region-3', 'region-4a'] },
+    { value: 'visayas', label: 'Visayas', children: ['cebu', 'region-8'] },
+    { value: 'mindanao', label: 'Mindanao', children: ['davao', 'region-12'] }
   ],
   region: [
-    { value: 'ncr', label: 'NCR', parent: 'luzon', children: ['metro-manila'] },
-    { value: 'region-3', label: 'Region 3', parent: 'luzon', children: ['bulacan', 'pampanga'] },
-    { value: 'region-7', label: 'Region 7 (Cebu)', parent: 'visayas', children: ['cebu-province'] },
-    { value: 'region-11', label: 'Region 11 (Davao)', parent: 'mindanao', children: ['davao-del-sur'] }
-  ],
-  province: [
-    { value: 'metro-manila', label: 'Metro Manila', parent: 'ncr', children: ['quezon-city', 'manila', 'makati'] },
-    { value: 'cebu-province', label: 'Cebu', parent: 'region-7', children: ['cebu-city', 'mandaue'] },
-    { value: 'davao-del-sur', label: 'Davao del Sur', parent: 'region-11', children: ['davao-city'] }
+    { value: 'metro-manila', label: 'Metro Manila', parent: 'luzon', children: ['quezon-city', 'manila', 'makati'] },
+    { value: 'cebu', label: 'Cebu', parent: 'visayas', children: ['cebu-city', 'mandaue'] },
+    { value: 'davao', label: 'Davao', parent: 'mindanao', children: ['davao-city'] }
   ],
   city: [
-    { value: 'quezon-city', label: 'Quezon City', parent: 'metro-manila', children: ['barangay-commonwealth', 'barangay-diliman'] },
+    { value: 'quezon-city', label: 'Quezon City', parent: 'metro-manila', children: ['barangay-commonwealth', 'barangay-diliman', 'barangay-fairview'] },
     { value: 'manila', label: 'Manila', parent: 'metro-manila', children: ['barangay-ermita', 'barangay-malate'] },
-    { value: 'cebu-city', label: 'Cebu City', parent: 'cebu-province', children: ['barangay-lahug', 'barangay-capitol'] },
-    { value: 'davao-city', label: 'Davao City', parent: 'davao-del-sur', children: ['barangay-poblacion', 'barangay-matina'] }
+    { value: 'makati', label: 'Makati', parent: 'metro-manila', children: ['barangay-poblacion', 'barangay-bel-air'] },
+    { value: 'cebu-city', label: 'Cebu City', parent: 'cebu', children: ['barangay-lahug', 'barangay-capitol-site'] },
+    { value: 'mandaue', label: 'Mandaue', parent: 'cebu', children: ['barangay-centro', 'barangay-alang-alang'] },
+    { value: 'davao-city', label: 'Davao City', parent: 'davao', children: ['barangay-poblacion', 'barangay-matina'] }
   ],
   barangay: [
+    // Quezon City barangays
     { value: 'barangay-commonwealth', label: 'Barangay Commonwealth', parent: 'quezon-city', children: ['store-sm-commonwealth', 'store-robinsons-commonwealth'] },
     { value: 'barangay-diliman', label: 'Barangay Diliman', parent: 'quezon-city', children: ['store-sm-north', 'store-trinoma'] },
-    { value: 'barangay-lahug', label: 'Barangay Lahug', parent: 'cebu-city', children: ['store-sm-cebu', 'store-ayala-cebu'] }
+    { value: 'barangay-fairview', label: 'Barangay Fairview', parent: 'quezon-city', children: ['store-sm-fairview', 'store-ayala-fairview'] },
+    // Manila barangays
+    { value: 'barangay-ermita', label: 'Barangay Ermita', parent: 'manila', children: ['store-robinson-manila', 'store-sm-manila'] },
+    { value: 'barangay-malate', label: 'Barangay Malate', parent: 'manila', children: ['store-harrison-plaza', 'store-midtown-mall'] },
+    // Makati barangays
+    { value: 'barangay-poblacion', label: 'Barangay Poblacion', parent: 'makati', children: ['store-greenbelt', 'store-glorietta'] },
+    { value: 'barangay-bel-air', label: 'Barangay Bel-Air', parent: 'makati', children: ['store-century-mall', 'store-powerplant'] },
+    // Cebu City barangays
+    { value: 'barangay-lahug', label: 'Barangay Lahug', parent: 'cebu-city', children: ['store-sm-cebu', 'store-ayala-cebu'] },
+    { value: 'barangay-capitol-site', label: 'Barangay Capitol Site', parent: 'cebu-city', children: ['store-robinson-cebu', 'store-jy-square'] },
+    // Mandaue barangays
+    { value: 'barangay-centro', label: 'Barangay Centro', parent: 'mandaue', children: ['store-parkmall', 'store-jcentre'] },
+    { value: 'barangay-alang-alang', label: 'Barangay Alang-Alang', parent: 'mandaue', children: ['store-citymart', 'store-gaisano'] },
+    // Davao City barangays
+    { value: 'barangay-poblacion', label: 'Barangay Poblacion', parent: 'davao-city', children: ['store-sm-davao', 'store-abreeza'] },
+    { value: 'barangay-matina', label: 'Barangay Matina', parent: 'davao-city', children: ['store-matina-town', 'store-gmall'] }
   ],
   store: [
     { value: 'store-sm-commonwealth', label: 'SM Commonwealth', parent: 'barangay-commonwealth', children: ['brand-oishi', 'brand-alaska'] },
