@@ -1,4 +1,3 @@
-
 // Comprehensive mock data based on TBWA client brands and Philippine market structure
 
 export interface Region {
@@ -53,152 +52,30 @@ export interface ConsumerProfile {
   payment: string;
 }
 
-export const regions: Region[] = [
-  { 
-    code: "NCR", 
-    name: "National Capital Region", 
-    weight: 0.23, 
-    major_cities: ["Quezon City", "Manila", "Caloocan", "Makati", "Taguig"],
-    barangays: ["Bagong Pag-asa", "Batasan Hills", "Commonwealth", "Cubao", "Diliman", "Fairview", "Kamuning", "La Loma", "Novaliches", "Project 8"]
-  },
-  { 
-    code: "I", 
-    name: "Ilocos Region", 
-    weight: 0.03, 
-    major_cities: ["Laoag", "Vigan"],
-    barangays: ["Barangay 1", "Barangay 2", "San Nicolas", "Buttong", "Gabu Norte"]
-  },
-  { 
-    code: "II", 
-    name: "Cagayan Valley", 
-    weight: 0.035, 
-    major_cities: ["Tuguegarao", "Cauayan"],
-    barangays: ["Atulayan", "Bagay", "Carig", "Centro", "Larion Alto"]
-  },
-  { 
-    code: "III", 
-    name: "Central Luzon", 
-    weight: 0.12, 
-    major_cities: ["San Fernando", "Angeles", "Balanga", "Cabanatuan"],
-    barangays: ["Balibago", "Cutcut", "Lourdes Norte", "Pampang", "Sapangbato"]
-  },
-  { 
-    code: "IV-A", 
-    name: "CALABARZON", 
-    weight: 0.16, 
-    major_cities: ["Calamba", "Antipolo", "Dasmariñas", "Lucena"],
-    barangays: ["Banadero", "Canlubang", "Halang", "Pansol", "Real"]
-  },
-  { 
-    code: "IV-B", 
-    name: "MIMAROPA", 
-    weight: 0.03, 
-    major_cities: ["Puerto Princesa", "Calapan"],
-    barangays: ["Bancao-Bancao", "Barangay Poblacion", "Mandaragat", "San Pedro"]
-  },
-  { 
-    code: "V", 
-    name: "Bicol Region", 
-    weight: 0.04, 
-    major_cities: ["Legazpi", "Naga"],
-    barangays: ["Bagumbayan Norte", "Dinaga", "Sagpon", "Taysan"]
-  },
-  { 
-    code: "VI", 
-    name: "Western Visayas", 
-    weight: 0.06, 
-    major_cities: ["Iloilo", "Bacolod"],
-    barangays: ["Arevalo", "Jaro", "La Paz", "Mandurriao", "Molo"]
-  },
-  { 
-    code: "VII", 
-    name: "Central Visayas", 
-    weight: 0.07, 
-    major_cities: ["Cebu City", "Tagbilaran"],
-    barangays: ["Apas", "Lahug", "Mabolo", "Talamban", "Zapatera"]
-  },
-  { 
-    code: "VIII", 
-    name: "Eastern Visayas", 
-    weight: 0.03, 
-    major_cities: ["Tacloban", "Ormoc"],
-    barangays: ["Bagacay", "San Jose", "Suhi", "V&G Subdivision"]
-  },
-  { 
-    code: "IX", 
-    name: "Zamboanga Peninsula", 
-    weight: 0.025, 
-    major_cities: ["Zamboanga City", "Dipolog"],
-    barangays: ["Ayala", "Baliwasan", "Guiwan", "Tetuan"]
-  },
-  { 
-    code: "X", 
-    name: "Northern Mindanao", 
-    weight: 0.035, 
-    major_cities: ["Cagayan de Oro", "Iligan"],
-    barangays: ["Barangay 9", "Carmen", "Nazareth", "Puerto"]
-  },
-  { 
-    code: "XI", 
-    name: "Davao Region", 
-    weight: 0.05, 
-    major_cities: ["Davao City", "Tagum"],
-    barangays: ["Agdao", "Buhangin", "Poblacion", "Toril"]
-  },
-  { 
-    code: "XII", 
-    name: "SOCCSKSARGEN", 
-    weight: 0.025, 
-    major_cities: ["General Santos", "Koronadal"],
-    barangays: ["Apopong", "Bula", "City Heights", "Dadiangas"]
-  },
-  { 
-    code: "XIII", 
-    name: "Caraga", 
-    weight: 0.015, 
-    major_cities: ["Butuan"],
-    barangays: ["Agusan Pequeño", "Bancasi", "Golden Ribbon", "Libertad"]
-  },
-  { 
-    code: "CAR", 
-    name: "Cordillera Administrative Region", 
-    weight: 0.02, 
-    major_cities: ["Baguio", "Tabuk"],
-    barangays: ["Aurora Hill", "Burnham-Legarda", "City Camp", "Malcolm Square"]
-  },
-  { 
-    code: "BARMM", 
-    name: "Bangsamoro Autonomous Region", 
-    weight: 0.015, 
-    major_cities: ["Marawi", "Cotabato City"],
-    barangays: ["Bangon", "Dansalan", "East Basak", "Poblacion"]
-  }
-];
-
-// TBWA Client Brands (60% of transactions)
+// TBWA Client Brands (60% of transactions) - updated categories
 export const tbwaClientBrands: Brand[] = [
   {
     name: "Alaska Milk Corporation",
     is_client: true,
-    categories: ["Dairy"],
+    categories: ["Groceries"],
     skus: ["Alaska Evaporated Milk", "Alaska Condensed Milk", "Alaska Powdered Milk", "Krem-Top Coffee Creamer", "Alpine Evaporated Milk", "Alpine Condensed Milk", "Cow Bell Powdered Milk"]
   },
   {
     name: "Oishi",
     is_client: true,
-    categories: ["Snacks", "Beverages"],
+    categories: ["Groceries"],
     skus: ["Oishi Prawn Crackers", "Oishi Pillows", "Oishi Marty's", "Oishi Ridges", "Oishi Bread Pan", "Gourmet Picks", "Crispy Patata", "Smart C+ Vitamin Drinks", "Oaties", "Hi-Ho", "Rinbee", "Deli Mex"]
   },
   {
     name: "Champion",
     is_client: true,
-    categories: ["Home Care", "Personal Care"],
+    categories: ["Health & Beauty"],
     skus: ["Champion Detergent", "Champion Fabric Conditioner", "Calla Personal Care", "Hana Shampoo", "Hana Conditioner", "Cyclone Bleach", "Pride Dishwashing Liquid", "Care Plus Alcohol", "Care Plus Hand Sanitizer"]
   },
   {
     name: "Del Monte",
     is_client: true,
-    categories: ["Food & Beverages"],
+    categories: ["Groceries"],
     skus: ["Del Monte Pineapple Juice", "Del Monte Pineapple Chunks", "Del Monte Pineapple Slices", "Del Monte Tomato Sauce", "Del Monte Ketchup", "Del Monte Spaghetti Sauce", "Del Monte Fruit Cocktail", "Del Monte Pasta", "S&W Premium Fruit", "Today's Budget Line", "Fit 'n Right Juice Drinks"]
   },
   {
@@ -209,36 +86,36 @@ export const tbwaClientBrands: Brand[] = [
   }
 ];
 
-// Competitor Brands (40% of transactions)
+// Competitor Brands (40% of transactions) - updated categories
 export const competitorBrands: Brand[] = [
   {
     name: "Nestlé",
     is_client: false,
-    categories: ["Dairy", "Food & Beverages"],
+    categories: ["Groceries"],
     skus: ["Bear Brand Milk", "Nestlé Condensed Milk", "Nescafé Coffee", "Maggi Noodles", "KitKat", "Milo"]
   },
   {
     name: "Unilever",
     is_client: false,
-    categories: ["Personal Care", "Home Care"],
+    categories: ["Health & Beauty"],
     skus: ["Surf Detergent", "Dove Soap", "Clear Shampoo", "Cream Silk", "Cif Cleaner", "Sunsilk"]
   },
   {
     name: "Procter & Gamble",
     is_client: false,
-    categories: ["Personal Care", "Home Care"],
+    categories: ["Health & Beauty"],
     skus: ["Head & Shoulders", "Pantene", "Tide Detergent", "Ariel", "Safeguard Soap", "Oral-B"]
   },
   {
     name: "Jack 'n Jill",
     is_client: false,
-    categories: ["Snacks"],
+    categories: ["Groceries"],
     skus: ["Piattos", "Nova", "Chippy", "Roller Coaster", "Chiz Curls", "Cream-O"]
   },
   {
     name: "Universal Robina",
     is_client: false,
-    categories: ["Snacks", "Food & Beverages"],
+    categories: ["Groceries"],
     skus: ["Ricoa Chocolate", "C2 Green Tea", "Great Taste Coffee", "Payless Noodles", "SkyFlakes"]
   },
   {
@@ -250,7 +127,7 @@ export const competitorBrands: Brand[] = [
   {
     name: "Colgate-Palmolive",
     is_client: false,
-    categories: ["Personal Care"],
+    categories: ["Health & Beauty"],
     skus: ["Colgate Toothpaste", "Palmolive Soap", "Mennen", "Softlan"]
   }
 ];

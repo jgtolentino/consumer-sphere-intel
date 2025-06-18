@@ -27,10 +27,10 @@ export const GlobalFilterBar: React.FC = () => {
     channels.length
   ].reduce((sum, count) => sum + count, 0);
 
-  // YAML specification filter options
+  // YAML specification filter options - removed Electronics, Clothing, Home & Garden
   const regionOptions = ['NCR', 'Region 3', 'Region 4A', 'Visayas', 'Mindanao'];
   const brandOptions = ['Alaska', 'Oishi', 'Del Monte', 'Peerless', 'JTI'];
-  const categoryOptions = ['Groceries', 'Health & Beauty', 'Home & Garden', 'Tobacco'];
+  const categoryOptions = ['Groceries', 'Health & Beauty', 'Tobacco'];
   const storeOptions = ['Store A', 'Store B', 'Store C', 'Store D', 'Store E'];
   const channelOptions = ['Traditional', 'Modern Trade'];
 
