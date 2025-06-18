@@ -40,4 +40,20 @@ export class RealDataService implements DataService {
     const response = await fetch(`${this.apiBaseUrl}/products`);
     return response.json();
   }
+
+  // New methods for enhanced analytics
+  async getSubstitutionData(): Promise<any> {
+    const response = await fetch(`${this.apiBaseUrl}/substitutions`);
+    return response.json();
+  }
+
+  async getBehavioralData(): Promise<any> {
+    const response = await fetch(`${this.apiBaseUrl}/behavioral`);
+    return response.json();
+  }
+
+  async getLocationHierarchy(): Promise<any> {
+    const response = await fetch(`${this.apiBaseUrl}/locations/hierarchy`);
+    return response.json();
+  }
 }

@@ -10,6 +10,10 @@ export interface DataService {
   getBrandData: () => Promise<any[]>;
   getConsumerData: () => Promise<any>;
   getProductData: () => Promise<any>;
+  // New methods for enhanced analytics
+  getSubstitutionData?: () => Promise<any>;
+  getBehavioralData?: () => Promise<any>;
+  getLocationHierarchy?: () => Promise<any>;
 }
 
 const DataContext = createContext<DataService | null>(null);

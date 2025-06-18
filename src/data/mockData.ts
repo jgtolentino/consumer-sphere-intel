@@ -6,6 +6,7 @@ export interface Region {
   name: string;
   weight: number;
   major_cities: string[];
+  barangays: string[];
 }
 
 export interface Brand {
@@ -19,12 +20,22 @@ export interface Transaction {
   id: string;
   date: string;
   time: string;
+  duration_seconds: number;
   region: string;
   city: string;
+  barangay: string;
+  location_id: string;
   channel: string;
   basket: BasketItem[];
   total: number;
   consumer_profile: ConsumerProfile;
+  substitution_from?: string;
+  substitution_to?: string;
+  requested_as: 'branded' | 'unbranded' | 'unsure';
+  request_type: 'verbal' | 'pointing' | 'indirect';
+  storeowner_suggested: boolean;
+  accepted_suggestion: boolean;
+  ai_recommendation_id?: string;
 }
 
 export interface BasketItem {
@@ -43,23 +54,125 @@ export interface ConsumerProfile {
 }
 
 export const regions: Region[] = [
-  { code: "NCR", name: "National Capital Region", weight: 0.23, major_cities: ["Quezon City", "Manila", "Caloocan", "Makati", "Taguig"] },
-  { code: "I", name: "Ilocos Region", weight: 0.03, major_cities: ["Laoag", "Vigan"] },
-  { code: "II", name: "Cagayan Valley", weight: 0.035, major_cities: ["Tuguegarao", "Cauayan"] },
-  { code: "III", name: "Central Luzon", weight: 0.12, major_cities: ["San Fernando", "Angeles", "Balanga", "Cabanatuan"] },
-  { code: "IV-A", name: "CALABARZON", weight: 0.16, major_cities: ["Calamba", "Antipolo", "Dasmariñas", "Lucena"] },
-  { code: "IV-B", name: "MIMAROPA", weight: 0.03, major_cities: ["Puerto Princesa", "Calapan"] },
-  { code: "V", name: "Bicol Region", weight: 0.04, major_cities: ["Legazpi", "Naga"] },
-  { code: "VI", name: "Western Visayas", weight: 0.06, major_cities: ["Iloilo", "Bacolod"] },
-  { code: "VII", name: "Central Visayas", weight: 0.07, major_cities: ["Cebu City", "Tagbilaran"] },
-  { code: "VIII", name: "Eastern Visayas", weight: 0.03, major_cities: ["Tacloban", "Ormoc"] },
-  { code: "IX", name: "Zamboanga Peninsula", weight: 0.025, major_cities: ["Zamboanga City", "Dipolog"] },
-  { code: "X", name: "Northern Mindanao", weight: 0.035, major_cities: ["Cagayan de Oro", "Iligan"] },
-  { code: "XI", name: "Davao Region", weight: 0.05, major_cities: ["Davao City", "Tagum"] },
-  { code: "XII", name: "SOCCSKSARGEN", weight: 0.025, major_cities: ["General Santos", "Koronadal"] },
-  { code: "XIII", name: "Caraga", weight: 0.015, major_cities: ["Butuan"] },
-  { code: "CAR", name: "Cordillera Administrative Region", weight: 0.02, major_cities: ["Baguio", "Tabuk"] },
-  { code: "BARMM", name: "Bangsamoro Autonomous Region", weight: 0.015, major_cities: ["Marawi", "Cotabato City"] }
+  { 
+    code: "NCR", 
+    name: "National Capital Region", 
+    weight: 0.23, 
+    major_cities: ["Quezon City", "Manila", "Caloocan", "Makati", "Taguig"],
+    barangays: ["Bagong Pag-asa", "Batasan Hills", "Commonwealth", "Cubao", "Diliman", "Fairview", "Kamuning", "La Loma", "Novaliches", "Project 8"]
+  },
+  { 
+    code: "I", 
+    name: "Ilocos Region", 
+    weight: 0.03, 
+    major_cities: ["Laoag", "Vigan"],
+    barangays: ["Barangay 1", "Barangay 2", "San Nicolas", "Buttong", "Gabu Norte"]
+  },
+  { 
+    code: "II", 
+    name: "Cagayan Valley", 
+    weight: 0.035, 
+    major_cities: ["Tuguegarao", "Cauayan"],
+    barangays: ["Atulayan", "Bagay", "Carig", "Centro", "Larion Alto"]
+  },
+  { 
+    code: "III", 
+    name: "Central Luzon", 
+    weight: 0.12, 
+    major_cities: ["San Fernando", "Angeles", "Balanga", "Cabanatuan"],
+    barangays: ["Balibago", "Cutcut", "Lourdes Norte", "Pampang", "Sapangbato"]
+  },
+  { 
+    code: "IV-A", 
+    name: "CALABARZON", 
+    weight: 0.16, 
+    major_cities: ["Calamba", "Antipolo", "Dasmariñas", "Lucena"],
+    barangays: ["Banadero", "Canlubang", "Halang", "Pansol", "Real"]
+  },
+  { 
+    code: "IV-B", 
+    name: "MIMAROPA", 
+    weight: 0.03, 
+    major_cities: ["Puerto Princesa", "Calapan"],
+    barangays: ["Bancao-Bancao", "Barangay Poblacion", "Mandaragat", "San Pedro"]
+  },
+  { 
+    code: "V", 
+    name: "Bicol Region", 
+    weight: 0.04, 
+    major_cities: ["Legazpi", "Naga"],
+    barangays: ["Bagumbayan Norte", "Dinaga", "Sagpon", "Taysan"]
+  },
+  { 
+    code: "VI", 
+    name: "Western Visayas", 
+    weight: 0.06, 
+    major_cities: ["Iloilo", "Bacolod"],
+    barangays: ["Arevalo", "Jaro", "La Paz", "Mandurriao", "Molo"]
+  },
+  { 
+    code: "VII", 
+    name: "Central Visayas", 
+    weight: 0.07, 
+    major_cities: ["Cebu City", "Tagbilaran"],
+    barangays: ["Apas", "Lahug", "Mabolo", "Talamban", "Zapatera"]
+  },
+  { 
+    code: "VIII", 
+    name: "Eastern Visayas", 
+    weight: 0.03, 
+    major_cities: ["Tacloban", "Ormoc"],
+    barangays: ["Bagacay", "San Jose", "Suhi", "V&G Subdivision"]
+  },
+  { 
+    code: "IX", 
+    name: "Zamboanga Peninsula", 
+    weight: 0.025, 
+    major_cities: ["Zamboanga City", "Dipolog"],
+    barangays: ["Ayala", "Baliwasan", "Guiwan", "Tetuan"]
+  },
+  { 
+    code: "X", 
+    name: "Northern Mindanao", 
+    weight: 0.035, 
+    major_cities: ["Cagayan de Oro", "Iligan"],
+    barangays: ["Barangay 9", "Carmen", "Nazareth", "Puerto"]
+  },
+  { 
+    code: "XI", 
+    name: "Davao Region", 
+    weight: 0.05, 
+    major_cities: ["Davao City", "Tagum"],
+    barangays: ["Agdao", "Buhangin", "Poblacion", "Toril"]
+  },
+  { 
+    code: "XII", 
+    name: "SOCCSKSARGEN", 
+    weight: 0.025, 
+    major_cities: ["General Santos", "Koronadal"],
+    barangays: ["Apopong", "Bula", "City Heights", "Dadiangas"]
+  },
+  { 
+    code: "XIII", 
+    name: "Caraga", 
+    weight: 0.015, 
+    major_cities: ["Butuan"],
+    barangays: ["Agusan Pequeño", "Bancasi", "Golden Ribbon", "Libertad"]
+  },
+  { 
+    code: "CAR", 
+    name: "Cordillera Administrative Region", 
+    weight: 0.02, 
+    major_cities: ["Baguio", "Tabuk"],
+    barangays: ["Aurora Hill", "Burnham-Legarda", "City Camp", "Malcolm Square"]
+  },
+  { 
+    code: "BARMM", 
+    name: "Bangsamoro Autonomous Region", 
+    weight: 0.015, 
+    major_cities: ["Marawi", "Cotabato City"],
+    barangays: ["Bangon", "Dansalan", "East Basak", "Poblacion"]
+  }
 ];
 
 // TBWA Client Brands (60% of transactions)
@@ -147,6 +260,12 @@ export const brands: Brand[] = [...tbwaClientBrands, ...competitorBrands];
 
 export const channels = ["Sari-Sari Store"];
 
+// AI Recommendation IDs for tracking
+const aiRecommendationIds = [
+  "ai_rec_001", "ai_rec_002", "ai_rec_003", "ai_rec_004", "ai_rec_005",
+  "ai_rec_006", "ai_rec_007", "ai_rec_008", "ai_rec_009", "ai_rec_010"
+];
+
 // Generate sample transactions based on realistic patterns
 export const generateMockTransactions = (count: number = 1000): Transaction[] => {
   const transactions: Transaction[] = [];
@@ -154,10 +273,14 @@ export const generateMockTransactions = (count: number = 1000): Transaction[] =>
   const ageBrackets = ["18-24", "25-34", "35-44", "45-54", "55+"];
   const incomeClasses = ["A", "B", "C1", "C2", "D", "E"];
   const paymentMethods = ["Cash", "GCash", "Credit Card", "Debit Card"];
+  const requestedAs = ["branded", "unbranded", "unsure"] as const;
+  const requestTypes = ["verbal", "pointing", "indirect"] as const;
 
   for (let i = 0; i < count; i++) {
     const region = regions[Math.floor(Math.random() * regions.length)];
     const city = region.major_cities[Math.floor(Math.random() * region.major_cities.length)];
+    const barangay = region.barangays[Math.floor(Math.random() * region.barangays.length)];
+    const locationId = `${region.code}-${city.replace(/\s+/g, '')}-${barangay.replace(/\s+/g, '')}`;
     const channel = "Sari-Sari Store";
     
     // 60% TBWA clients, 40% competitors
@@ -169,6 +292,11 @@ export const generateMockTransactions = (count: number = 1000): Transaction[] =>
     const basket: BasketItem[] = [];
     let total = 0;
 
+    // Track if substitution occurred
+    let substitutionFrom: string | undefined;
+    let substitutionTo: string | undefined;
+    const hasSubstitution = Math.random() < 0.15; // 15% chance of substitution
+
     for (let j = 0; j < basketSize; j++) {
       const brand = availableBrands[Math.floor(Math.random() * availableBrands.length)];
       const sku = brand.skus[Math.floor(Math.random() * brand.skus.length)];
@@ -176,6 +304,14 @@ export const generateMockTransactions = (count: number = 1000): Transaction[] =>
       const units = Math.floor(Math.random() * 3) + 1;
       const basePrice = Math.floor(Math.random() * 200) + 20;
       const price = basePrice * units;
+      
+      // Handle substitution logic
+      if (hasSubstitution && j === 0) {
+        const allBrands = [...tbwaClientBrands, ...competitorBrands];
+        const originalBrand = allBrands[Math.floor(Math.random() * allBrands.length)];
+        substitutionFrom = originalBrand.name;
+        substitutionTo = brand.name;
+      }
       
       basket.push({
         sku,
@@ -192,13 +328,28 @@ export const generateMockTransactions = (count: number = 1000): Transaction[] =>
     const date = new Date();
     date.setDate(date.getDate() - Math.floor(Math.random() * 360));
     const time = `${Math.floor(Math.random() * 24).toString().padStart(2, '0')}:${Math.floor(Math.random() * 60).toString().padStart(2, '0')}`;
+    
+    // Generate transaction duration (30 seconds to 10 minutes)
+    const durationSeconds = Math.floor(Math.random() * 570) + 30;
+    
+    // Generate behavioral fields
+    const requestedAsValue = requestedAs[Math.floor(Math.random() * requestedAs.length)];
+    const requestType = requestTypes[Math.floor(Math.random() * requestTypes.length)];
+    const storekeperSuggested = Math.random() < 0.3; // 30% chance of suggestion
+    const acceptedSuggestion = storekeperSuggested ? Math.random() < 0.7 : false; // 70% acceptance rate
+    const hasAiRecommendation = Math.random() < 0.2; // 20% chance of AI recommendation
+    const aiRecommendationId = hasAiRecommendation ? 
+      aiRecommendationIds[Math.floor(Math.random() * aiRecommendationIds.length)] : undefined;
 
     transactions.push({
       id: `T${(i + 1).toString().padStart(5, '0')}`,
       date: date.toISOString().split('T')[0],
       time,
+      duration_seconds: durationSeconds,
       region: region.name,
       city,
+      barangay,
+      location_id: locationId,
       channel,
       basket,
       total,
@@ -207,7 +358,14 @@ export const generateMockTransactions = (count: number = 1000): Transaction[] =>
         age_bracket: ageBrackets[Math.floor(Math.random() * ageBrackets.length)],
         inferred_income: incomeClasses[Math.floor(Math.random() * incomeClasses.length)],
         payment: paymentMethods[Math.floor(Math.random() * paymentMethods.length)]
-      }
+      },
+      substitution_from: substitutionFrom,
+      substitution_to: substitutionTo,
+      requested_as: requestedAsValue,
+      request_type: requestType,
+      storeowner_suggested: storekeperSuggested,
+      accepted_suggestion: acceptedSuggestion,
+      ai_recommendation_id: aiRecommendationId
     });
   }
 
@@ -253,4 +411,52 @@ export const getCategoryMix = () => {
     count: Math.floor(Math.random() * 100) + 20,
     percentage: Math.floor(Math.random() * 25) + 5
   }));
+};
+
+// New analytics functions for behavioral insights
+export const getSubstitutionPatterns = () => {
+  const substitutions = mockTransactions
+    .filter(t => t.substitution_from && t.substitution_to)
+    .reduce((acc: Record<string, { to: string; count: number }[]>, t) => {
+      const key = t.substitution_from!;
+      if (!acc[key]) acc[key] = [];
+      
+      const existing = acc[key].find(s => s.to === t.substitution_to);
+      if (existing) {
+        existing.count++;
+      } else {
+        acc[key].push({ to: t.substitution_to!, count: 1 });
+      }
+      
+      return acc;
+    }, {});
+
+  return Object.entries(substitutions).map(([from, patterns]) => ({
+    from,
+    patterns: patterns.sort((a, b) => b.count - a.count)
+  }));
+};
+
+export const getRequestTypeAnalytics = () => {
+  const requestStats = mockTransactions.reduce((acc, t) => {
+    acc[t.requested_as] = (acc[t.requested_as] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  return Object.entries(requestStats).map(([type, count]) => ({
+    type,
+    count,
+    percentage: (count / mockTransactions.length) * 100
+  }));
+};
+
+export const getStorekeeperInfluence = () => {
+  const totalSuggestions = mockTransactions.filter(t => t.storeowner_suggested).length;
+  const acceptedSuggestions = mockTransactions.filter(t => t.storeowner_suggested && t.accepted_suggestion).length;
+  
+  return {
+    totalSuggestions,
+    acceptedSuggestions,
+    acceptanceRate: totalSuggestions > 0 ? (acceptedSuggestions / totalSuggestions) * 100 : 0
+  };
 };

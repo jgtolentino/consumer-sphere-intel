@@ -1,6 +1,13 @@
 
 import { DataService } from '../providers/DataProvider';
-import { mockTransactions, getRegionalData, getTopBrands } from '../data/mockData';
+import { 
+  mockTransactions, 
+  getRegionalData, 
+  getTopBrands, 
+  getSubstitutionPatterns,
+  getRequestTypeAnalytics,
+  getStorekeeperInfluence
+} from '../data/mockData';
 
 export class MockDataService implements DataService {
   async getTransactions(filters?: any): Promise<any[]> {
@@ -16,6 +23,18 @@ export class MockDataService implements DataService {
     if (filters?.regions?.length > 0) {
       filteredTransactions = filteredTransactions.filter(t => 
         filters.regions.includes(t.region)
+      );
+    }
+    
+    if (filters?.categories?.length > 0) {
+      filteredTransactions = filteredTransactions.filter(t =>
+        t.basket.some(item => filters.categories.includes(item.category))
+      );
+    }
+    
+    if (filters?.brands?.length > 0) {
+      filteredTransactions = filteredTransactions.filter(t =>
+        t.basket.some(item => filters.brands.includes(item.brand))
       );
     }
     
@@ -50,6 +69,47 @@ export class MockDataService implements DataService {
       topSkus: this.getTopSkus(allItems),
       total: allItems.length
     };
+  }
+
+  // New methods for behavioral analytics
+  async getSubstitutionData(): Promise<any> {
+    return {
+      patterns: getSubstitutionPatterns(),
+      totalSubstitutions: mockTransactions.filter(t => t.substitution_from).length
+    };
+  }
+
+  async getBehavioralData(): Promise<any> {
+    return {
+      requestTypes: getRequestTypeAnalytics(),
+      storekeperInfluence: getStorekeeperInfluence(),
+      averageDuration: this.getAverageDuration(),
+      aiRecommendations: this.getAiRecommendationStats()
+    };
+  }
+
+  async getLocationHierarchy(): Promise<any> {
+    // Build location hierarchy for drilldown
+    const hierarchy: Record<string, any> = {};
+    
+    mockTransactions.forEach(t => {
+      if (!hierarchy[t.region]) {
+        hierarchy[t.region] = { cities: {} };
+      }
+      if (!hierarchy[t.region].cities[t.city]) {
+        hierarchy[t.region].cities[t.city] = { barangays: new Set() };
+      }
+      hierarchy[t.region].cities[t.city].barangays.add(t.barangay);
+    });
+
+    // Convert sets to arrays
+    Object.keys(hierarchy).forEach(region => {
+      Object.keys(hierarchy[region].cities).forEach(city => {
+        hierarchy[region].cities[city].barangays = Array.from(hierarchy[region].cities[city].barangays);
+      });
+    });
+
+    return hierarchy;
   }
 
   private processGenderMix(consumers: any[]) {
@@ -111,5 +171,18 @@ export class MockDataService implements DataService {
       }))
       .sort((a, b) => b.revenue - a.revenue)
       .slice(0, 10);
+  }
+
+  private getAverageDuration() {
+    const totalDuration = mockTransactions.reduce((sum, t) => sum + t.duration_seconds, 0);
+    return Math.round(totalDuration / mockTransactions.length);
+  }
+
+  private getAiRecommendationStats() {
+    const withRecommendations = mockTransactions.filter(t => t.ai_recommendation_id).length;
+    return {
+      total: withRecommendations,
+      percentage: (withRecommendations / mockTransactions.length) * 100
+    };
   }
 }
