@@ -1,9 +1,8 @@
 
 import React, { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { MapPin } from 'lucide-react';
 import { useFilterStore } from '../state/useFilterStore';
 
 // Fix for default markers in react-leaflet
@@ -60,75 +59,34 @@ const mockRegionData: RegionData[] = [
   }
 ];
 
-// Custom marker component that updates when filters change
-const CustomMarker: React.FC<{
-  region: RegionData;
-  isSelected: boolean;
-  onRegionClick: (regionName: string) => void;
-}> = ({ region, isSelected, onRegionClick }) => {
-  // Create custom icon based on selection state
-  const customIcon = L.divIcon({
-    html: `<div style="
-      width: 30px;
-      height: 30px;
-      background: ${isSelected ? '#2AB5B0' : '#36CFC9'};
-      border: 3px solid ${isSelected ? '#0A2540' : 'white'};
-      border-radius: 50%;
-      cursor: pointer;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-      transform: ${isSelected ? 'scale(1.2)' : 'scale(1)'};
-      transition: all 0.2s ease;
-    "></div>`,
-    className: 'custom-leaflet-marker',
-    iconSize: [30, 30],
-    iconAnchor: [15, 15]
-  });
-
-  const handleClick = () => {
-    onRegionClick(region.location);
-  };
-
-  return (
-    <Marker
-      position={region.coordinates}
-      icon={customIcon}
-      eventHandlers={{
-        click: handleClick
-      }}
-    >
-      <Popup>
-        <div className="p-3">
-          <h3 className="font-semibold text-gray-900 mb-2">{region.location}</h3>
-          <div className="space-y-1 text-sm">
-            <div className="flex justify-between">
-              <span className="text-gray-600">Revenue:</span>
-              <span className="font-medium">₱{(region.revenue / 1000000).toFixed(1)}M</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Transactions:</span>
-              <span className="font-medium">{region.transactions.toLocaleString()}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Growth:</span>
-              <span className="font-medium text-green-600">+{region.growth}%</span>
-            </div>
-          </div>
-        </div>
-      </Popup>
-    </Marker>
-  );
-};
-
 export const GeoMap: React.FC = () => {
   const { barangays, setFilter } = useFilterStore();
 
   const handleRegionClick = (regionName: string) => {
     console.log('Region clicked:', regionName);
-    // Cross-filter: clicking a region applies it as a filter
     const currentRegions = barangays.includes(regionName) 
       ? barangays.filter(r => r !== regionName)
       : [...barangays, regionName];
     setFilter('barangays', currentRegions);
+  };
+
+  const createCustomIcon = (isSelected: boolean) => {
+    return L.divIcon({
+      html: `<div style="
+        width: 30px;
+        height: 30px;
+        background: ${isSelected ? '#2AB5B0' : '#36CFC9'};
+        border: 3px solid ${isSelected ? '#0A2540' : 'white'};
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        transform: ${isSelected ? 'scale(1.2)' : 'scale(1)'};
+        transition: all 0.2s ease;
+      "></div>`,
+      className: 'custom-leaflet-marker',
+      iconSize: [30, 30],
+      iconAnchor: [15, 15]
+    });
   };
 
   return (
@@ -148,14 +106,39 @@ export const GeoMap: React.FC = () => {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          {mockRegionData.map((region) => (
-            <CustomMarker
-              key={region.location}
-              region={region}
-              isSelected={barangays.includes(region.location)}
-              onRegionClick={handleRegionClick}
-            />
-          ))}
+          {mockRegionData.map((region) => {
+            const isSelected = barangays.includes(region.location);
+            return (
+              <Marker
+                key={region.location}
+                position={region.coordinates}
+                icon={createCustomIcon(isSelected)}
+                eventHandlers={{
+                  click: () => handleRegionClick(region.location)
+                }}
+              >
+                <Popup>
+                  <div className="p-3">
+                    <h3 className="font-semibold text-gray-900 mb-2">{region.location}</h3>
+                    <div className="space-y-1 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Revenue:</span>
+                        <span className="font-medium">₱{(region.revenue / 1000000).toFixed(1)}M</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Transactions:</span>
+                        <span className="font-medium">{region.transactions.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Growth:</span>
+                        <span className="font-medium text-green-600">+{region.growth}%</span>
+                      </div>
+                    </div>
+                  </div>
+                </Popup>
+              </Marker>
+            );
+          })}
         </MapContainer>
       </div>
     </div>
