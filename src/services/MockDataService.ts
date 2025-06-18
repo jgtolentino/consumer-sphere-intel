@@ -9,7 +9,7 @@ import {
   getStorekeeperInfluence
 } from '../data/mockData';
 
-// FMCG categories filter
+// FMCG categories filter - Updated to include tobacco products
 const FMCG_CATEGORIES = [
   'Dairy & Milk Products',
   'Snacks & Confectionery', 
@@ -41,8 +41,10 @@ export class MockDataService implements DataService {
     // Apply filters to mock data if provided
     let filteredTransactions = [...mockTransactions];
     
-    // Filter to FMCG categories only
+    // Filter to FMCG categories only (including tobacco)
     filteredTransactions = this.filterFMCGTransactions(filteredTransactions);
+    
+    console.log(`Total FMCG transactions after filtering: ${filteredTransactions.length}`);
     
     if (filters?.dateRange?.from) {
       filteredTransactions = filteredTransactions.filter(t => 
