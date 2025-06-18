@@ -53,42 +53,126 @@ export interface ConsumerProfile {
   payment: string;
 }
 
-// Philippine Regions Structure
+// Complete Philippine Regions Structure (All 17 Regions)
 export const regions: Region[] = [
   {
     code: "NCR",
     name: "NCR",
-    weight: 0.35,
+    weight: 0.25,
     major_cities: ["Manila", "Quezon City", "Makati", "Pasig", "Taguig"],
     barangays: ["Barangay 1", "Barangay 2", "Barangay 3", "Barangay 4", "Barangay 5"]
   },
   {
+    code: "R1",
+    name: "Ilocos Region",
+    weight: 0.05,
+    major_cities: ["Laoag", "Vigan", "San Fernando", "Dagupan"],
+    barangays: ["Poblacion", "San Jose", "Santa Rosa", "San Miguel", "Santo Tomas"]
+  },
+  {
+    code: "R2",
+    name: "Cagayan Valley",
+    weight: 0.03,
+    major_cities: ["Tuguegarao", "Ilagan", "Santiago", "Cauayan"],
+    barangays: ["Centro", "Poblacion", "San Roque", "Santa Ana", "San Pedro"]
+  },
+  {
     code: "R3",
-    name: "Region 3",
-    weight: 0.20,
+    name: "Central Luzon",
+    weight: 0.15,
     major_cities: ["San Fernando", "Angeles", "Olongapo", "Malolos", "Cabanatuan"],
     barangays: ["Poblacion", "San Jose", "Santa Rosa", "San Miguel", "Santo Tomas"]
   },
   {
     code: "R4A",
-    name: "Region 4A",
-    weight: 0.25,
+    name: "CALABARZON",
+    weight: 0.18,
     major_cities: ["Calamba", "Antipolo", "Bacoor", "San Pedro", "Biñan"],
     barangays: ["Poblacion", "San Antonio", "Santa Cruz", "San Vicente", "Santo Niño"]
   },
   {
-    code: "VIS",
-    name: "Visayas",
-    weight: 0.15,
-    major_cities: ["Cebu City", "Iloilo", "Bacolod", "Tacloban", "Dumaguete"],
+    code: "R4B",
+    name: "MIMAROPA",
+    weight: 0.03,
+    major_cities: ["Calapan", "Puerto Princesa", "Mamburao", "Boac"],
+    barangays: ["Poblacion", "San Roque", "Santa Maria", "San Jose", "Santo Tomas"]
+  },
+  {
+    code: "R5",
+    name: "Bicol Region",
+    weight: 0.06,
+    major_cities: ["Legazpi", "Naga", "Iriga", "Tabaco", "Ligao"],
+    barangays: ["Centro", "Poblacion", "San Antonio", "Santa Cruz", "San Vicente"]
+  },
+  {
+    code: "R6",
+    name: "Western Visayas",
+    weight: 0.08,
+    major_cities: ["Iloilo City", "Bacolod", "Kalibo", "Roxas", "San Jose"],
     barangays: ["Centro", "Poblacion", "San Roque", "Santa Ana", "San Pedro"]
   },
   {
-    code: "MIN",
-    name: "Mindanao",
-    weight: 0.05,
-    major_cities: ["Davao", "Cagayan de Oro", "Zamboanga", "Butuan", "General Santos"],
+    code: "R7",
+    name: "Central Visayas",
+    weight: 0.08,
+    major_cities: ["Cebu City", "Lapu-Lapu", "Mandaue", "Tagbilaran", "Dumaguete"],
+    barangays: ["Centro", "Poblacion", "San Roque", "Santa Ana", "San Pedro"]
+  },
+  {
+    code: "R8",
+    name: "Eastern Visayas",
+    weight: 0.04,
+    major_cities: ["Tacloban", "Ormoc", "Maasin", "Borongan", "Catbalogan"],
     barangays: ["Poblacion", "San Miguel", "Santa Maria", "San Jose", "Santo Tomas"]
+  },
+  {
+    code: "R9",
+    name: "Zamboanga Peninsula",
+    weight: 0.04,
+    major_cities: ["Zamboanga City", "Pagadian", "Dipolog", "Dapitan"],
+    barangays: ["Centro", "Poblacion", "San Roque", "Santa Ana", "San Pedro"]
+  },
+  {
+    code: "R10",
+    name: "Northern Mindanao",
+    weight: 0.05,
+    major_cities: ["Cagayan de Oro", "Iligan", "Valencia", "Malaybalay", "Gingoog"],
+    barangays: ["Poblacion", "San Miguel", "Santa Maria", "San Jose", "Santo Tomas"]
+  },
+  {
+    code: "R11",
+    name: "Davao Region",
+    weight: 0.06,
+    major_cities: ["Davao City", "Tagum", "Panabo", "Samal", "Digos"],
+    barangays: ["Poblacion", "San Antonio", "Santa Cruz", "San Vicente", "Santo Niño"]
+  },
+  {
+    code: "R12",
+    name: "SOCCSKSARGEN",
+    weight: 0.04,
+    major_cities: ["General Santos", "Koronadal", "Tacurong", "Kidapawan"],
+    barangays: ["Centro", "Poblacion", "San Roque", "Santa Ana", "San Pedro"]
+  },
+  {
+    code: "R13",
+    name: "Caraga",
+    weight: 0.03,
+    major_cities: ["Butuan", "Surigao", "Bayugan", "Cabadbaran"],
+    barangays: ["Poblacion", "San Miguel", "Santa Maria", "San Jose", "Santo Tomas"]
+  },
+  {
+    code: "CAR",
+    name: "CAR",
+    weight: 0.02,
+    major_cities: ["Baguio", "La Trinidad", "Tabuk", "Bangued"],
+    barangays: ["Centro", "Poblacion", "San Antonio", "Santa Cruz", "San Vicente"]
+  },
+  {
+    code: "BARMM",
+    name: "BARMM",
+    weight: 0.01,
+    major_cities: ["Cotabato City", "Marawi", "Lamitan", "Jolo"],
+    barangays: ["Poblacion", "San Roque", "Santa Maria", "San Jose", "Santo Tomas"]
   }
 ];
 
