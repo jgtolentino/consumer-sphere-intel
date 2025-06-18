@@ -1,13 +1,16 @@
 
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { BarChart3, TrendingUp, Package, Users, Home } from 'lucide-react';
+import { BarChart3, TrendingUp, Package, Users, Home, Bot, Sparkles, Heart } from 'lucide-react';
 
 const navigationItems = [
   { name: 'Overview', href: '/', icon: Home },
   { name: 'Transaction Trends', href: '/transaction-trends', icon: TrendingUp },
   { name: 'Product Mix', href: '/product-mix', icon: Package },
   { name: 'Consumer Insights', href: '/consumer-insights', icon: Users },
+  { name: 'RetailBot', href: '/retailbot', icon: Bot },
+  { name: 'AI Assist', href: '/ai-assist', icon: Sparkles },
+  { name: 'Vibe Check', href: '/vibe-check', icon: Heart },
 ];
 
 export const Sidebar: React.FC = () => {

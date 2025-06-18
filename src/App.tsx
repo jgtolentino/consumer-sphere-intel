@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -13,6 +12,9 @@ import Overview from './pages/Overview';
 import TransactionTrends from './pages/TransactionTrends';
 import ProductMix from './pages/ProductMix';
 import ConsumerInsights from './pages/ConsumerInsights';
+import RetailBot from './pages/RetailBot';
+import AiAssist from './pages/AiAssist';
+import VibeCheck from './pages/VibeCheck';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -41,6 +43,9 @@ const AppContent: React.FC = () => {
             <Route path="/transaction-trends" element={<TransactionTrends />} />
             <Route path="/product-mix" element={<ProductMix />} />
             <Route path="/consumer-insights" element={<ConsumerInsights />} />
+            <Route path="/retailbot" element={<RetailBot />} />
+            <Route path="/ai-assist" element={<AiAssist />} />
+            <Route path="/vibe-check" element={<VibeCheck />} />
           </Routes>
         </main>
       </div>
