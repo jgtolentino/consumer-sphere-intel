@@ -38,7 +38,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
 
 export const useDataService = (): DataService => {
   const context = useContext(DataContext);
-  if (!context) {
+  if (context === null) {
     throw new Error('useDataService must be used within a DataProvider');
   }
   return context;
