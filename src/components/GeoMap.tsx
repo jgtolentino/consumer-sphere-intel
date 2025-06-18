@@ -54,9 +54,11 @@ const mockRegionData: RegionData[] = [
 export const GeoMap: React.FC = () => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
-  const [mapboxToken, setMapboxToken] = useState('');
-  const [showTokenInput, setShowTokenInput] = useState(true);
+  const [mapLoaded, setMapLoaded] = useState(false);
   const { barangays, setFilter } = useFilterStore();
+
+  // Use your provided Mapbox token
+  const MAPBOX_TOKEN = 'pk.eyJ1Ijoiamd0b2xlbnRpbm8iLCJhIjoiY21jMmNycWRiMDc0ajJqcHZoaDYyeTJ1NiJ9.Dns6WOql16BUQ4l7otaeww';
 
   const handleRegionClick = (regionName: string) => {
     console.log('Region clicked:', regionName);
@@ -67,10 +69,10 @@ export const GeoMap: React.FC = () => {
     setFilter('barangays', currentRegions);
   };
 
-  const initializeMap = (token: string) => {
-    if (!mapContainer.current || !token) return;
+  useEffect(() => {
+    if (!mapContainer.current || map.current) return;
 
-    mapboxgl.accessToken = token;
+    mapboxgl.accessToken = MAPBOX_TOKEN;
     
     try {
       map.current = new mapboxgl.Map({
@@ -87,6 +89,7 @@ export const GeoMap: React.FC = () => {
 
       map.current.on('load', () => {
         if (!map.current) return;
+        setMapLoaded(true);
 
         // Add markers for each region
         mockRegionData.forEach((region) => {
@@ -143,23 +146,14 @@ export const GeoMap: React.FC = () => {
         });
       });
 
-      setShowTokenInput(false);
     } catch (error) {
       console.error('Error initializing map:', error);
-      alert('Invalid Mapbox token. Please check your token and try again.');
     }
-  };
-
-  const handleTokenSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (mapboxToken.trim()) {
-      initializeMap(mapboxToken.trim());
-    }
-  };
+  }, []);
 
   // Re-initialize map when filters change to update marker styles
   useEffect(() => {
-    if (map.current && !showTokenInput) {
+    if (map.current && mapLoaded) {
       // Re-render markers with updated selection state
       const markers = document.querySelectorAll('.custom-marker');
       markers.forEach((marker, index) => {
@@ -171,7 +165,7 @@ export const GeoMap: React.FC = () => {
         markerEl.style.transform = isSelected ? 'scale(1.2)' : 'scale(1)';
       });
     }
-  }, [barangays, showTokenInput]);
+  }, [barangays, mapLoaded]);
 
   useEffect(() => {
     return () => {
@@ -180,36 +174,6 @@ export const GeoMap: React.FC = () => {
       }
     };
   }, []);
-
-  if (showTokenInput) {
-    return (
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-        <div className="text-center space-y-4">
-          <MapPin className="h-12 w-12 text-[#36CFC9] mx-auto" />
-          <h3 className="text-lg font-semibold text-gray-900">Map Configuration Required</h3>
-          <p className="text-sm text-gray-600 max-w-md mx-auto">
-            To display the geospatial map, please enter your Mapbox public token. 
-            You can get one at <a href="https://mapbox.com/" target="_blank" rel="noopener noreferrer" className="text-[#36CFC9] hover:underline">mapbox.com</a>
-          </p>
-          <form onSubmit={handleTokenSubmit} className="space-y-3">
-            <input
-              type="text"
-              value={mapboxToken}
-              onChange={(e) => setMapboxToken(e.target.value)}
-              placeholder="Enter Mapbox public token"
-              className="w-full max-w-md px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#36CFC9] focus:border-transparent"
-            />
-            <button
-              type="submit"
-              className="px-6 py-2 bg-[#36CFC9] text-white rounded-lg hover:bg-[#2AB5B0] transition-colors"
-            >
-              Initialize Map
-            </button>
-          </form>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
