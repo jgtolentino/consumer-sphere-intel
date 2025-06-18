@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { MapPin } from 'lucide-react';
+import { useFilterStore } from '../state/useFilterStore';
 
 interface RegionData {
   location: string;
@@ -55,6 +56,16 @@ export const GeoMap: React.FC = () => {
   const map = useRef<mapboxgl.Map | null>(null);
   const [mapboxToken, setMapboxToken] = useState('');
   const [showTokenInput, setShowTokenInput] = useState(true);
+  const { barangays, setFilter } = useFilterStore();
+
+  const handleRegionClick = (regionName: string) => {
+    console.log('Region clicked:', regionName);
+    // Cross-filter: clicking a region applies it as a filter
+    const currentRegions = barangays.includes(regionName) 
+      ? barangays.filter(r => r !== regionName)
+      : [...barangays, regionName];
+    setFilter('barangays', currentRegions);
+  };
 
   const initializeMap = (token: string) => {
     if (!mapContainer.current || !token) return;
@@ -79,19 +90,29 @@ export const GeoMap: React.FC = () => {
 
         // Add markers for each region
         mockRegionData.forEach((region) => {
+          const isSelected = barangays.includes(region.location);
+          
           // Create marker element
           const markerEl = document.createElement('div');
           markerEl.className = 'custom-marker';
           markerEl.style.cssText = `
             width: 30px;
             height: 30px;
-            background: #36CFC9;
-            border: 3px solid white;
+            background: ${isSelected ? '#2AB5B0' : '#36CFC9'};
+            border: 3px solid ${isSelected ? '#0A2540' : 'white'};
             border-radius: 50%;
             cursor: pointer;
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
             position: relative;
+            transform: ${isSelected ? 'scale(1.2)' : 'scale(1)'};
+            transition: all 0.2s ease;
           `;
+
+          // Add click handler for cross-filtering
+          markerEl.addEventListener('click', (e) => {
+            e.stopPropagation();
+            handleRegionClick(region.location);
+          });
 
           // Create popup
           const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
@@ -136,6 +157,22 @@ export const GeoMap: React.FC = () => {
     }
   };
 
+  // Re-initialize map when filters change to update marker styles
+  useEffect(() => {
+    if (map.current && !showTokenInput) {
+      // Re-render markers with updated selection state
+      const markers = document.querySelectorAll('.custom-marker');
+      markers.forEach((marker, index) => {
+        const region = mockRegionData[index];
+        const isSelected = barangays.includes(region.location);
+        const markerEl = marker as HTMLElement;
+        markerEl.style.background = isSelected ? '#2AB5B0' : '#36CFC9';
+        markerEl.style.border = `3px solid ${isSelected ? '#0A2540' : 'white'}`;
+        markerEl.style.transform = isSelected ? 'scale(1.2)' : 'scale(1)';
+      });
+    }
+  }, [barangays, showTokenInput]);
+
   useEffect(() => {
     return () => {
       if (map.current) {
@@ -178,7 +215,7 @@ export const GeoMap: React.FC = () => {
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
       <div className="p-4 border-b border-gray-100">
         <h3 className="text-lg font-semibold text-gray-900">Regional Performance Map</h3>
-        <p className="text-sm text-gray-600">Click markers to view detailed metrics</p>
+        <p className="text-sm text-gray-600">Click markers to filter data by region</p>
       </div>
       <div ref={mapContainer} className="w-full h-96" />
     </div>
