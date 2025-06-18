@@ -42,7 +42,7 @@ export const Navbar: React.FC = () => {
               <input
                 type="text"
                 placeholder="Search analytics..."
-                className="pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#36CFC9] focus:border-transparent w-48 lg:w-64 bg-white dark:bg-[#2F3A4F] text-[#0A2540] dark:text-[#F5F6FA]"
+                className="pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#36CFC9] focus:border-transparent w-48 lg:w-64 bg-white dark:bg-[#2F3A4F] text-[#0A2540] dark:text-[#F5F6FA] text-sm"
               />
             </div>
             
@@ -51,7 +51,7 @@ export const Navbar: React.FC = () => {
               variant="ghost"
               size="sm"
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="h-8 w-8 p-0"
+              className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-700"
             >
               {theme === 'dark' ? (
                 <Sun className="h-4 w-4" />
@@ -61,16 +61,18 @@ export const Navbar: React.FC = () => {
               <span className="sr-only">Toggle theme</span>
             </Button>
             
-            <button className="relative p-2 text-gray-400 hover:text-[#36CFC9] transition-colors">
+            <button className="relative p-2 text-gray-400 hover:text-[#36CFC9] hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
               <Bell className="h-5 w-5" />
-              <span className="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
+              <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full flex items-center justify-center">
+                <span className="h-2 w-2 bg-red-500 rounded-full"></span>
+              </span>
             </button>
             
-            <button className="p-2 text-gray-400 hover:text-[#36CFC9] transition-colors hidden sm:block">
+            <button className="p-2 text-gray-400 hover:text-[#36CFC9] hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors hidden sm:block">
               <Settings className="h-5 w-5" />
             </button>
             
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 pl-2">
               <div className="h-8 w-8 scout-gradient rounded-full flex items-center justify-center">
                 <User className="h-4 w-4 text-white" />
               </div>
