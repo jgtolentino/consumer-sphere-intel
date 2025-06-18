@@ -1,8 +1,16 @@
 
 import React from 'react';
-import { Package, TrendingUp, ShoppingBag, Star } from 'lucide-react';
+import { Package, TrendingUp, ShoppingBag, Star, BarChart3, ArrowRightLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useFilterStore } from '../state/useFilterStore';
+import { KpiCard } from '../components/KpiCard';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '../components/ui/chart';
+import { TreemapChart } from '../components/TreemapChart';
+import { SankeyChart } from '../components/SankeyChart';
+import { SkuTable } from '../components/SkuTable';
+import { BrandPerformanceChart } from '../components/BrandPerformanceChart';
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from 'recharts';
 
 const ProductMix: React.FC = () => {
   const navigate = useNavigate();
@@ -13,12 +21,19 @@ const ProductMix: React.FC = () => {
     navigate('/transaction-trends');
   };
 
-  const topSkus = [
-    { name: 'Samsung Galaxy A54', category: 'Electronics', sales: 2847, revenue: 1423500, growth: '+15%' },
-    { name: 'Nestle Coffee Creamer', category: 'Groceries', sales: 5621, revenue: 168630, growth: '+8%' },
-    { name: 'Unilever Shampoo 400ml', category: 'Health & Beauty', sales: 3214, revenue: 482100, growth: '+12%' },
-    { name: 'Nike Running Shoes', category: 'Clothing', sales: 567, revenue: 2835000, growth: '+22%' },
-    { name: 'Coca-Cola 1.5L', category: 'Beverages', sales: 8934, revenue: 447000, growth: '+5%' }
+  const kpiData = [
+    { title: 'Total SKUs', value: '2,847', change: '+12%', trend: 'up' as const, icon: <Package className="h-5 w-5" /> },
+    { title: 'Avg Basket Size', value: '₱1,245', change: '+8%', trend: 'up' as const, icon: <ShoppingBag className="h-5 w-5" /> },
+    { title: 'Category Diversity', value: '85%', change: '+3%', trend: 'up' as const, icon: <BarChart3 className="h-5 w-5" /> },
+    { title: 'Substitution Rate', value: '23%', change: '-2%', trend: 'down' as const, icon: <ArrowRightLeft className="h-5 w-5" /> }
+  ];
+
+  const categoryMixData = [
+    { name: 'Electronics', value: 4200000, percentage: 35 },
+    { name: 'Groceries', value: 3100000, percentage: 26 },
+    { name: 'Health & Beauty', value: 2800000, percentage: 23 },
+    { name: 'Clothing', value: 1200000, percentage: 10 },
+    { name: 'Beverages', value: 700000, percentage: 6 }
   ];
 
   return (
@@ -28,6 +43,20 @@ const ProductMix: React.FC = () => {
           <h1 className="text-3xl font-bold text-gray-900">Product Mix & SKU Insights</h1>
           <p className="text-gray-600 mt-1">Analyze product performance and category trends</p>
         </div>
+      </div>
+
+      {/* KPI Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {kpiData.map((kpi, index) => (
+          <KpiCard
+            key={index}
+            title={kpi.title}
+            value={kpi.value}
+            change={kpi.change}
+            trend={kpi.trend}
+            icon={kpi.icon}
+          />
+        ))}
       </div>
 
       {/* Category Performance Cards */}
@@ -64,92 +93,59 @@ const ProductMix: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <h3 className="text-lg font-semibold mb-4 text-gray-900">Category Mix Distribution</h3>
-          <div className="h-80 flex items-center justify-center bg-gradient-to-br from-blue-50 to-teal-50 rounded-lg">
-            <div className="text-center">
-              <Package className="h-12 w-12 text-blue-500 mx-auto mb-3" />
-              <p className="text-gray-500">Interactive bar chart showing sales by category</p>
-              <p className="text-sm text-gray-400 mt-2">Click bars to filter transactions</p>
-            </div>
-          </div>
-        </div>
+        {/* Category Mix Chart */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <BarChart3 className="h-5 w-5 mr-2 text-blue-500" />
+              Category Mix Distribution
+            </CardTitle>
+            <CardDescription>Sales distribution across product categories</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <TreemapChart data={categoryMixData} />
+          </CardContent>
+        </Card>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <h3 className="text-lg font-semibold mb-4 text-gray-900">Product Substitution Flow</h3>
-          <div className="h-80 flex items-center justify-center bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg">
-            <div className="text-center">
-              <TrendingUp className="h-12 w-12 text-green-500 mx-auto mb-3" />
-              <p className="text-gray-500">Sankey diagram showing product switching patterns</p>
-            </div>
-          </div>
-        </div>
+        {/* Product Substitution Flow */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <ArrowRightLeft className="h-5 w-5 mr-2 text-green-500" />
+              Product Substitution Flow
+            </CardTitle>
+            <CardDescription>Customer switching patterns between products</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <SankeyChart />
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Top SKUs Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-        <div className="p-6 border-b border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-900">Top Performing SKUs</h3>
-          <p className="text-gray-600 text-sm mt-1">Best-selling products across all categories</p>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Product Name
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Category
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Units Sold
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Revenue
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Growth
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {topSkus.map((sku, index) => (
-                <tr key={index} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{sku.name}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="inline-flex px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
-                      {sku.category}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {sku.sales.toLocaleString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
-                    ₱{sku.revenue.toLocaleString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="text-green-600 text-sm font-medium">{sku.growth}</span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      {/* SKU Performance Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Top Performing SKUs</CardTitle>
+          <CardDescription>Best-selling products with detailed metrics</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <SkuTable />
+        </CardContent>
+      </Card>
 
-      {/* Brand Performance */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-        <h3 className="text-lg font-semibold mb-4 text-gray-900">Brand Performance Analysis</h3>
-        <div className="h-64 flex items-center justify-center bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg">
-          <div className="text-center">
-            <Star className="h-12 w-12 text-purple-500 mx-auto mb-3" />
-            <p className="text-gray-500">Brand comparison matrix showing market share and growth</p>
-          </div>
-        </div>
-      </div>
+      {/* Brand Performance Analysis */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <Star className="h-5 w-5 mr-2 text-purple-500" />
+            Brand Performance Analysis
+          </CardTitle>
+          <CardDescription>Market share and growth comparison across brands</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <BrandPerformanceChart />
+        </CardContent>
+      </Card>
     </div>
   );
 };
