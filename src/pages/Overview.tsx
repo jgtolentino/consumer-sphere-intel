@@ -5,7 +5,7 @@ import { AiRecommendationPanel } from '../components/AiRecommendationPanel';
 import { ShoppingCart, DollarSign, Package, MapPin } from 'lucide-react';
 
 const Overview: React.FC = () => {
-  console.log('Overview component rendering');
+  console.log('Overview component rendering - START');
   
   const kpis = [
     {
@@ -39,9 +39,11 @@ const Overview: React.FC = () => {
   ];
 
   console.log('KPIs data:', kpis);
+  console.log('About to render Overview JSX');
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-6">
+      {/* Header */}
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Overview</h1>
@@ -54,9 +56,12 @@ const Overview: React.FC = () => {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {kpis.map((kpi, index) => (
-          <KpiCard key={index} {...kpi} />
-        ))}
+        {kpis.map((kpi, index) => {
+          console.log('Rendering KPI card:', kpi.title);
+          return (
+            <KpiCard key={index} {...kpi} />
+          );
+        })}
       </div>
 
       {/* Charts and Insights */}

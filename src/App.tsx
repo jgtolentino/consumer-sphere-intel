@@ -26,7 +26,7 @@ const queryClient = new QueryClient({
 const AppContent: React.FC = () => {
   useSyncFilters();
   
-  console.log('AppContent rendering');
+  console.log('AppContent rendering - route should work');
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
@@ -35,7 +35,7 @@ const AppContent: React.FC = () => {
       
       <div className="flex">
         <Sidebar />
-        <main className="flex-1 p-6 ml-64">
+        <main className="flex-1 ml-64">
           <Routes>
             <Route path="/" element={<Overview />} />
             <Route path="/transaction-trends" element={<TransactionTrends />} />
@@ -49,7 +49,7 @@ const AppContent: React.FC = () => {
 };
 
 const App: React.FC = () => {
-  console.log('App component rendering');
+  console.log('App component rendering - should mount correctly');
   
   return (
     <QueryClientProvider client={queryClient}>
