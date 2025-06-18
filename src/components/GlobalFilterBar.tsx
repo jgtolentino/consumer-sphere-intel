@@ -30,7 +30,7 @@ export const GlobalFilterBar: React.FC = () => {
   // YAML specification filter options
   const regionOptions = ['NCR', 'Region 3', 'Region 4A', 'Visayas', 'Mindanao'];
   const brandOptions = ['Alaska', 'Oishi', 'Del Monte', 'Peerless', 'JTI'];
-  const categoryOptions = ['Electronics', 'Groceries', 'Clothing', 'Health & Beauty', 'Home & Garden'];
+  const categoryOptions = ['Groceries', 'Health & Beauty', 'Home & Garden', 'Tobacco'];
   const storeOptions = ['Store A', 'Store B', 'Store C', 'Store D', 'Store E'];
   const channelOptions = ['Traditional', 'Modern Trade'];
 
