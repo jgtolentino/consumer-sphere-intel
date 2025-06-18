@@ -118,4 +118,14 @@
   .scout-kpi-card {
     @apply bg-white rounded-lg border border-gray-100 p-6 shadow-none;
   }
+
+  /* Hide scrollbar utility */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -32,24 +33,32 @@ const AppContent: React.FC = () => {
   console.log('AppContent rendering - route should work');
   
   return (
-    <div className="min-h-screen bg-[#F5F6FA] dark:bg-[#0A2540]">
+    <div className="min-h-screen bg-[#F5F6FA] dark:bg-[#0A2540] w-full">
       <Navbar />
-      <GlobalFilterBar />
       
-      <div className="flex min-h-screen">
+      <div className="flex w-full">
+        {/* Fixed sidebar with proper z-index */}
         <Sidebar />
-        <main className="flex-1 lg:ml-64 pt-32 p-4 md:p-6 overflow-x-auto">
-          <div className="max-w-full">
-            <Routes>
-              <Route path="/" element={<Overview />} />
-              <Route path="/trends" element={<TransactionTrends />} />
-              <Route path="/products" element={<ProductMix />} />
-              <Route path="/regional" element={<Regional />} />
-              <Route path="/brands" element={<BrandAnalytics />} />
-              <Route path="/chat" element={<RetailBot />} />
-            </Routes>
-          </div>
-        </main>
+        
+        {/* Main content area with proper margins */}
+        <div className="flex-1 lg:ml-64">
+          {/* Filter bar positioned after sidebar */}
+          <GlobalFilterBar />
+          
+          {/* Main content with proper padding */}
+          <main className="pt-4 p-4 md:p-6 overflow-x-auto">
+            <div className="max-w-full">
+              <Routes>
+                <Route path="/" element={<Overview />} />
+                <Route path="/trends" element={<TransactionTrends />} />
+                <Route path="/products" element={<ProductMix />} />
+                <Route path="/regional" element={<Regional />} />
+                <Route path="/brands" element={<BrandAnalytics />} />
+                <Route path="/chat" element={<RetailBot />} />
+              </Routes>
+            </div>
+          </main>
+        </div>
       </div>
     </div>
   );

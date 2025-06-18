@@ -14,7 +14,7 @@ const navigationItems = [
 
 export const Sidebar: React.FC = () => {
   return (
-    <aside className="fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 bg-white dark:bg-[#2F3A4F] border-r border-gray-200 dark:border-gray-700 shadow-sm z-10 hidden lg:block">
+    <aside className="fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 bg-white dark:bg-[#2F3A4F] border-r border-gray-200 dark:border-gray-700 shadow-sm z-50 hidden lg:block">
       <div className="p-4 xl:p-6 h-full overflow-y-auto flex flex-col">
         <nav className="space-y-2 flex-1">
           {navigationItems.map((item) => (
