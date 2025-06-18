@@ -2,6 +2,7 @@
 import React from 'react';
 import { Calendar, X, Filter, RotateCcw, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useFilterStore } from '../state/useFilterStore';
+import { tbwaClientBrands, competitorBrands } from '../data/mockData';
 
 export const GlobalFilterBar: React.FC = () => {
   const { 
@@ -27,9 +28,10 @@ export const GlobalFilterBar: React.FC = () => {
     channels.length
   ].reduce((sum, count) => sum + count, 0);
 
-  // YAML specification filter options - removed Electronics, Clothing, Home & Garden
+  // Updated filter options based on new data structure
   const regionOptions = ['NCR', 'Region 3', 'Region 4A', 'Visayas', 'Mindanao'];
-  const brandOptions = ['Alaska', 'Oishi', 'Del Monte', 'Peerless', 'JTI'];
+  const allBrands = [...tbwaClientBrands, ...competitorBrands];
+  const brandOptions = [...new Set(allBrands.map(b => b.name))].sort();
   const categoryOptions = ['Groceries', 'Health & Beauty', 'Tobacco'];
   const storeOptions = ['Store A', 'Store B', 'Store C', 'Store D', 'Store E'];
   const channelOptions = ['Traditional', 'Modern Trade'];

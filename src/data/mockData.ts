@@ -1,3 +1,4 @@
+
 // Comprehensive mock data based on TBWA client brands and Philippine market structure
 
 export interface Region {
@@ -10,8 +11,9 @@ export interface Region {
 
 export interface Brand {
   name: string;
+  company: string;
   is_client: boolean;
-  categories: string[];
+  category: string;
   skus: string[];
 }
 
@@ -52,84 +54,106 @@ export interface ConsumerProfile {
   payment: string;
 }
 
-// TBWA Client Brands (60% of transactions) - updated categories
-export const tbwaClientBrands: Brand[] = [
+// Philippine Regions Structure
+export const regions: Region[] = [
   {
-    name: "Alaska Milk Corporation",
-    is_client: true,
-    categories: ["Groceries"],
-    skus: ["Alaska Evaporated Milk", "Alaska Condensed Milk", "Alaska Powdered Milk", "Krem-Top Coffee Creamer", "Alpine Evaporated Milk", "Alpine Condensed Milk", "Cow Bell Powdered Milk"]
+    code: "NCR",
+    name: "NCR",
+    weight: 0.35,
+    major_cities: ["Manila", "Quezon City", "Makati", "Pasig", "Taguig"],
+    barangays: ["Barangay 1", "Barangay 2", "Barangay 3", "Barangay 4", "Barangay 5"]
   },
   {
-    name: "Oishi",
-    is_client: true,
-    categories: ["Groceries"],
-    skus: ["Oishi Prawn Crackers", "Oishi Pillows", "Oishi Marty's", "Oishi Ridges", "Oishi Bread Pan", "Gourmet Picks", "Crispy Patata", "Smart C+ Vitamin Drinks", "Oaties", "Hi-Ho", "Rinbee", "Deli Mex"]
+    code: "R3",
+    name: "Region 3",
+    weight: 0.20,
+    major_cities: ["San Fernando", "Angeles", "Olongapo", "Malolos", "Cabanatuan"],
+    barangays: ["Poblacion", "San Jose", "Santa Rosa", "San Miguel", "Santo Tomas"]
   },
   {
-    name: "Champion",
-    is_client: true,
-    categories: ["Health & Beauty"],
-    skus: ["Champion Detergent", "Champion Fabric Conditioner", "Calla Personal Care", "Hana Shampoo", "Hana Conditioner", "Cyclone Bleach", "Pride Dishwashing Liquid", "Care Plus Alcohol", "Care Plus Hand Sanitizer"]
+    code: "R4A",
+    name: "Region 4A",
+    weight: 0.25,
+    major_cities: ["Calamba", "Antipolo", "Bacoor", "San Pedro", "Biñan"],
+    barangays: ["Poblacion", "San Antonio", "Santa Cruz", "San Vicente", "Santo Niño"]
   },
   {
-    name: "Del Monte",
-    is_client: true,
-    categories: ["Groceries"],
-    skus: ["Del Monte Pineapple Juice", "Del Monte Pineapple Chunks", "Del Monte Pineapple Slices", "Del Monte Tomato Sauce", "Del Monte Ketchup", "Del Monte Spaghetti Sauce", "Del Monte Fruit Cocktail", "Del Monte Pasta", "S&W Premium Fruit", "Today's Budget Line", "Fit 'n Right Juice Drinks"]
+    code: "VIS",
+    name: "Visayas",
+    weight: 0.15,
+    major_cities: ["Cebu City", "Iloilo", "Bacolod", "Tacloban", "Dumaguete"],
+    barangays: ["Centro", "Poblacion", "San Roque", "Santa Ana", "San Pedro"]
   },
   {
-    name: "Winston",
-    is_client: true,
-    categories: ["Tobacco"],
-    skus: ["Winston Red", "Winston Blue", "Camel", "Mevius", "LD", "Mighty", "Caster", "Glamour"]
+    code: "MIN",
+    name: "Mindanao",
+    weight: 0.05,
+    major_cities: ["Davao", "Cagayan de Oro", "Zamboanga", "Butuan", "General Santos"],
+    barangays: ["Poblacion", "San Miguel", "Santa Maria", "San Jose", "Santo Tomas"]
   }
 ];
 
-// Competitor Brands (40% of transactions) - updated categories
+// TBWA Client Brands - Comprehensive expanded structure
+export const tbwaClientBrands: Brand[] = [
+  // Alaska Milk Corporation
+  { name: "Alaska Evaporated Milk", company: "Alaska Milk Corporation", is_client: true, category: "Groceries", skus: ["Alaska Evaporated Milk Original", "Alaska Evaporated Milk Full Cream", "Alaska Evaporated Milk Low Fat"] },
+  { name: "Alaska Condensed Milk", company: "Alaska Milk Corporation", is_client: true, category: "Groceries", skus: ["Alaska Condensed Milk Original", "Alaska Condensed Milk Sweetened"] },
+  { name: "Alaska Powdered Milk", company: "Alaska Milk Corporation", is_client: true, category: "Groceries", skus: ["Alaska Powdered Milk Small Pack", "Alaska Powdered Milk Family Pack"] },
+  { name: "Krem-Top", company: "Alaska Milk Corporation", is_client: true, category: "Groceries", skus: ["Krem-Top Regular", "Krem-Top Sugar-Free"] },
+  { name: "Alpine", company: "Alaska Milk Corporation", is_client: true, category: "Groceries", skus: ["Alpine Evaporated Milk", "Alpine Condensed Milk"] },
+  { name: "Cow Bell", company: "Alaska Milk Corporation", is_client: true, category: "Groceries", skus: ["Cow Bell Powdered Milk Small Pack", "Cow Bell Powdered Milk Large Pack"] },
+
+  // Oishi (Liwayway Marketing Corporation)
+  { name: "Oishi Prawn Crackers", company: "Oishi", is_client: true, category: "Groceries", skus: ["Oishi Prawn Crackers Original", "Oishi Prawn Crackers Spicy"] },
+  { name: "Oishi Pillows", company: "Oishi", is_client: true, category: "Groceries", skus: ["Oishi Pillows Chocolate", "Oishi Pillows Milk"] },
+  { name: "Oishi Marty's", company: "Oishi", is_client: true, category: "Groceries", skus: ["Oishi Marty's Baconette Strips", "Oishi Marty's Vegetarian Chicharon"] },
+  { name: "Oishi Ridges", company: "Oishi", is_client: true, category: "Groceries", skus: ["Oishi Ridges Cheese", "Oishi Ridges Sour Cream"] },
+  { name: "Oishi Bread Pan", company: "Oishi", is_client: true, category: "Groceries", skus: ["Oishi Bread Pan Garlic", "Oishi Bread Pan Cheese"] },
+  { name: "Gourmet Picks", company: "Oishi", is_client: true, category: "Groceries", skus: ["Gourmet Picks Truffle", "Gourmet Picks Sour Cream"] },
+  { name: "Crispy Patata", company: "Oishi", is_client: true, category: "Groceries", skus: ["Crispy Patata Classic", "Crispy Patata Barbecue"] },
+  { name: "Smart C+", company: "Oishi", is_client: true, category: "Groceries", skus: ["Smart C+ Lemon", "Smart C+ Orange", "Smart C+ Pomelo"] },
+  { name: "Oaties", company: "Oishi", is_client: true, category: "Groceries", skus: ["Oaties Milk", "Oaties Chocolate"] },
+  { name: "Hi-Ho", company: "Oishi", is_client: true, category: "Groceries", skus: ["Hi-Ho Original"] },
+  { name: "Rinbee", company: "Oishi", is_client: true, category: "Groceries", skus: ["Rinbee Cheese", "Rinbee Sweet Corn"] },
+  { name: "Deli Mex", company: "Oishi", is_client: true, category: "Groceries", skus: ["Deli Mex Sour Cream", "Deli Mex Barbecue"] },
+
+  // Peerless Products Manufacturing Corporation
+  { name: "Champion", company: "Peerless", is_client: true, category: "Health & Beauty", skus: ["Champion Detergent", "Champion Fabric Conditioner"] },
+  { name: "Calla", company: "Peerless", is_client: true, category: "Health & Beauty", skus: ["Calla Shampoo", "Calla Body Wash"] },
+  { name: "Hana", company: "Peerless", is_client: true, category: "Health & Beauty", skus: ["Hana Shampoo", "Hana Conditioner"] },
+  { name: "Cyclone", company: "Peerless", is_client: true, category: "Health & Beauty", skus: ["Cyclone Bleach"] },
+  { name: "Pride", company: "Peerless", is_client: true, category: "Health & Beauty", skus: ["Pride Dishwashing Liquid"] },
+  { name: "Care Plus", company: "Peerless", is_client: true, category: "Health & Beauty", skus: ["Care Plus Alcohol", "Care Plus Hand Sanitizer"] },
+
+  // Del Monte Philippines
+  { name: "Del Monte Pineapple", company: "Del Monte", is_client: true, category: "Groceries", skus: ["Del Monte Pineapple Juice", "Del Monte Pineapple Chunks", "Del Monte Pineapple Slices"] },
+  { name: "Del Monte Tomato Sauce & Ketchup", company: "Del Monte", is_client: true, category: "Groceries", skus: ["Del Monte Tomato Sauce", "Del Monte Ketchup"] },
+  { name: "Del Monte Spaghetti Sauce", company: "Del Monte", is_client: true, category: "Groceries", skus: ["Del Monte Spaghetti Sauce Italian Style", "Del Monte Spaghetti Sauce Sweet Style"] },
+  { name: "Del Monte Fruit Cocktail", company: "Del Monte", is_client: true, category: "Groceries", skus: ["Del Monte Fruit Cocktail Standard", "Del Monte Fruit Cocktail Fiesta"] },
+  { name: "Del Monte Pasta", company: "Del Monte", is_client: true, category: "Groceries", skus: ["Del Monte Pasta Spaghetti", "Del Monte Pasta Penne", "Del Monte Pasta Elbow Macaroni"] },
+  { name: "S&W", company: "Del Monte", is_client: true, category: "Groceries", skus: ["S&W Premium Pineapple", "S&W Premium Corn"] },
+  { name: "Today's", company: "Del Monte", is_client: true, category: "Groceries", skus: ["Today's Fruit Cocktail", "Today's Pasta"] },
+  { name: "Fit 'n Right", company: "Del Monte", is_client: true, category: "Groceries", skus: ["Fit 'n Right Apple", "Fit 'n Right Pineapple", "Fit 'n Right Grape"] },
+
+  // Japan Tobacco International (JTI)
+  { name: "Winston", company: "JTI", is_client: true, category: "Tobacco", skus: ["Winston Red", "Winston Blue", "Winston White"] },
+  { name: "Camel", company: "JTI", is_client: true, category: "Tobacco", skus: ["Camel Blue", "Camel Filters"] },
+  { name: "Mevius", company: "JTI", is_client: true, category: "Tobacco", skus: ["Mevius Mild Seven", "Mevius Lights"] },
+  { name: "LD", company: "JTI", is_client: true, category: "Tobacco", skus: ["LD Red", "LD Blue"] },
+  { name: "Mighty", company: "JTI", is_client: true, category: "Tobacco", skus: ["Mighty Pack"] },
+  { name: "Caster", company: "JTI", is_client: true, category: "Tobacco", skus: ["Caster Mild", "Caster Super Mild"] },
+  { name: "Glamour", company: "JTI", is_client: true, category: "Tobacco", skus: ["Glamour Super Slims"] }
+];
+
+// Competitor Brands (40% of transactions)
 export const competitorBrands: Brand[] = [
-  {
-    name: "Nestlé",
-    is_client: false,
-    categories: ["Groceries"],
-    skus: ["Bear Brand Milk", "Nestlé Condensed Milk", "Nescafé Coffee", "Maggi Noodles", "KitKat", "Milo"]
-  },
-  {
-    name: "Unilever",
-    is_client: false,
-    categories: ["Health & Beauty"],
-    skus: ["Surf Detergent", "Dove Soap", "Clear Shampoo", "Cream Silk", "Cif Cleaner", "Sunsilk"]
-  },
-  {
-    name: "Procter & Gamble",
-    is_client: false,
-    categories: ["Health & Beauty"],
-    skus: ["Head & Shoulders", "Pantene", "Tide Detergent", "Ariel", "Safeguard Soap", "Oral-B"]
-  },
-  {
-    name: "Jack 'n Jill",
-    is_client: false,
-    categories: ["Groceries"],
-    skus: ["Piattos", "Nova", "Chippy", "Roller Coaster", "Chiz Curls", "Cream-O"]
-  },
-  {
-    name: "Universal Robina",
-    is_client: false,
-    categories: ["Groceries"],
-    skus: ["Ricoa Chocolate", "C2 Green Tea", "Great Taste Coffee", "Payless Noodles", "SkyFlakes"]
-  },
-  {
-    name: "Philip Morris",
-    is_client: false,
-    categories: ["Tobacco"],
-    skus: ["Marlboro", "Parliament", "L&M", "Chesterfield"]
-  },
-  {
-    name: "Colgate-Palmolive",
-    is_client: false,
-    categories: ["Health & Beauty"],
-    skus: ["Colgate Toothpaste", "Palmolive Soap", "Mennen", "Softlan"]
-  }
+  { name: "Nestlé", company: "Nestlé", is_client: false, category: "Groceries", skus: ["Bear Brand Milk", "Nestlé Condensed Milk", "Nescafé Coffee", "Maggi Noodles", "KitKat", "Milo"] },
+  { name: "Unilever", company: "Unilever", is_client: false, category: "Health & Beauty", skus: ["Surf Detergent", "Dove Soap", "Clear Shampoo", "Cream Silk", "Cif Cleaner", "Sunsilk"] },
+  { name: "Procter & Gamble", company: "P&G", is_client: false, category: "Health & Beauty", skus: ["Head & Shoulders", "Pantene", "Tide Detergent", "Ariel", "Safeguard Soap", "Oral-B"] },
+  { name: "Jack 'n Jill", company: "Universal Robina", is_client: false, category: "Groceries", skus: ["Piattos", "Nova", "Chippy", "Roller Coaster", "Chiz Curls", "Cream-O"] },
+  { name: "Universal Robina", company: "Universal Robina", is_client: false, category: "Groceries", skus: ["Ricoa Chocolate", "C2 Green Tea", "Great Taste Coffee", "Payless Noodles", "SkyFlakes"] },
+  { name: "Philip Morris", company: "Philip Morris", is_client: false, category: "Tobacco", skus: ["Marlboro", "Parliament", "L&M", "Chesterfield"] },
+  { name: "Colgate-Palmolive", company: "Colgate-Palmolive", is_client: false, category: "Health & Beauty", skus: ["Colgate Toothpaste", "Palmolive Soap", "Mennen", "Softlan"] }
 ];
 
 // Combined brands array
@@ -177,7 +201,7 @@ export const generateMockTransactions = (count: number = 1000): Transaction[] =>
     for (let j = 0; j < basketSize; j++) {
       const brand = availableBrands[Math.floor(Math.random() * availableBrands.length)];
       const sku = brand.skus[Math.floor(Math.random() * brand.skus.length)];
-      const category = brand.categories[Math.floor(Math.random() * brand.categories.length)];
+      const category = brand.category;
       const units = Math.floor(Math.random() * 3) + 1;
       const basePrice = Math.floor(Math.random() * 200) + 20;
       const price = basePrice * units;
@@ -282,7 +306,7 @@ export const getTopBrands = () => {
 };
 
 export const getCategoryMix = () => {
-  const allCategories = [...new Set(brands.flatMap(b => b.categories))];
+  const allCategories = [...new Set(brands.map(b => b.category))];
   return allCategories.map(category => ({
     category,
     count: Math.floor(Math.random() * 100) + 20,
