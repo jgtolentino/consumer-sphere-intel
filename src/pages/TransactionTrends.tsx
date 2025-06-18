@@ -1,15 +1,18 @@
-
 import React from 'react';
 import { Calendar, TrendingUp, Clock, BarChart3 } from 'lucide-react';
 import { TimeSeriesChart } from '../components/TimeSeriesChart';
+import { BoxPlot } from '../components/BoxPlot';
+import { useTransactions } from '../hooks/useTransactions';
 
 const TransactionTrends: React.FC = () => {
   console.log('TransactionTrends rendering with full content');
 
+  const { data: transactionData, isLoading } = useTransactions();
+
   const timeRanges = ['Last 24 hours', 'Last 7 days', 'Last 30 days', 'Last 90 days'];
   
-  // Mock time series data for the line chart
-  const timeSeriesData = [
+  // Use real data if available, otherwise fallback to mock data
+  const timeSeriesData = transactionData?.timeSeries || [
     { date: '2024-01-01', volume: 245, value: 18500 },
     { date: '2024-01-02', volume: 312, value: 23400 },
     { date: '2024-01-03', volume: 189, value: 14200 },
@@ -18,6 +21,14 @@ const TransactionTrends: React.FC = () => {
     { date: '2024-01-06', volume: 423, value: 31800 },
     { date: '2024-01-07', volume: 298, value: 22400 }
   ];
+
+  const valueDistribution = transactionData?.valueDistribution || {
+    min: 50,
+    q1: 420,
+    median: 847,
+    q3: 1650,
+    max: 8500
+  };
 
   // Mock distribution data for box plot stats
   const distributionStats = [
@@ -33,6 +44,17 @@ const TransactionTrends: React.FC = () => {
     hour: `${hour}:00`,
     intensity: Math.floor(Math.random() * 100) + 20
   }));
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6 p-6">
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-1/3 mb-2"></div>
+          <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 p-6">
@@ -112,7 +134,7 @@ const TransactionTrends: React.FC = () => {
       {/* Time Series Chart */}
       <TimeSeriesChart data={timeSeriesData} height={400} />
 
-      {/* Charts Grid */}
+      {/* Charts Grid - Updated to include BoxPlot */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
           <h3 className="text-lg font-semibold mb-4 text-gray-900">Revenue Distribution Analysis</h3>
@@ -155,6 +177,9 @@ const TransactionTrends: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Box Plot for Transaction Value Distribution */}
+      <BoxPlot data={valueDistribution} height={300} />
 
       {/* Regional Transaction Performance */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
