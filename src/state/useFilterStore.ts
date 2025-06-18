@@ -1,5 +1,6 @@
 
 import { create } from 'zustand';
+import { tbwaClientBrands, competitorBrands, regions } from '../data/mockData';
 
 interface DateRange {
   from: Date | null;
@@ -14,12 +15,19 @@ interface FilterState {
   skus: string[];
   stores: string[];
   channels: string[];
-  setFilter: <K extends keyof Omit<FilterState, 'setFilter' | 'reset' | 'getQueryString'>>(
+  setFilter: <K extends keyof Omit<FilterState, 'setFilter' | 'reset' | 'getQueryString' | 'getMasterLists'>>(
     key: K, 
     value: FilterState[K]
   ) => void;
   reset: () => void;
   getQueryString: () => string;
+  getMasterLists: () => {
+    allRegions: string[];
+    allBrands: string[];
+    allCategories: string[];
+    allCompanies: string[];
+    allChannels: string[];
+  };
 }
 
 const defaultState = {
@@ -41,7 +49,7 @@ export const useFilterStore = create<FilterState>((set, get) => ({
   
   getQueryString: () => {
     const state = get();
-    const { setFilter, reset, getQueryString, ...filters } = state;
+    const { setFilter, reset, getQueryString, getMasterLists, ...filters } = state;
     
     const params = new URLSearchParams();
     
@@ -71,5 +79,17 @@ export const useFilterStore = create<FilterState>((set, get) => ({
     }
     
     return params.toString();
+  },
+
+  getMasterLists: () => {
+    const allBrands = [...tbwaClientBrands, ...competitorBrands];
+    
+    return {
+      allRegions: regions.map(r => r.name).sort(),
+      allBrands: [...new Set(allBrands.map(b => b.name))].sort(),
+      allCategories: [...new Set(allBrands.map(b => b.category))].sort(),
+      allCompanies: [...new Set(allBrands.map(b => b.company))].sort(),
+      allChannels: ['Traditional', 'Modern Trade', 'Sari-Sari Store'].sort()
+    };
   }
 }));
