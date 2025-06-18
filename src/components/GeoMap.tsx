@@ -139,7 +139,7 @@ export const GeoMap: React.FC = () => {
       </div>
       <div className="w-full h-96">
         <MapContainer
-          center={[12.0, 122.0]} // Philippines center
+          center={[12.0, 122.0]}
           zoom={6}
           style={{ height: '100%', width: '100%' }}
           scrollWheelZoom={true}
