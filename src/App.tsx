@@ -35,7 +35,7 @@ const AppContent: React.FC = () => {
       
       <div className="flex">
         <Sidebar />
-        <main className="flex-1 ml-64">
+        <main className="flex-1 ml-64 pt-32">
           <Routes>
             <Route path="/" element={<Overview />} />
             <Route path="/transaction-trends" element={<TransactionTrends />} />

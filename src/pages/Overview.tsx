@@ -2,6 +2,7 @@
 import React from 'react';
 import { KpiCard } from '../components/KpiCard';
 import { AiRecommendationPanel } from '../components/AiRecommendationPanel';
+import { TimeSeriesChart } from '../components/TimeSeriesChart';
 import { ShoppingCart, DollarSign, Package, MapPin } from 'lucide-react';
 
 const Overview: React.FC = () => {
@@ -38,6 +39,17 @@ const Overview: React.FC = () => {
     }
   ];
 
+  // Mock time series data for the chart
+  const timeSeriesData = [
+    { date: '2024-01-01', volume: 245, value: 18500 },
+    { date: '2024-01-02', volume: 312, value: 23400 },
+    { date: '2024-01-03', volume: 189, value: 14200 },
+    { date: '2024-01-04', volume: 278, value: 20900 },
+    { date: '2024-01-05', volume: 356, value: 26800 },
+    { date: '2024-01-06', volume: 423, value: 31800 },
+    { date: '2024-01-07', volume: 298, value: 22400 }
+  ];
+
   console.log('KPIs data:', kpis);
   console.log('About to render Overview JSX');
 
@@ -66,11 +78,8 @@ const Overview: React.FC = () => {
 
       {/* Charts and Insights */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <h3 className="text-lg font-semibold mb-4 text-gray-900">Transaction Volume Trends</h3>
-          <div className="h-64 flex items-center justify-center bg-gradient-to-br from-blue-50 to-teal-50 rounded-lg">
-            <p className="text-gray-500">Chart visualization will be rendered here</p>
-          </div>
+        <div className="lg:col-span-2">
+          <TimeSeriesChart data={timeSeriesData} height={300} />
         </div>
         
         <AiRecommendationPanel />
