@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { ComposedChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 interface BoxPlotProps {
   data: {
@@ -21,29 +22,130 @@ export const BoxPlot: React.FC<BoxPlotProps> = ({ data, height = 300 }) => {
     );
   }
 
+  // Transform data for box plot visualization
+  const boxPlotData = [
+    {
+      name: 'Distribution',
+      min: data.min,
+      q1: data.q1,
+      median: data.median,
+      q3: data.q3,
+      max: data.max,
+      // Calculate ranges for visualization
+      lowerWhisker: data.q1 - data.min,
+      box: data.q3 - data.q1,
+      upperWhisker: data.max - data.q3
+    }
+  ];
+
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload;
+      return (
+        <div className="bg-white p-4 border border-gray-300 rounded-lg shadow-lg">
+          <h4 className="font-semibold text-scout-navy mb-2">Transaction Value Distribution</h4>
+          <div className="space-y-1 text-sm">
+            <div className="flex justify-between">
+              <span className="text-gray-600">Maximum:</span>
+              <span className="font-medium text-scout-navy">₱{data.max.toLocaleString()}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Q3 (75th percentile):</span>
+              <span className="font-medium text-scout-navy">₱{data.q3.toLocaleString()}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Median (50th percentile):</span>
+              <span className="font-medium text-scout-teal">₱{data.median.toLocaleString()}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Q1 (25th percentile):</span>
+              <span className="font-medium text-scout-navy">₱{data.q1.toLocaleString()}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Minimum:</span>
+              <span className="font-medium text-scout-navy">₱{data.min.toLocaleString()}</span>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
-    <div className="bg-white p-6 rounded-lg shadow">
-      <h3 className="text-lg font-semibold mb-4">Transaction Value Distribution</h3>
-      <div className="space-y-2">
-        <div className="flex justify-between">
-          <span className="text-sm text-gray-600">Maximum:</span>
-          <span className="font-medium">₱{data.max.toLocaleString()}</span>
+    <div style={{ width: '100%', height }}>
+      <ResponsiveContainer>
+        <ComposedChart
+          data={boxPlotData}
+          margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+        >
+          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+          <XAxis 
+            dataKey="name" 
+            axisLine={false}
+            tickLine={false}
+            tick={{ fontSize: 12, fill: '#6b7280' }}
+          />
+          <YAxis 
+            axisLine={false}
+            tickLine={false}
+            tick={{ fontSize: 12, fill: '#6b7280' }}
+            tickFormatter={(value) => `₱${value.toLocaleString()}`}
+            domain={[0, 'dataMax']}
+          />
+          <Tooltip content={<CustomTooltip />} />
+          
+          {/* Lower whisker */}
+          <Bar 
+            dataKey="min" 
+            fill="#36CFC9" 
+            opacity={0.3}
+            stroke="#36CFC9"
+            strokeWidth={2}
+          />
+          
+          {/* IQR Box */}
+          <Bar 
+            dataKey="box" 
+            fill="#36CFC9" 
+            opacity={0.6}
+            stroke="#0A2540"
+            strokeWidth={1}
+            stackId="box"
+          />
+          
+          {/* Median line visualization */}
+          <Bar 
+            dataKey="median" 
+            fill="#0A2540" 
+            opacity={0.8}
+            stroke="#0A2540"
+            strokeWidth={3}
+          />
+        </ComposedChart>
+      </ResponsiveContainer>
+      
+      {/* Stats summary below chart */}
+      <div className="grid grid-cols-5 gap-2 mt-4 text-center text-xs">
+        <div className="p-2 bg-scout-light rounded">
+          <div className="font-semibold text-scout-navy">Min</div>
+          <div className="text-scout-dark">₱{data.min.toLocaleString()}</div>
         </div>
-        <div className="flex justify-between">
-          <span className="text-sm text-gray-600">Q3 (75th percentile):</span>
-          <span className="font-medium">₱{data.q3.toLocaleString()}</span>
+        <div className="p-2 bg-scout-light rounded">
+          <div className="font-semibold text-scout-navy">Q1</div>
+          <div className="text-scout-dark">₱{data.q1.toLocaleString()}</div>
         </div>
-        <div className="flex justify-between">
-          <span className="text-sm text-gray-600">Median:</span>
-          <span className="font-medium">₱{data.median.toLocaleString()}</span>
+        <div className="p-2 bg-scout-teal bg-opacity-10 rounded">
+          <div className="font-semibold text-scout-teal">Median</div>
+          <div className="text-scout-navy font-medium">₱{data.median.toLocaleString()}</div>
         </div>
-        <div className="flex justify-between">
-          <span className="text-sm text-gray-600">Q1 (25th percentile):</span>
-          <span className="font-medium">₱{data.q1.toLocaleString()}</span>
+        <div className="p-2 bg-scout-light rounded">
+          <div className="font-semibold text-scout-navy">Q3</div>
+          <div className="text-scout-dark">₱{data.q3.toLocaleString()}</div>
         </div>
-        <div className="flex justify-between">
-          <span className="text-sm text-gray-600">Minimum:</span>
-          <span className="font-medium">₱{data.min.toLocaleString()}</span>
+        <div className="p-2 bg-scout-light rounded">
+          <div className="font-semibold text-scout-navy">Max</div>
+          <div className="text-scout-dark">₱{data.max.toLocaleString()}</div>
         </div>
       </div>
     </div>

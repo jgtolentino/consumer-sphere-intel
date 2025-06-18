@@ -9,10 +9,40 @@ import {
   getStorekeeperInfluence
 } from '../data/mockData';
 
+// FMCG categories filter
+const FMCG_CATEGORIES = [
+  'Dairy & Milk Products',
+  'Snacks & Confectionery', 
+  'Beverages',
+  'Personal Care',
+  'Household Cleaning',
+  'Food & Grocery',
+  'Health & Wellness',
+  'Baby Care',
+  'Tobacco Products',
+  'Frozen Foods',
+  'Canned Goods',
+  'Condiments & Sauces',
+  'Bakery Products',
+  'Fresh Produce'
+];
+
 export class MockDataService implements DataService {
+  private filterFMCGTransactions(transactions: any[]) {
+    return transactions.map(transaction => ({
+      ...transaction,
+      basket: transaction.basket.filter((item: any) => 
+        FMCG_CATEGORIES.includes(item.category)
+      )
+    })).filter(transaction => transaction.basket.length > 0);
+  }
+
   async getTransactions(filters?: any): Promise<any[]> {
     // Apply filters to mock data if provided
     let filteredTransactions = [...mockTransactions];
+    
+    // Filter to FMCG categories only
+    filteredTransactions = this.filterFMCGTransactions(filteredTransactions);
     
     if (filters?.dateRange?.from) {
       filteredTransactions = filteredTransactions.filter(t => 
@@ -28,13 +58,13 @@ export class MockDataService implements DataService {
     
     if (filters?.categories?.length > 0) {
       filteredTransactions = filteredTransactions.filter(t =>
-        t.basket.some(item => filters.categories.includes(item.category))
+        t.basket.some((item: any) => filters.categories.includes(item.category))
       );
     }
     
     if (filters?.brands?.length > 0) {
       filteredTransactions = filteredTransactions.filter(t =>
-        t.basket.some(item => filters.brands.includes(item.brand))
+        t.basket.some((item: any) => filters.brands.includes(item.brand))
       );
     }
     
@@ -61,8 +91,9 @@ export class MockDataService implements DataService {
   }
 
   async getProductData(): Promise<any> {
-    // Process mock product data from transactions
-    const allItems = mockTransactions.flatMap(t => t.basket);
+    // Process mock product data from transactions with FMCG filter
+    const fmcgTransactions = this.filterFMCGTransactions(mockTransactions);
+    const allItems = fmcgTransactions.flatMap(t => t.basket);
     
     return {
       categoryMix: this.processCategoryMix(allItems),
@@ -141,7 +172,9 @@ export class MockDataService implements DataService {
   private processCategoryMix(items: any[]) {
     const categoryCount: Record<string, number> = {};
     items.forEach(item => {
-      categoryCount[item.category] = (categoryCount[item.category] || 0) + item.units;
+      if (FMCG_CATEGORIES.includes(item.category)) {
+        categoryCount[item.category] = (categoryCount[item.category] || 0) + item.units;
+      }
     });
     
     return Object.entries(categoryCount).map(([category, count]) => ({
