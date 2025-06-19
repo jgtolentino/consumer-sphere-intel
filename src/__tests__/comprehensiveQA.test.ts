@@ -1,3 +1,4 @@
+
 import { describe, it, expect, beforeAll } from 'vitest';
 import { 
   mockTransactions, 
@@ -212,7 +213,8 @@ describe('Comprehensive QA Audit - 5,000 Mock Records', () => {
         const brandsInBasket = new Set(txn.basket?.map((item: any) => String(item.brand)) || []);
         brandsInBasket.forEach(brand => {
           const brandStr = String(brand);
-          brandCounts.set(brandStr, (brandCounts.get(brandStr) || 0) + 1);
+          const currentCount = brandCounts.get(brandStr) || 0;
+          brandCounts.set(brandStr, currentCount + 1);
         });
       });
       
