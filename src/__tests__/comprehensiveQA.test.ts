@@ -196,7 +196,7 @@ describe('Comprehensive QA Audit - 5,000 Mock Records', () => {
         
         // Sum of all cities should equal region total
         const citySum = Object.values(cityValidation.details.groups)
-          .reduce((sum, count) => {
+          .reduce((sum: number, count) => {
             const countValue = Number(count) || 0;
             return sum + countValue;
           }, 0);
