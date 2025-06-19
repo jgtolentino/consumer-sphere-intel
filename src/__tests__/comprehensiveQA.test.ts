@@ -1,4 +1,3 @@
-
 import { describe, it, expect, beforeAll } from 'vitest';
 import { 
   mockTransactions, 
@@ -96,9 +95,13 @@ describe('Comprehensive QA Audit - 5,000 Mock Records', () => {
         return sum + transactionTotal;
       }, 0);
       const avgBasketSize = totalRevenue / allTransactions.length;
-      const totalItems = allTransactions.reduce((sum: number, t: any) => 
-        sum + (t.basket?.reduce((itemSum: number, item: any) => itemSum + (Number(item.units) || 0), 0) || 0), 0
-      );
+      const totalItems = allTransactions.reduce((sum: number, t: any) => {
+        const basketTotal = t.basket?.reduce((itemSum: number, item: any) => {
+          const itemUnits = Number(item.units) || 0;
+          return itemSum + itemUnits;
+        }, 0) || 0;
+        return sum + basketTotal;
+      }, 0);
       
       expect(allTransactions.length).toBe(5000);
       expect(totalRevenue).toBeGreaterThan(0);
@@ -116,8 +119,14 @@ describe('Comprehensive QA Audit - 5,000 Mock Records', () => {
       expect(combined.length).toBe(ncr.length + bicol.length);
       
       // Validate all filtered transactions are from correct regions
-      ncr.forEach((t: any) => expect(String(t.region)).toBe('NCR'));
-      bicol.forEach((t: any) => expect(String(t.region)).toBe('Bicol Region'));
+      ncr.forEach((t: any) => {
+        const regionValue = String(t.region);
+        expect(regionValue).toBe('NCR');
+      });
+      bicol.forEach((t: any) => {
+        const regionValue = String(t.region);
+        expect(regionValue).toBe('Bicol Region');
+      });
     });
 
     it('should filter data correctly by brand', async () => {
@@ -127,10 +136,11 @@ describe('Comprehensive QA Audit - 5,000 Mock Records', () => {
       
       expect(alaska.length).toBeGreaterThan(0);
       alaska.forEach((t: any) => {
-        const hasAlaskaBrand = t.basket?.some((item: any) => 
-          String(item.brand).includes('Alaska Evaporated Milk') || 
-          String(item.brand).includes('Alaska Condensed Milk')
-        );
+        const hasAlaskaBrand = t.basket?.some((item: any) => {
+          const brandName = String(item.brand);
+          return brandName.includes('Alaska Evaporated Milk') || 
+                 brandName.includes('Alaska Condensed Milk');
+        });
         expect(hasAlaskaBrand).toBe(true);
       });
     });
@@ -147,7 +157,8 @@ describe('Comprehensive QA Audit - 5,000 Mock Records', () => {
       expect(recentTransactions.length).toBeLessThan(5000);
       
       recentTransactions.forEach((t: any) => {
-        expect(new Date(String(t.date)).getTime()).toBeGreaterThanOrEqual(thirtyDaysAgo.getTime());
+        const dateValue = String(t.date);
+        expect(new Date(dateValue).getTime()).toBeGreaterThanOrEqual(thirtyDaysAgo.getTime());
       });
     });
   });
@@ -271,14 +282,16 @@ describe('Comprehensive QA Audit - 5,000 Mock Records', () => {
         const txnRegion = String(txn.region);
         expect(['NCR', 'CALABARZON']).toContain(txnRegion);
         
-        const hasValidBrand = txn.basket?.some((item: any) => 
-          ['Alaska Evaporated Milk', 'Oishi Prawn Crackers'].includes(String(item.brand))
-        );
+        const hasValidBrand = txn.basket?.some((item: any) => {
+          const brandName = String(item.brand);
+          return ['Alaska Evaporated Milk', 'Oishi Prawn Crackers'].includes(brandName);
+        });
         expect(hasValidBrand).toBe(true);
         
-        const hasValidCategory = txn.basket?.some((item: any) => 
-          ['Dairy', 'Snacks'].includes(String(item.category))
-        );
+        const hasValidCategory = txn.basket?.some((item: any) => {
+          const categoryName = String(item.category);
+          return ['Dairy', 'Snacks'].includes(categoryName);
+        });
         expect(hasValidCategory).toBe(true);
       });
     });
@@ -450,14 +463,21 @@ describe('Comprehensive QA Audit - 5,000 Mock Records', () => {
         // Validate filtered results meet criteria
         result.forEach((txn: any) => {
           if (filters.regions) {
-            expect(filters.regions).toContain(String(txn.region));
+            const regionValue = String(txn.region);
+            expect(filters.regions).toContain(regionValue);
           }
           if (filters.categories) {
-            const hasCategory = txn.basket?.some((item: any) => filters.categories!.includes(String(item.category)));
+            const hasCategory = txn.basket?.some((item: any) => {
+              const categoryValue = String(item.category);
+              return filters.categories!.includes(categoryValue);
+            });
             expect(hasCategory).toBe(true);
           }
           if (filters.brands) {
-            const hasBrand = txn.basket?.some((item: any) => filters.brands!.includes(String(item.brand)));
+            const hasBrand = txn.basket?.some((item: any) => {
+              const brandValue = String(item.brand);
+              return filters.brands!.includes(brandValue);
+            });
             expect(hasBrand).toBe(true);
           }
         });
