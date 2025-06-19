@@ -3,7 +3,7 @@ import React from 'react';
 import { KpiCard } from '../components/KpiCard';
 import { AiRecommendationPanel } from '../components/AiRecommendationPanel';
 import { TimeSeriesChart } from '../components/TimeSeriesChart';
-import { MapboxBubbleMap } from '../components/MapboxBubbleMap';
+import { ChoroplethMap } from '../components/ChoroplethMap';
 import { ShoppingCart, DollarSign, Package, MapPin } from 'lucide-react';
 import { mockTransactions, getTopBrands } from '../data/mockData';
 
@@ -91,8 +91,8 @@ const Overview: React.FC = () => {
         </div>
       </div>
 
-      {/* Mapbox Bubble Map */}
-      <MapboxBubbleMap />
+      {/* Choropleth Map */}
+      <ChoroplethMap />
 
       {/* TBWA Client Brand Performance */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 xl:p-6">
