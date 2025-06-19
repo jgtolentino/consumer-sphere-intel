@@ -13,11 +13,11 @@ const FMCG_BASELINES = {
   dailyTransactions: 1250, // Medium store
   marketShareDistribution: [34.2, 25.2, 21.1, 22.8, 9.8, 15.4], // Top 6 regions
   brandDistribution: [
-    { name: 'JTI', category: 'Tobacco', marketShare: 35.8, revenue: 125000000 },
-    { name: 'Alaska', category: 'Dairy & Beverages', marketShare: 28.5, revenue: 89000000 },
-    { name: 'Oishi', category: 'Snacks', marketShare: 24.2, revenue: 76000000 },
-    { name: 'Del Monte', category: 'Food Products', marketShare: 18.7, revenue: 58000000 },
-    { name: 'Peerless', category: 'Beverages', marketShare: 16.3, revenue: 51000000 }
+    { name: 'JTI', category: 'Tobacco', marketShare: 31.3, revenue: 125000000 },
+    { name: 'Alaska', category: 'Dairy & Beverages', marketShare: 22.3, revenue: 89000000 },
+    { name: 'Oishi', category: 'Snacks', marketShare: 19.0, revenue: 76000000 },
+    { name: 'Del Monte', category: 'Food Products', marketShare: 14.5, revenue: 58000000 },
+    { name: 'Peerless', category: 'Beverages', marketShare: 12.8, revenue: 51000000 }
   ]
 };
 
@@ -86,26 +86,26 @@ export const imputeRegionalPerformance = (realData: any[] = []): ImputationResul
     }
   }
 
-  // Professional regional baseline - all 18 Philippine regions (scaled to realistic levels)
+  // Professional regional baseline - all 18 Philippine regions (market shares total 100%)
   const baselineData = [
-    { region: 'National Capital Region', revenue: 420000000, marketShare: 34.2 },
-    { region: 'CALABARZON', revenue: 310000000, marketShare: 25.2 },
-    { region: 'Central Luzon', revenue: 260000000, marketShare: 21.1 },
-    { region: 'Central Visayas', revenue: 280000000, marketShare: 22.8 },
-    { region: 'Western Visayas', revenue: 120000000, marketShare: 9.8 },
-    { region: 'Davao Region', revenue: 190000000, marketShare: 15.4 },
-    { region: 'Ilocos Region', revenue: 85000000, marketShare: 6.9 },
-    { region: 'Cagayan Valley', revenue: 62000000, marketShare: 5.0 },
-    { region: 'Cordillera Administrative Region', revenue: 75000000, marketShare: 6.1 },
-    { region: 'Bicol Region', revenue: 72000000, marketShare: 5.9 },
-    { region: 'MIMAROPA', revenue: 48000000, marketShare: 3.9 },
-    { region: 'Eastern Visayas', revenue: 59000000, marketShare: 4.8 },
-    { region: 'Negros Island Region', revenue: 68000000, marketShare: 5.5 },
-    { region: 'Northern Mindanao', revenue: 110000000, marketShare: 8.9 },
-    { region: 'SOCCSKSARGEN', revenue: 78000000, marketShare: 6.3 },
-    { region: 'Zamboanga Peninsula', revenue: 52000000, marketShare: 4.2 },
-    { region: 'CARAGA', revenue: 42000000, marketShare: 3.4 },
-    { region: 'Bangsamoro Autonomous Region in Muslim Mindanao', revenue: 38000000, marketShare: 3.1 }
+    { region: 'National Capital Region', revenue: 420000000, marketShare: 17.7 },
+    { region: 'CALABARZON', revenue: 310000000, marketShare: 13.1 },
+    { region: 'Central Visayas', revenue: 280000000, marketShare: 11.8 },
+    { region: 'Central Luzon', revenue: 260000000, marketShare: 11.0 },
+    { region: 'Davao Region', revenue: 190000000, marketShare: 8.0 },
+    { region: 'Western Visayas', revenue: 120000000, marketShare: 5.1 },
+    { region: 'Northern Mindanao', revenue: 110000000, marketShare: 4.6 },
+    { region: 'Ilocos Region', revenue: 85000000, marketShare: 3.6 },
+    { region: 'SOCCSKSARGEN', revenue: 78000000, marketShare: 3.3 },
+    { region: 'Cordillera Administrative Region', revenue: 75000000, marketShare: 3.2 },
+    { region: 'Bicol Region', revenue: 72000000, marketShare: 3.0 },
+    { region: 'Negros Island Region', revenue: 68000000, marketShare: 2.9 },
+    { region: 'Cagayan Valley', revenue: 62000000, marketShare: 2.6 },
+    { region: 'Eastern Visayas', revenue: 59000000, marketShare: 2.5 },
+    { region: 'Zamboanga Peninsula', revenue: 52000000, marketShare: 2.2 },
+    { region: 'MIMAROPA', revenue: 48000000, marketShare: 2.0 },
+    { region: 'CARAGA', revenue: 42000000, marketShare: 1.8 },
+    { region: 'Bangsamoro Autonomous Region in Muslim Mindanao', revenue: 38000000, marketShare: 1.6 }
   ];
 
   return {
