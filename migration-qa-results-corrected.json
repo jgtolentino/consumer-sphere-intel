@@ -1,0 +1,152 @@
+{
+  "timestamp": "2025-06-19T19:26:46.419Z",
+  "environment": "Production",
+  "database": "consumer-sphere-intel (Corrected Schema)",
+  "tests": {
+    "dataConsistency": {
+      "transactionItemsQuery": {
+        "status": "PASS",
+        "details": "Retrieved 5 transaction items",
+        "timestamp": "2025-06-19T19:26:46.795Z"
+      },
+      "priceUnitPriceConsistency": {
+        "status": "PASS",
+        "details": "price and unit_price are consistent",
+        "timestamp": "2025-06-19T19:26:46.795Z"
+      },
+      "customerSpendingLogic": {
+        "status": "PASS",
+        "details": "All customer spending values are valid",
+        "timestamp": "2025-06-19T19:26:46.862Z"
+      }
+    },
+    "schemaValidation": {
+      "transactionColumns": {
+        "status": "PASS",
+        "details": "Found 18 columns",
+        "timestamp": "2025-06-19T19:26:46.714Z"
+      },
+      "customerColumns": {
+        "status": "PASS",
+        "details": "Found 12 columns",
+        "timestamp": "2025-06-19T19:26:46.714Z"
+      },
+      "transactionItemsColumns": {
+        "status": "PASS",
+        "details": "Found 7 columns",
+        "timestamp": "2025-06-19T19:26:46.714Z"
+      },
+      "customerAgeColumn": {
+        "status": "PASS",
+        "details": "customer_age exists in transactions",
+        "timestamp": "2025-06-19T19:26:46.714Z"
+      },
+      "deviceIdColumn": {
+        "status": "PASS",
+        "details": "device_id exists for edge tracking",
+        "timestamp": "2025-06-19T19:26:46.714Z"
+      },
+      "loyaltyTierColumn": {
+        "status": "PASS",
+        "details": "loyalty_tier exists in customers",
+        "timestamp": "2025-06-19T19:26:46.714Z"
+      }
+    },
+    "rowLevelSecurity": {
+      "anonReadBrands": {
+        "status": "PASS",
+        "details": "Anon can read 3 brands",
+        "timestamp": "2025-06-19T19:26:46.939Z"
+      },
+      "anonReadTransactions": {
+        "status": "PASS",
+        "details": "Anon can read 3 transactions",
+        "timestamp": "2025-06-19T19:26:47.014Z"
+      },
+      "serviceRoleAccess": {
+        "status": "PASS",
+        "details": "Service role has full read access",
+        "timestamp": "2025-06-19T19:26:47.127Z"
+      }
+    },
+    "businessLogic": {
+      "dashboardSummary": {
+        "status": "PASS",
+        "details": "Dashboard summary returns 1 metrics",
+        "timestamp": "2025-06-19T19:26:47.219Z"
+      },
+      "brandPerformance": {
+        "status": "PASS",
+        "details": "Brand performance returns 10 records",
+        "timestamp": "2025-06-19T19:26:47.316Z"
+      },
+      "revenueCalculation": {
+        "status": "PASS",
+        "details": "Total revenue: $18575.00, Avg: $18.57",
+        "timestamp": "2025-06-19T19:26:47.397Z"
+      }
+    },
+    "performance": {
+      "transactionQuery100": {
+        "status": "PASS",
+        "details": "Query took 66ms for 100 recent transactions",
+        "timestamp": "2025-06-19T19:26:47.463Z"
+      },
+      "aggregationQuery": {
+        "status": "PASS",
+        "details": "Aggregation query took 78ms for 500 items",
+        "timestamp": "2025-06-19T19:26:47.541Z"
+      }
+    }
+  },
+  "summary": {
+    "passed": 17,
+    "failed": 0,
+    "warnings": 0
+  },
+  "schemaInfo": {
+    "actualTransactionColumns": [
+      "checkout_seconds",
+      "checkout_time",
+      "created_at",
+      "customer_age",
+      "customer_gender",
+      "device_id",
+      "id",
+      "is_weekend",
+      "nlp_confidence_score",
+      "nlp_processed",
+      "nlp_processed_at",
+      "payment_method",
+      "request_type",
+      "store_id",
+      "store_location",
+      "suggestion_accepted",
+      "total_amount",
+      "transcription_text"
+    ],
+    "actualCustomerColumns": [
+      "age",
+      "barangay",
+      "city",
+      "created_at",
+      "customer_id",
+      "gender",
+      "id",
+      "loyalty_tier",
+      "name",
+      "region",
+      "total_spent",
+      "visit_count"
+    ],
+    "actualTransactionItemsColumns": [
+      "created_at",
+      "id",
+      "price",
+      "product_id",
+      "quantity",
+      "transaction_id",
+      "unit_price"
+    ]
+  }
+}

@@ -1,0 +1,118 @@
+{
+  "timestamp": "2025-06-19T19:24:57.855Z",
+  "environment": "Production",
+  "database": "consumer-sphere-intel",
+  "tests": {
+    "dataConsistency": {
+      "rowCount_brands": {
+        "status": "PASS",
+        "details": "89 rows",
+        "timestamp": "2025-06-19T19:24:58.001Z"
+      },
+      "rowCount_customers": {
+        "status": "PASS",
+        "details": "5 rows",
+        "timestamp": "2025-06-19T19:24:58.087Z"
+      },
+      "rowCount_transactions": {
+        "status": "PASS",
+        "details": "18001 rows",
+        "timestamp": "2025-06-19T19:24:58.191Z"
+      },
+      "rowCount_products": {
+        "status": "PASS",
+        "details": "109 rows",
+        "timestamp": "2025-06-19T19:24:58.290Z"
+      },
+      "rowCount_stores": {
+        "status": "PASS",
+        "details": "4 rows",
+        "timestamp": "2025-06-19T19:24:58.376Z"
+      },
+      "rowCount_transaction_items": {
+        "status": "PASS",
+        "details": "3746 rows",
+        "timestamp": "2025-06-19T19:24:58.803Z"
+      },
+      "crossTableJoins": {
+        "status": "FAIL",
+        "details": "Could not embed because more than one relationship was found for 'transaction_items' and 'transactions'",
+        "timestamp": "2025-06-19T19:24:58.903Z"
+      },
+      "foreignKeyIntegrity": {
+        "status": "PASS",
+        "details": "Found 0 orphaned transaction_items",
+        "timestamp": "2025-06-19T19:24:58.975Z"
+      }
+    },
+    "indexConstraints": {
+      "checkConstraint_positivePrice": {
+        "status": "PASS",
+        "details": "Constraint working - rejected negative price",
+        "timestamp": "2025-06-19T19:24:59.043Z"
+      },
+      "foreignKeyConstraint": {
+        "status": "PASS",
+        "details": "FK constraint working - rejected invalid IDs",
+        "timestamp": "2025-06-19T19:24:59.110Z"
+      },
+      "uniqueConstraint_brandName": {
+        "status": "FAIL",
+        "details": "Unique constraint failed",
+        "timestamp": "2025-06-19T19:24:59.180Z"
+      }
+    },
+    "rowLevelSecurity": {
+      "anonReadAccess": {
+        "status": "PASS",
+        "details": "Anon can read 5 brands",
+        "timestamp": "2025-06-19T19:24:59.281Z"
+      },
+      "anonWriteRestriction": {
+        "status": "FAIL",
+        "details": "RLS failed - anon could write",
+        "timestamp": "2025-06-19T19:24:59.350Z"
+      },
+      "serviceRoleAccess": {
+        "status": "PASS",
+        "details": "Service role has full access",
+        "timestamp": "2025-06-19T19:24:59.420Z"
+      }
+    },
+    "auditTriggers": {
+      "createdAtTimestamp": {
+        "status": "PASS",
+        "details": "created_at set to 2025-06-19T19:24:59.564373+00:00",
+        "timestamp": "2025-06-19T19:24:59.574Z"
+      },
+      "updatedAtTrigger": {
+        "status": "FAIL",
+        "details": "updated_at did not change",
+        "timestamp": "2025-06-19T19:25:00.699Z"
+      }
+    },
+    "codeWiring": {},
+    "edgeCases": {
+      "unicodeEmoji": {
+        "status": "PASS",
+        "details": "Unicode and emoji support working",
+        "timestamp": "2025-06-19T19:25:00.859Z"
+      },
+      "largeNumericValues": {
+        "status": "FAIL",
+        "details": "Could not find the 'items_count' column of 'transactions' in the schema cache",
+        "timestamp": "2025-06-19T19:25:01.003Z"
+      },
+      "nullHandling": {
+        "status": "FAIL",
+        "details": "Could not find the 'email' column of 'customers' in the schema cache",
+        "timestamp": "2025-06-19T19:25:01.066Z"
+      }
+    }
+  },
+  "summary": {
+    "passed": 13,
+    "failed": 6,
+    "warnings": 0
+  }
+}
