@@ -1,12 +1,13 @@
 
 import { supabase } from '../integrations/supabase/client';
 import { DataService } from '../providers/DataProvider';
+import { SUPABASE_LIMITS } from '../config/supabase-limits';
 
 export class RealDataService implements DataService {
   constructor(private apiBaseUrl?: string) {}
 
   async getTransactions(filters?: any): Promise<any[]> {
-    let query = supabase
+    let baseQuery = supabase
       .from('transactions')
       .select(`
         *,
@@ -19,24 +20,50 @@ export class RealDataService implements DataService {
 
     // Apply filters
     if (filters?.dateRange?.from) {
-      query = query.gte('created_at', filters.dateRange.from.toISOString());
+      baseQuery = baseQuery.gte('created_at', filters.dateRange.from.toISOString());
     }
     if (filters?.dateRange?.to) {
-      query = query.lte('created_at', filters.dateRange.to.toISOString());
+      baseQuery = baseQuery.lte('created_at', filters.dateRange.to.toISOString());
     }
     if (filters?.regions?.length > 0) {
-      query = query.in('store_location', filters.regions);
+      baseQuery = baseQuery.in('store_location', filters.regions);
     }
 
-    const { data, error } = await query.limit(5000);
-    
-    if (error) {
-      console.error('Error fetching transactions:', error);
-      throw error;
+    // Use pagination to get more than 1000 records
+    const allData: any[] = [];
+    const pageSize = 1000; // Supabase default limit
+    let page = 0;
+    const maxRecords = SUPABASE_LIMITS.transactions;
+
+    while (allData.length < maxRecords) {
+      const query = baseQuery
+        .range(page * pageSize, (page + 1) * pageSize - 1)
+        .order('created_at', { ascending: false });
+
+      const { data, error } = await query;
+      
+      if (error) {
+        console.error('Error fetching transactions:', error);
+        throw error;
+      }
+
+      if (!data || data.length === 0) {
+        break; // No more records
+      }
+
+      allData.push(...data);
+      page++;
+
+      // Stop if we've reached our limit or got less than a full page
+      if (data.length < pageSize || allData.length >= maxRecords) {
+        break;
+      }
     }
+
+    console.log(`Total FMCG transactions after filtering: ${allData.length}`);
 
     // Transform to match mock data structure
-    return data?.map(transaction => ({
+    return allData.slice(0, maxRecords).map(transaction => ({
       id: transaction.id,
       date: transaction.created_at,
       total: transaction.total_amount,
@@ -52,7 +79,7 @@ export class RealDataService implements DataService {
         units: item.quantity,
         price: item.price * item.quantity
       })) || []
-    })) || [];
+    }));
   }
 
   async getRegionalData(): Promise<any[]> {
@@ -82,7 +109,7 @@ export class RealDataService implements DataService {
       .from('brand_analytics')
       .select('*')
       .order('total_revenue', { ascending: false })
-      .limit(20);
+      .limit(SUPABASE_LIMITS.brands);
 
     if (error) throw error;
 
