@@ -11,18 +11,19 @@ const brandData = [
   { name: 'Winston', marketShare: 20, growth: 5, revenue: 700000 }
 ];
 
+// Use Scout Analytics brand colors
 const chartConfig = {
   marketShare: {
     label: "Market Share %",
-    color: "hsl(var(--chart-1))",
+    color: "#36CFC9", // Scout teal
   },
   growth: {
     label: "Growth %",
-    color: "hsl(var(--chart-2))",
+    color: "#0A2540", // Scout navy
   },
   revenue: {
     label: "Revenue",
-    color: "hsl(var(--chart-3))",
+    color: "#2F3A4F", // Scout dark
   },
 };
 
@@ -38,14 +39,18 @@ export const BrandPerformanceChart: React.FC<BrandPerformanceChartProps> = ({ ac
           <ChartContainer config={chartConfig} className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={brandData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis tickFormatter={(value) => `₱${(value / 1000000).toFixed(1)}M`} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <XAxis dataKey="name" stroke="#64748b" fontSize={12} />
+                <YAxis 
+                  tickFormatter={(value) => `₱${(value / 1000000).toFixed(1)}M`} 
+                  stroke="#64748b" 
+                  fontSize={12}
+                />
                 <ChartTooltip 
                   content={<ChartTooltipContent />}
                   formatter={(value: any) => [`₱${(value / 1000000).toFixed(1)}M`, 'Revenue']}
                 />
-                <Bar dataKey="revenue" fill="var(--color-revenue)" />
+                <Bar dataKey="revenue" fill="#2F3A4F" />
               </BarChart>
             </ResponsiveContainer>
           </ChartContainer>
@@ -56,14 +61,18 @@ export const BrandPerformanceChart: React.FC<BrandPerformanceChartProps> = ({ ac
           <ChartContainer config={chartConfig} className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={brandData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis tickFormatter={(value) => `${value}%`} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <XAxis dataKey="name" stroke="#64748b" fontSize={12} />
+                <YAxis 
+                  tickFormatter={(value) => `${value}%`} 
+                  stroke="#64748b" 
+                  fontSize={12}
+                />
                 <ChartTooltip 
                   content={<ChartTooltipContent />}
                   formatter={(value: any) => [`${value}%`, 'Market Share']}
                 />
-                <Bar dataKey="marketShare" fill="var(--color-marketShare)" />
+                <Bar dataKey="marketShare" fill="#36CFC9" />
               </BarChart>
             </ResponsiveContainer>
           </ChartContainer>
@@ -74,9 +83,13 @@ export const BrandPerformanceChart: React.FC<BrandPerformanceChartProps> = ({ ac
           <ChartContainer config={chartConfig} className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={brandData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis tickFormatter={(value) => `${value}%`} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <XAxis dataKey="name" stroke="#64748b" fontSize={12} />
+                <YAxis 
+                  tickFormatter={(value) => `${value}%`} 
+                  stroke="#64748b" 
+                  fontSize={12}
+                />
                 <ChartTooltip 
                   content={<ChartTooltipContent />}
                   formatter={(value: any) => [`${value}%`, 'Growth']}
@@ -84,9 +97,9 @@ export const BrandPerformanceChart: React.FC<BrandPerformanceChartProps> = ({ ac
                 <Line 
                   type="monotone" 
                   dataKey="growth" 
-                  stroke="var(--color-growth)" 
+                  stroke="#0A2540" 
                   strokeWidth={3}
-                  dot={{ fill: "var(--color-growth)", strokeWidth: 2, r: 6 }}
+                  dot={{ fill: "#0A2540", strokeWidth: 2, r: 6 }}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -102,7 +115,7 @@ export const BrandPerformanceChart: React.FC<BrandPerformanceChartProps> = ({ ac
     <div className="space-y-6">
       {/* Active Chart */}
       <div>
-        <h4 className="text-sm font-medium text-gray-700 mb-3">
+        <h4 className="text-sm font-medium text-scout-dark mb-3">
           {activeTab === 'revenue' && 'Revenue Performance'}
           {activeTab === 'marketShare' && 'Market Share Distribution'}
           {activeTab === 'growth' && 'Growth Rate Comparison'}
@@ -112,36 +125,48 @@ export const BrandPerformanceChart: React.FC<BrandPerformanceChartProps> = ({ ac
 
       {/* Growth vs Market Share Scatter */}
       <div>
-        <h4 className="text-sm font-medium text-gray-700 mb-3">Growth vs Market Share Analysis</h4>
+        <h4 className="text-sm font-medium text-scout-dark mb-3">Growth vs Market Share Analysis</h4>
         <ChartContainer config={chartConfig} className="h-64">
           <ResponsiveContainer width="100%" height="100%">
             <ScatterChart data={brandData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="marketShare" name="Market Share" unit="%" />
-              <YAxis dataKey="growth" name="Growth" unit="%" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <XAxis 
+                dataKey="marketShare" 
+                name="Market Share" 
+                unit="%" 
+                stroke="#64748b" 
+                fontSize={12}
+              />
+              <YAxis 
+                dataKey="growth" 
+                name="Growth" 
+                unit="%" 
+                stroke="#64748b" 
+                fontSize={12}
+              />
               <ChartTooltip content={<ChartTooltipContent />} />
-              <Scatter dataKey="growth" fill="var(--color-growth)" />
+              <Scatter dataKey="growth" fill="#0A2540" />
             </ScatterChart>
           </ResponsiveContainer>
         </ChartContainer>
       </div>
 
-      {/* Brand Summary Cards */}
+      {/* Brand Summary Cards - Fixed colors to Scout branding */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-blue-50 p-4 rounded-lg">
-          <h5 className="font-medium text-blue-900">Market Leader</h5>
-          <p className="text-2xl font-bold text-blue-600">Alaska</p>
-          <p className="text-sm text-blue-700">28% market share</p>
+        <div className="bg-scout-teal/10 p-4 rounded-lg border border-scout-teal/20">
+          <h5 className="font-medium text-scout-navy">Market Leader</h5>
+          <p className="text-2xl font-bold text-scout-navy">Alaska</p>
+          <p className="text-sm text-scout-dark">28% market share</p>
         </div>
-        <div className="bg-green-50 p-4 rounded-lg">
-          <h5 className="font-medium text-green-900">Fastest Growing</h5>
-          <p className="text-2xl font-bold text-green-600">Oishi</p>
-          <p className="text-sm text-green-700">+24% growth</p>
+        <div className="bg-scout-teal/10 p-4 rounded-lg border border-scout-teal/20">
+          <h5 className="font-medium text-scout-navy">Fastest Growing</h5>
+          <p className="text-2xl font-bold text-scout-navy">Oishi</p>
+          <p className="text-sm text-scout-dark">+24% growth</p>
         </div>
-        <div className="bg-purple-50 p-4 rounded-lg">
-          <h5 className="font-medium text-purple-900">Highest Revenue</h5>
-          <p className="text-2xl font-bold text-purple-600">Alaska</p>
-          <p className="text-sm text-purple-700">₱4.2M total</p>
+        <div className="bg-scout-teal/10 p-4 rounded-lg border border-scout-teal/20">
+          <h5 className="font-medium text-scout-navy">Highest Revenue</h5>
+          <p className="text-2xl font-bold text-scout-navy">Alaska</p>
+          <p className="text-sm text-scout-dark">₱4.2M total</p>
         </div>
       </div>
     </div>

@@ -183,21 +183,10 @@ const TransactionTrends: React.FC = () => {
         </div>
       </div>
 
-      {/* Time Series Chart with Enhanced Controls */}
+      {/* Time Series Chart - REMOVED zoom controls */}
       <div className="scout-card p-6">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-semibold text-scout-navy">Transaction Volume & Value Trends</h3>
-          <div className="flex space-x-2">
-            <button className="px-3 py-1 text-xs bg-scout-teal text-white rounded hover:bg-opacity-80">
-              Zoom In
-            </button>
-            <button className="px-3 py-1 text-xs bg-gray-500 text-white rounded hover:bg-opacity-80">
-              Reset Zoom
-            </button>
-            <button className="px-3 py-1 text-xs bg-scout-teal text-white rounded hover:bg-opacity-80">
-              Full Screen
-            </button>
-          </div>
         </div>
         <TimeSeriesChart data={timeSeriesData} height={400} />
       </div>
@@ -257,25 +246,25 @@ const TransactionTrends: React.FC = () => {
         <BoxPlot data={valueDistribution} height={300} />
       </div>
 
-      {/* Regional Transaction Performance */}
+      {/* Regional Transaction Performance - Fixed colors */}
       <div className="scout-card p-6">
         <h3 className="text-lg font-semibold mb-4 text-scout-navy">Regional Transaction Performance</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="text-center p-4 bg-gradient-to-br from-scout-teal from-opacity-10 to-scout-teal to-opacity-20 rounded-lg">
+          <div className="text-center p-4 bg-gradient-to-br from-scout-teal/10 to-scout-teal/20 rounded-lg">
             <h4 className="font-semibold text-scout-navy">Metro Manila</h4>
             <p className="text-2xl font-bold text-scout-navy mt-2">47,892</p>
             <p className="text-sm text-scout-dark">transactions/day</p>
             <p className="text-xs text-scout-teal mt-1">+15% vs last month</p>
           </div>
           
-          <div className="text-center p-4 bg-gradient-to-br from-scout-teal from-opacity-10 to-scout-teal to-opacity-20 rounded-lg">
+          <div className="text-center p-4 bg-gradient-to-br from-scout-teal/10 to-scout-teal/20 rounded-lg">
             <h4 className="font-semibold text-scout-navy">Cebu</h4>
             <p className="text-2xl font-bold text-scout-navy mt-2">28,456</p>
             <p className="text-sm text-scout-dark">transactions/day</p>
             <p className="text-xs text-scout-teal mt-1">+8% vs last month</p>
           </div>
           
-          <div className="text-center p-4 bg-gradient-to-br from-scout-teal from-opacity-10 to-scout-teal to-opacity-20 rounded-lg">
+          <div className="text-center p-4 bg-gradient-to-br from-scout-teal/10 to-scout-teal/20 rounded-lg">
             <h4 className="font-semibold text-scout-navy">Davao</h4>
             <p className="text-2xl font-bold text-scout-navy mt-2">19,234</p>
             <p className="text-sm text-scout-dark">transactions/day</p>
