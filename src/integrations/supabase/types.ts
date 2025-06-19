@@ -315,20 +315,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "fk_products_brand_id"
-            columns: ["brand_id"]
-            isOneToOne: false
-            referencedRelation: "brand_analytics"
-            referencedColumns: ["brand_id"]
-          },
-          {
-            foreignKeyName: "fk_products_brand_id"
-            columns: ["brand_id"]
-            isOneToOne: false
-            referencedRelation: "brands"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "products_brand_id_fkey"
             columns: ["brand_id"]
             isOneToOne: false
@@ -520,7 +506,6 @@ export type Database = {
           product_id: number | null
           quantity: number
           transaction_id: number | null
-          unit_price: number | null
         }
         Insert: {
           created_at?: string | null
@@ -529,7 +514,6 @@ export type Database = {
           product_id?: number | null
           quantity: number
           transaction_id?: number | null
-          unit_price?: number | null
         }
         Update: {
           created_at?: string | null
@@ -538,30 +522,8 @@ export type Database = {
           product_id?: number | null
           quantity?: number
           transaction_id?: number | null
-          unit_price?: number | null
         }
         Relationships: [
-          {
-            foreignKeyName: "fk_transaction_items_product_id"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "products"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_transaction_items_transaction_id"
-            columns: ["transaction_id"]
-            isOneToOne: false
-            referencedRelation: "basket_analytics"
-            referencedColumns: ["transaction_id"]
-          },
-          {
-            foreignKeyName: "fk_transaction_items_transaction_id"
-            columns: ["transaction_id"]
-            isOneToOne: false
-            referencedRelation: "transactions"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "transaction_items_product_id_fkey"
             columns: ["product_id"]

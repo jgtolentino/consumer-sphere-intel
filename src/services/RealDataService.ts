@@ -13,7 +13,7 @@ export class RealDataService implements DataService {
         *,
         transaction_items(
           quantity,
-          unit_price,
+          price,
           products(name, category, brands(name, category))
         )
       `);
@@ -77,7 +77,7 @@ export class RealDataService implements DataService {
         category: item.products?.brands?.category || 'Unknown',
         brand: item.products?.brands?.name || 'Unknown',
         units: item.quantity,
-        price: item.unit_price * item.quantity
+        price: item.price * item.quantity
       })) || []
     }));
   }
@@ -144,7 +144,6 @@ export class RealDataService implements DataService {
       .from('transaction_items')
       .select(`
         quantity,
-        unit_price,
         products(name, category, brands(name, category))
       `);
 
@@ -154,7 +153,7 @@ export class RealDataService implements DataService {
       category: item.products?.brands?.category || 'Unknown',
       sku: item.products?.name || 'Unknown',
       units: item.quantity,
-      price: item.unit_price || 0
+      price: 0 // Price not available in this structure
     })) || [];
 
     return {
@@ -322,17 +321,19 @@ export class RealDataService implements DataService {
       .slice(0, 10);
   }
 
-  // Product Mix methods - Fixed to use proper field names
+  // Product Mix methods
   async getCategoryMix(): Promise<any[]> {
     try {
-      // Use simpler query to avoid nested relationship issues
+      // Try to get real category mix data from transactions
       const { data, error } = await supabase
-        .from('transaction_items')
+        .from('transactions')
         .select(`
-          quantity,
-          unit_price,
-          products (
-            category
+          transaction_items (
+            products (
+              category
+            ),
+            quantity,
+            unit_price
           )
         `);
 
@@ -341,15 +342,17 @@ export class RealDataService implements DataService {
       // Process category mix from real data
       const categoryStats: Record<string, { value: number; count: number }> = {};
       
-      data?.forEach((item: any) => {
-        const category = item.products?.category || 'Unknown';
-        const value = (item.quantity || 0) * (item.unit_price || 0);
-        
-        if (!categoryStats[category]) {
-          categoryStats[category] = { value: 0, count: 0 };
-        }
-        categoryStats[category].value += value;
-        categoryStats[category].count += item.quantity || 0;
+      data?.forEach((transaction: any) => {
+        transaction.transaction_items?.forEach((item: any) => {
+          const category = item.products?.category || 'Unknown';
+          const value = (item.quantity || 0) * (item.unit_price || 0);
+          
+          if (!categoryStats[category]) {
+            categoryStats[category] = { value: 0, count: 0 };
+          }
+          categoryStats[category].value += value;
+          categoryStats[category].count += item.quantity || 0;
+        });
       });
 
       const totalValue = Object.values(categoryStats).reduce((sum, cat) => sum + cat.value, 0);
@@ -370,31 +373,18 @@ export class RealDataService implements DataService {
 
   async getProductSubstitution(): Promise<any[]> {
     try {
-      // Try to get real substitution patterns from the substitutions table
+      // Try to get real substitution patterns from customer behavior
       const { data, error } = await supabase
-        .from('substitutions')
-        .select(`
-          *,
-          original_product:products!original_product_id(name),
-          substitute_product:products!substitute_product_id(name)
-        `);
+        .from('substitution_patterns')
+        .select('*');
 
-      if (error) {
-        console.log('No substitution data available, using fallback');
-        throw error;
-      }
+      if (error) throw error;
 
-      // Transform the data to match the expected format
-      return data?.map(sub => ({
-        from: sub.original_product?.name || 'Unknown Product',
-        to: sub.substitute_product?.name || 'Unknown Product', 
-        flow: 1 // Since we don't have flow percentages, use 1 as placeholder
-      })) || [];
+      return data || [];
       
     } catch (error) {
       console.error('Failed to fetch product substitution:', error);
-      // Return empty array so the hook can fall back to mock data
-      return [];
+      throw error;
     }
   }
 }

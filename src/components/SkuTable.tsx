@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
 import { Button } from '../components/ui/button';
 import { ArrowUpDown, Download } from 'lucide-react';
-import { useProducts } from '../hooks/useProducts';
 
 interface SkuData {
   name: string;
@@ -17,27 +16,16 @@ interface SkuData {
 
 export const SkuTable: React.FC = () => {
   const [sortConfig, setSortConfig] = useState<{ key: keyof SkuData; direction: 'asc' | 'desc' } | null>(null);
-  const { data: productData, isLoading } = useProducts();
 
-  // Convert product data to SKU format with TBWA client brands
-  const skuData: SkuData[] = productData?.topSkus?.slice(0, 8).map((sku: any, index: number) => ({
-    name: sku.name,
-    category: sku.category,
-    sales: sku.sales,
-    revenue: sku.revenue,
-    growth: `+${Math.floor(Math.random() * 20) + 5}%`, // Random growth between 5-25%
-    margin: Math.floor(Math.random() * 15) + 18, // Random margin between 18-33%
-    stockLevel: ['High', 'Medium', 'Low'][index % 3]
-  })) || [
-    // Fallback TBWA client data if no data available
-    { name: 'Alaska Milk 1L', category: 'Dairy & Beverages', sales: 8947, revenue: 447350, growth: '+15%', margin: 28.5, stockLevel: 'High' },
-    { name: 'Oishi Prawn Crackers', category: 'Snacks', sales: 5621, revenue: 168630, growth: '+8%', margin: 25.2, stockLevel: 'Medium' },
-    { name: 'Del Monte Corned Beef', category: 'Food Products', sales: 3214, revenue: 482100, growth: '+12%', margin: 22.8, stockLevel: 'High' },
-    { name: 'JTI Winston Red', category: 'Tobacco', sales: 2567, revenue: 2835000, growth: '+22%', margin: 35.6, stockLevel: 'Low' },
-    { name: 'Peerless Orange Shampoo', category: 'Personal Care', sales: 4934, revenue: 247000, growth: '+5%', margin: 28.1, stockLevel: 'High' },
-    { name: 'Alaska Condensada', category: 'Dairy & Beverages', sales: 1245, revenue: 312375, growth: '+25%', margin: 20.5, stockLevel: 'Medium' },
-    { name: 'Oishi Smart C+', category: 'Beverages', sales: 4532, revenue: 135960, growth: '+6%', margin: 30.2, stockLevel: 'High' },
-    { name: 'Peerless Apple Shampoo', category: 'Personal Care', sales: 2198, revenue: 329700, growth: '+9%', margin: 24.5, stockLevel: 'Medium' }
+  const skuData: SkuData[] = [
+    { name: 'Samsung Galaxy A54', category: 'Electronics', sales: 2847, revenue: 1423500, growth: '+15%', margin: 18.5, stockLevel: 'High' },
+    { name: 'Nestle Coffee Creamer', category: 'Groceries', sales: 5621, revenue: 168630, growth: '+8%', margin: 25.2, stockLevel: 'Medium' },
+    { name: 'Unilever Shampoo 400ml', category: 'Health & Beauty', sales: 3214, revenue: 482100, growth: '+12%', margin: 22.8, stockLevel: 'High' },
+    { name: 'Nike Running Shoes', category: 'Clothing', sales: 567, revenue: 2835000, growth: '+22%', margin: 35.6, stockLevel: 'Low' },
+    { name: 'Coca-Cola 1.5L', category: 'Beverages', sales: 8934, revenue: 447000, growth: '+5%', margin: 28.1, stockLevel: 'High' },
+    { name: 'iPhone 14 Pro', category: 'Electronics', sales: 1245, revenue: 3123750, growth: '+25%', margin: 20.5, stockLevel: 'Medium' },
+    { name: 'Kopiko Coffee Mix', category: 'Groceries', sales: 4532, revenue: 135960, growth: '+6%', margin: 30.2, stockLevel: 'High' },
+    { name: 'P&G Shampoo', category: 'Health & Beauty', sales: 2198, revenue: 329700, growth: '+9%', margin: 24.5, stockLevel: 'Medium' }
   ];
 
   const handleSort = (key: keyof SkuData) => {
@@ -60,7 +48,7 @@ export const SkuTable: React.FC = () => {
       }
       return 0;
     });
-  }, [sortConfig, skuData]);
+  }, [sortConfig]);
 
   const exportToCSV = () => {
     const headers = ['Product Name', 'Category', 'Units Sold', 'Revenue', 'Growth', 'Margin %', 'Stock Level'];
@@ -81,7 +69,7 @@ export const SkuTable: React.FC = () => {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'tbwa-sku-performance.csv';
+    a.download = 'sku-performance.csv';
     a.click();
     window.URL.revokeObjectURL(url);
   };
@@ -95,23 +83,10 @@ export const SkuTable: React.FC = () => {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <h3 className="text-lg font-semibold">SKU Performance Details</h3>
-        </div>
-        <div className="flex items-center justify-center h-40">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold">TBWA Client SKU Performance</h3>
+        <h3 className="text-lg font-semibold">SKU Performance Details</h3>
         <Button onClick={exportToCSV} variant="outline" size="sm">
           <Download className="h-4 w-4 mr-2" />
           Export CSV

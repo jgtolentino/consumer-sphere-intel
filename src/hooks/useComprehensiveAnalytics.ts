@@ -2,6 +2,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useDataService } from '../providers/DataProvider';
 import { useFilterStore } from '../state/useFilterStore';
+import { regions, tbwaClientBrands, competitorBrands } from '../data/mockData';
 
 export const useComprehensiveAnalytics = () => {
   const dataService = useDataService();
@@ -107,15 +108,9 @@ const generateCompanyAnalytics = (transactions: any[], allCompanies: string[]) =
   const companyStats = allCompanies.map(company => {
     const companyTransactions = transactions.filter(t => 
       t.basket?.some((item: any) => {
-        // Map brands to companies (simplified mapping)
-        const brandToCompany: Record<string, string> = {
-          'Coca-Cola': 'Coca-Cola Philippines',
-          'Pepsi': 'Pepsi-Cola Products Philippines',
-          'Alaska Milk': 'Alaska Milk Corporation',
-          'Nestlé': 'Nestlé Philippines',
-          'Unilever': 'Unilever Philippines'
-        };
-        return brandToCompany[item.brand] === company;
+        const allBrands = [...tbwaClientBrands, ...competitorBrands];
+        const brandObj = allBrands.find(b => b.name === item.brand);
+        return brandObj?.company === company;
       })
     );
     const revenue = companyTransactions.reduce((sum, t) => sum + (t.total || 0), 0);
@@ -125,7 +120,7 @@ const generateCompanyAnalytics = (transactions: any[], allCompanies: string[]) =
       transactions: companyTransactions.length,
       revenue,
       marketShare: transactions.length > 0 ? (companyTransactions.length / transactions.length) * 100 : 0,
-      isClient: ['Alaska Milk Corporation', 'Nestlé Philippines'].includes(company) // Example TBWA clients
+      isClient: [...tbwaClientBrands].some(b => b.company === company)
     };
   });
 
