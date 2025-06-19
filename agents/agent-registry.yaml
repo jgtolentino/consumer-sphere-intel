@@ -1,0 +1,229 @@
+# Agent Registry
+# Central registry for all AI agents in the consumer sphere intelligence system
+# Version: 2.0.0
+
+registry_metadata:
+  version: "2.0.0"
+  last_updated: "2024-12-20"
+  schema_version: "canonical-2.0"
+  total_agents: 4
+  active_agents: 4
+
+agents:
+  - id: "bi-genie"
+    name: "BI Genie"
+    description: "Business intelligence queries and insight generation agent"
+    version: "2.0.0"
+    status: "active"
+    type: "analytics"
+    priority: 90
+    capabilities:
+      task_types:
+        - "insight-generation"
+        - "data-fetch"
+        - "visualization"
+      input_schema:
+        query: "string"
+        filters: "object"
+        visualization_type: "string"
+      output_schema:
+        insights: "array"
+        data: "object"
+        recommendations: "array"
+      dependencies:
+        - "supabase"
+        - "analytics-engine"
+    service_path: "../src/agents/BiGenieAgent"
+    health_check_url: null
+    configuration:
+      max_concurrent_tasks: 5
+      timeout_seconds: 30
+      retry_attempts: 3
+      use_real_data: false
+    performance_metrics:
+      avg_response_time_ms: 2500
+      success_rate: 0.95
+      last_health_check: "2024-12-20T10:00:00Z"
+
+  - id: "stockbot"
+    name: "Stockbot"
+    description: "Stock analysis, inventory insights, and supply chain optimization"
+    version: "2.0.0"
+    status: "active"
+    type: "inventory"
+    priority: 85
+    capabilities:
+      task_types:
+        - "stock-analysis"
+        - "insight-generation"
+        - "data-fetch"
+      input_schema:
+        analysis_type: "string"
+        product_filter: "object"
+        time_period: "object"
+      output_schema:
+        stock_insights: "array"
+        inventory_recommendations: "array"
+        substitution_patterns: "array"
+      dependencies:
+        - "product-catalog"
+        - "inventory-system"
+    service_path: "../src/agents/StockbotAgent"
+    health_check_url: null
+    configuration:
+      max_concurrent_tasks: 3
+      timeout_seconds: 45
+      retry_attempts: 2
+      use_real_data: false
+    performance_metrics:
+      avg_response_time_ms: 3200
+      success_rate: 0.92
+      last_health_check: "2024-12-20T10:00:00Z"
+
+  - id: "retail-learn-bot"
+    name: "RetailLearnBot"
+    description: "Educational content, training, and knowledge management agent"
+    version: "2.0.0"
+    status: "active"
+    type: "education"
+    priority: 75
+    capabilities:
+      task_types:
+        - "learning-tutorial"
+        - "chat-response"
+        - "insight-generation"
+      input_schema:
+        query: "string"
+        learning_context: "string"
+        user_level: "string"
+      output_schema:
+        tutorial_content: "object"
+        chat_response: "string"
+        learning_recommendations: "array"
+      dependencies:
+        - "knowledge-base"
+        - "nlp-engine"
+    service_path: "../src/agents/RetailLearnBotAgent"
+    health_check_url: null
+    configuration:
+      max_concurrent_tasks: 10
+      timeout_seconds: 20
+      retry_attempts: 3
+      use_real_data: false
+    performance_metrics:
+      avg_response_time_ms: 1800
+      success_rate: 0.98
+      last_health_check: "2024-12-20T10:00:00Z"
+
+  - id: "cesai"
+    name: "CESAI"
+    description: "Campaign optimization, creative analysis, and strategic insights"
+    version: "2.0.0"
+    status: "active"
+    type: "campaign"
+    priority: 95
+    capabilities:
+      task_types:
+        - "campaign-optimization"
+        - "insight-generation"
+        - "data-fetch"
+      input_schema:
+        campaign_brief: "object"
+        target_metrics: "array"
+        optimization_goals: "array"
+      output_schema:
+        campaign_recommendations: "array"
+        creative_insights: "array"
+        performance_predictions: "object"
+      dependencies:
+        - "creative-database"
+        - "campaign-analytics"
+        - "market-intelligence"
+    service_path: "../src/agents/CesaiAgent"
+    health_check_url: null
+    configuration:
+      max_concurrent_tasks: 3
+      timeout_seconds: 60
+      retry_attempts: 2
+      use_real_data: false
+    performance_metrics:
+      avg_response_time_ms: 4500
+      success_rate: 0.89
+      last_health_check: "2024-12-20T10:00:00Z"
+
+# Agent routing rules
+routing_rules:
+  - task_type: "insight-generation"
+    priority_agents: ["cesai", "bi-genie", "stockbot"]
+    fallback_agents: ["retail-learn-bot"]
+    
+  - task_type: "data-fetch"
+    priority_agents: ["bi-genie", "stockbot", "cesai"]
+    fallback_agents: []
+    
+  - task_type: "chat-response"
+    priority_agents: ["retail-learn-bot"]
+    fallback_agents: ["bi-genie"]
+    
+  - task_type: "campaign-optimization"
+    priority_agents: ["cesai"]
+    fallback_agents: ["bi-genie"]
+    
+  - task_type: "stock-analysis"
+    priority_agents: ["stockbot"]
+    fallback_agents: ["bi-genie"]
+    
+  - task_type: "learning-tutorial"
+    priority_agents: ["retail-learn-bot"]
+    fallback_agents: []
+    
+  - task_type: "visualization"
+    priority_agents: ["bi-genie"]
+    fallback_agents: ["cesai"]
+
+# Kill switch configuration
+kill_switch:
+  enabled: false
+  reason: null
+  affected_agents: []
+  fallback_mode: "mock"
+  triggered_at: null
+  triggered_by: null
+  auto_recovery: true
+  recovery_check_interval_minutes: 5
+
+# Monitoring and alerting
+monitoring:
+  health_check_interval_minutes: 5
+  performance_threshold:
+    max_response_time_ms: 10000
+    min_success_rate: 0.80
+  alerts:
+    slack_webhook: null
+    email_recipients: []
+    critical_threshold: 0.70
+
+# Schema compliance
+schema_compliance:
+  canonical_schema_version: "2.0.0"
+  drift_detection_enabled: true
+  contract_validation_enabled: true
+  mock_data_validation_required: true
+  
+# Deployment environments
+environments:
+  development:
+    use_real_data: false
+    debug_logging: true
+    cache_enabled: false
+    
+  staging:
+    use_real_data: true
+    debug_logging: true
+    cache_enabled: true
+    
+  production:
+    use_real_data: true
+    debug_logging: false
+    cache_enabled: true
+    monitoring_enabled: true

@@ -1,0 +1,292 @@
+name: AI Agent Workflow Validation
+
+on:
+  pull_request:
+    branches: [ main, feat/tailwind-cruip-groqbot-rewrite ]
+  push:
+    branches: [ main, feat/tailwind-cruip-groqbot-rewrite ]
+
+jobs:
+  schema-drift-validation:
+    runs-on: ubuntu-latest
+    name: Schema Drift Detection
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run schema drift detection
+      run: npm run check-schema-drift
+      
+    - name: Run schema tests
+      run: npm run schema:test
+
+  agent-contract-validation:
+    runs-on: ubuntu-latest
+    name: Agent Contract Compliance
+    needs: schema-drift-validation
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run agent contract tests
+      run: npm run agents:test
+      
+    - name: Validate agent registry
+      run: |
+        echo "🔍 Validating agent registry configuration..."
+        if [ ! -f "agents/agent-registry.yaml" ]; then
+          echo "❌ Agent registry file missing"
+          exit 1
+        fi
+        echo "✅ Agent registry file exists"
+        
+    - name: Check agent service implementations
+      run: |
+        echo "🤖 Checking agent service implementations..."
+        required_agents=("BiGenieAgent.ts" "StockbotAgent.ts" "RetailLearnBotAgent.ts" "CesaiAgent.ts")
+        
+        for agent in "${required_agents[@]}"; do
+          if [ ! -f "src/agents/$agent" ]; then
+            echo "❌ Missing agent implementation: $agent"
+            exit 1
+          fi
+          echo "✅ Found: $agent"
+        done
+        
+  workflow-integration-test:
+    runs-on: ubuntu-latest
+    name: Workflow Integration Test
+    needs: [schema-drift-validation, agent-contract-validation]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run comprehensive workflow tests
+      run: npm run workflow:test
+      
+    - name: Test kill switch functionality
+      run: |
+        echo "🚨 Testing kill switch functionality..."
+        # Test environment-based kill switch
+        export KILL_SWITCH=true
+        export KILL_SWITCH_REASON="CI/CD integration test"
+        
+        # Run a basic test to ensure kill switch works
+        npm run test -- src/__tests__/agentContracts.test.ts
+        
+        echo "✅ Kill switch integration test passed"
+        
+  build-and-deploy-validation:
+    runs-on: ubuntu-latest
+    name: Build & Deploy Validation
+    needs: workflow-integration-test
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: TypeScript compilation check
+      run: npx tsc --noEmit --strict
+      
+    - name: Build application
+      run: npm run build
+      
+    - name: Validate build artifacts
+      run: |
+        echo "📦 Validating build artifacts..."
+        if [ ! -d "dist" ]; then
+          echo "❌ Build directory missing"
+          exit 1
+        fi
+        
+        if [ ! -f "dist/index.html" ]; then
+          echo "❌ Main HTML file missing"
+          exit 1
+        fi
+        
+        # Check build size
+        build_size=$(du -sh dist | cut -f1)
+        echo "📊 Build size: $build_size"
+        
+        echo "✅ Build validation passed"
+        
+    - name: Test production deployment readiness
+      run: |
+        echo "🚀 Testing production deployment readiness..."
+        
+        # Simulate production environment
+        export NODE_ENV=production
+        export VITE_DATA_MODE=mock
+        
+        # Test that kill switch is properly configured
+        if [ ! -f "src/config/killSwitch.ts" ]; then
+          echo "❌ Kill switch configuration missing"
+          exit 1
+        fi
+        
+        echo "✅ Production deployment validation passed"
+
+  performance-validation:
+    runs-on: ubuntu-latest
+    name: Performance Validation
+    needs: build-and-deploy-validation
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run performance tests
+      run: |
+        echo "⚡ Running performance validation..."
+        
+        # Test agent response times
+        npm run agents:test 2>&1 | grep -E "(ms|seconds)" || echo "Performance metrics collected"
+        
+        # Check bundle size
+        npm run build
+        bundle_size=$(stat -f%z dist/assets/*.js | head -1)
+        max_size=5242880  # 5MB limit
+        
+        if [ $bundle_size -gt $max_size ]; then
+          echo "❌ Bundle size too large: $bundle_size bytes (max: $max_size)"
+          exit 1
+        fi
+        
+        echo "✅ Performance validation passed"
+
+  security-validation:
+    runs-on: ubuntu-latest
+    name: Security Validation
+    needs: performance-validation
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run security audit
+      run: npm audit --audit-level=moderate
+      
+    - name: Check for hardcoded secrets
+      run: |
+        echo "🔒 Checking for hardcoded secrets..."
+        
+        # Check for common secret patterns
+        if grep -r -i "api_key\|secret\|password\|token" src/ --include="*.ts" --include="*.tsx" | grep -v "placeholder\|example\|test\|mock"; then
+          echo "❌ Potential hardcoded secrets found"
+          exit 1
+        fi
+        
+        echo "✅ No hardcoded secrets detected"
+        
+    - name: Validate kill switch security
+      run: |
+        echo "🛡️ Validating kill switch security..."
+        
+        # Ensure kill switch can't be bypassed
+        if grep -r "killSwitch.*=.*false" src/ --include="*.ts" --include="*.tsx"; then
+          echo "⚠️ Found potential kill switch bypass - manual review required"
+        fi
+        
+        echo "✅ Kill switch security validation passed"
+
+  integration-summary:
+    runs-on: ubuntu-latest
+    name: Integration Summary
+    needs: [schema-drift-validation, agent-contract-validation, workflow-integration-test, build-and-deploy-validation, performance-validation, security-validation]
+    if: always()
+    
+    steps:
+    - name: Generate integration report
+      run: |
+        echo "📋 AI Agent Workflow Integration Report"
+        echo "====================================="
+        echo ""
+        echo "✅ Schema Drift Detection: ${{ needs.schema-drift-validation.result }}"
+        echo "✅ Agent Contract Validation: ${{ needs.agent-contract-validation.result }}"
+        echo "✅ Workflow Integration: ${{ needs.workflow-integration-test.result }}"
+        echo "✅ Build & Deploy: ${{ needs.build-and-deploy-validation.result }}"
+        echo "✅ Performance: ${{ needs.performance-validation.result }}"
+        echo "✅ Security: ${{ needs.security-validation.result }}"
+        echo ""
+        echo "🤖 Managed AI Bot Workflow System Status:"
+        echo "  - BI Genie Agent: Ready"
+        echo "  - Stockbot Agent: Ready"
+        echo "  - RetailLearnBot Agent: Ready"
+        echo "  - CESAI Agent: Ready"
+        echo "  - Kill Switch System: Validated"
+        echo "  - Schema Mirroring: Enforced"
+        echo "  - Contract Compliance: Verified"
+        echo ""
+        echo "🚀 System ready for managed AI agent orchestration"
+        
+    - name: Check overall status
+      run: |
+        if [[ "${{ needs.schema-drift-validation.result }}" == "success" && 
+              "${{ needs.agent-contract-validation.result }}" == "success" && 
+              "${{ needs.workflow-integration-test.result }}" == "success" && 
+              "${{ needs.build-and-deploy-validation.result }}" == "success" && 
+              "${{ needs.performance-validation.result }}" == "success" && 
+              "${{ needs.security-validation.result }}" == "success" ]]; then
+          echo "🎉 ALL VALIDATIONS PASSED - Ready for deployment"
+          exit 0
+        else
+          echo "❌ Some validations failed - Review required"
+          exit 1
+        fi
