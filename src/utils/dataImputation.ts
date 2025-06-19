@@ -86,26 +86,26 @@ export const imputeRegionalPerformance = (realData: any[] = []): ImputationResul
     }
   }
 
-  // Professional regional baseline - all 18 Philippine regions
+  // Professional regional baseline - all 18 Philippine regions (scaled to realistic levels)
   const baselineData = [
-    { region: 'National Capital Region', revenue: 4200000, marketShare: 34.2 },
-    { region: 'CALABARZON', revenue: 3100000, marketShare: 25.2 },
-    { region: 'Central Luzon', revenue: 2600000, marketShare: 21.1 },
-    { region: 'Central Visayas', revenue: 2800000, marketShare: 22.8 },
-    { region: 'Western Visayas', revenue: 1200000, marketShare: 9.8 },
-    { region: 'Davao Region', revenue: 1900000, marketShare: 15.4 },
-    { region: 'Ilocos Region', revenue: 850000, marketShare: 6.9 },
-    { region: 'Cagayan Valley', revenue: 620000, marketShare: 5.0 },
-    { region: 'Cordillera Administrative Region', revenue: 750000, marketShare: 6.1 },
-    { region: 'Bicol Region', revenue: 720000, marketShare: 5.9 },
-    { region: 'MIMAROPA', revenue: 480000, marketShare: 3.9 },
-    { region: 'Eastern Visayas', revenue: 590000, marketShare: 4.8 },
-    { region: 'Negros Island Region', revenue: 680000, marketShare: 5.5 },
-    { region: 'Northern Mindanao', revenue: 1100000, marketShare: 8.9 },
-    { region: 'SOCCSKSARGEN', revenue: 780000, marketShare: 6.3 },
-    { region: 'Zamboanga Peninsula', revenue: 520000, marketShare: 4.2 },
-    { region: 'CARAGA', revenue: 420000, marketShare: 3.4 },
-    { region: 'Bangsamoro Autonomous Region in Muslim Mindanao', revenue: 380000, marketShare: 3.1 }
+    { region: 'National Capital Region', revenue: 420000000, marketShare: 34.2 },
+    { region: 'CALABARZON', revenue: 310000000, marketShare: 25.2 },
+    { region: 'Central Luzon', revenue: 260000000, marketShare: 21.1 },
+    { region: 'Central Visayas', revenue: 280000000, marketShare: 22.8 },
+    { region: 'Western Visayas', revenue: 120000000, marketShare: 9.8 },
+    { region: 'Davao Region', revenue: 190000000, marketShare: 15.4 },
+    { region: 'Ilocos Region', revenue: 85000000, marketShare: 6.9 },
+    { region: 'Cagayan Valley', revenue: 62000000, marketShare: 5.0 },
+    { region: 'Cordillera Administrative Region', revenue: 75000000, marketShare: 6.1 },
+    { region: 'Bicol Region', revenue: 72000000, marketShare: 5.9 },
+    { region: 'MIMAROPA', revenue: 48000000, marketShare: 3.9 },
+    { region: 'Eastern Visayas', revenue: 59000000, marketShare: 4.8 },
+    { region: 'Negros Island Region', revenue: 68000000, marketShare: 5.5 },
+    { region: 'Northern Mindanao', revenue: 110000000, marketShare: 8.9 },
+    { region: 'SOCCSKSARGEN', revenue: 78000000, marketShare: 6.3 },
+    { region: 'Zamboanga Peninsula', revenue: 52000000, marketShare: 4.2 },
+    { region: 'CARAGA', revenue: 42000000, marketShare: 3.4 },
+    { region: 'Bangsamoro Autonomous Region in Muslim Mindanao', revenue: 38000000, marketShare: 3.1 }
   ];
 
   return {
