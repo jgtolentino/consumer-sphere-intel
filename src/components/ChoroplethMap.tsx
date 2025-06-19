@@ -7,6 +7,7 @@ import { philippineRegionsGeoJSON } from '../data/philippineRegions';
 import { useFilterStore } from '../state/useFilterStore';
 import { useDrillDownStore } from '../state/useDrillDownStore';
 import { getCanonicalRegionName, debugRegionMappings } from '../utils/regionNormalizer';
+import { useDataService } from '../providers/DataProvider';
 
 interface RegionData {
   region: string;
@@ -16,36 +17,8 @@ interface RegionData {
   marketShare: number;
 }
 
-// Comprehensive Philippines regional data with complete coverage
-const regionData: RegionData[] = [
-  // Major Metro Areas
-  { region: 'National Capital Region', coordinates: [121.0244, 14.6042], totalSales: 4200000, transactions: 53400, marketShare: 34 },
-  { region: 'CALABARZON', coordinates: [121.2, 14.2], totalSales: 3100000, transactions: 39500, marketShare: 25 },
-  { region: 'Central Luzon', coordinates: [120.8, 15.3], totalSales: 2600000, transactions: 33000, marketShare: 21 },
-  { region: 'Central Visayas', coordinates: [123.8854, 10.3157], totalSales: 2800000, transactions: 35600, marketShare: 23 },
-  { region: 'Western Visayas', coordinates: [120.7935, 10.7202], totalSales: 1200000, transactions: 15300, marketShare: 10 },
-  { region: 'Davao Region', coordinates: [125.6144, 7.0731], totalSales: 1900000, transactions: 24200, marketShare: 15 },
-  
-  // Northern Luzon
-  { region: 'Ilocos Region', coordinates: [120.4, 17.6], totalSales: 850000, transactions: 10800, marketShare: 7 },
-  { region: 'Cagayan Valley', coordinates: [121.8, 17.6], totalSales: 620000, transactions: 7900, marketShare: 5 },
-  { region: 'Cordillera Administrative Region', coordinates: [120.6, 16.4], totalSales: 750000, transactions: 9600, marketShare: 6 },
-  
-  // Southern Luzon
-  { region: 'Bicol Region', coordinates: [123.4, 13.6], totalSales: 720000, transactions: 9200, marketShare: 6 },
-  { region: 'MIMAROPA', coordinates: [121.0, 13.0], totalSales: 480000, transactions: 6100, marketShare: 4 },
-  
-  // Visayas
-  { region: 'Eastern Visayas', coordinates: [125.0, 11.2], totalSales: 590000, transactions: 7500, marketShare: 5 },
-  { region: 'Negros Island Region', coordinates: [123.0, 10.0], totalSales: 680000, transactions: 8700, marketShare: 6 },
-  
-  // Mindanao
-  { region: 'Northern Mindanao', coordinates: [124.5, 8.5], totalSales: 1100000, transactions: 14000, marketShare: 9 },
-  { region: 'SOCCSKSARGEN', coordinates: [124.8, 6.2], totalSales: 780000, transactions: 9900, marketShare: 6 },
-  { region: 'Zamboanga Peninsula', coordinates: [122.1, 7.3], totalSales: 520000, transactions: 6600, marketShare: 4 },
-  { region: 'CARAGA', coordinates: [126.0, 8.5], totalSales: 420000, transactions: 5400, marketShare: 3 },
-  { region: 'Bangsamoro Autonomous Region in Muslim Mindanao', coordinates: [124.3, 7.2], totalSales: 380000, transactions: 4800, marketShare: 3 }
-];
+// Regional data will be fetched from real data service
+// No hardcoded regional data
 
 type MetricType = 'totalSales' | 'transactions' | 'marketShare';
 
@@ -106,10 +79,12 @@ export const ChoroplethMap: React.FC = () => {
   const [selectedMetric, setSelectedMetric] = useState<MetricType>('totalSales');
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
   const [hoveredRegion, setHoveredRegion] = useState<string | null>(null);
+  const [regionData, setRegionData] = useState<RegionData[]>([]);
   
   // State management for cross-filtering
   const { setFilter } = useFilterStore();
   const { drillDown } = useDrillDownStore();
+  const dataService = useDataService();
 
   const MAPBOX_TOKEN = 'pk.eyJ1Ijoiamd0b2xlbnRpbm8iLCJhIjoiY21jMmNycWRiMDc0ajJqcHZoaDYyeTJ1NiJ9.Dns6WOql16BUQ4l7otaeww';
 
@@ -163,6 +138,29 @@ export const ChoroplethMap: React.FC = () => {
     
     return { ...region, rank };
   };
+
+  // Fetch regional data from real data service
+  useEffect(() => {
+    const fetchRegionalData = async () => {
+      try {
+        const data = await dataService.getRegionalData();
+        // Transform to match RegionData interface
+        const transformedData = data.map(item => ({
+          region: item.region,
+          coordinates: [0, 0] as [number, number], // Will be set from GeoJSON
+          totalSales: item.revenue || 0,
+          transactions: item.transactions || 0,
+          marketShare: ((item.revenue || 0) / 24000000) * 100 // Calculate percentage
+        }));
+        setRegionData(transformedData);
+      } catch (error) {
+        console.error('Failed to fetch regional data:', error);
+        setRegionData([]); // No fallback data
+      }
+    };
+
+    fetchRegionalData();
+  }, [dataService]);
 
   useEffect(() => {
     if (!mapContainer.current || map.current) return;
