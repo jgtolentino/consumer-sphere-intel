@@ -72,7 +72,7 @@ interface MetricConfig {
   label: string;
   unit: string;
   formatter: (value: number) => string;
-  colorScale: string[];
+  colorStops: [number, string][];
 }
 
 const metricConfigs: Record<MetricType, MetricConfig> = {
@@ -80,19 +80,37 @@ const metricConfigs: Record<MetricType, MetricConfig> = {
     label: 'Total Sales',
     unit: '₱',
     formatter: (value) => `₱${(value / 1000000).toFixed(1)}M`,
-    colorScale: ['#fef0d9', '#fdcc8a', '#fc8d59', '#e34a33', '#b30000']
+    colorStops: [
+      [0, '#fff5f0'],
+      [1000000, '#fdcc8a'],
+      [2000000, '#fc8d59'],
+      [3000000, '#e34a33'],
+      [4500000, '#b30000']
+    ]
   },
   transactions: {
     label: 'Transactions',
     unit: '',
     formatter: (value) => `${(value / 1000).toFixed(1)}K`,
-    colorScale: ['#eff3ff', '#bdd7e7', '#6baed6', '#3182bd', '#08519c']
+    colorStops: [
+      [0, '#f7fbff'],
+      [15000, '#c6dbef'],
+      [25000, '#6baed6'],
+      [35000, '#3182bd'],
+      [55000, '#08519c']
+    ]
   },
   marketShare: {
     label: 'Market Share',
     unit: '%',
     formatter: (value) => `${value}%`,
-    colorScale: ['#edf8e9', '#bae4b3', '#74c476', '#31a354', '#006d2c']
+    colorStops: [
+      [0, '#f7fcf5'],
+      [10, '#c7e9c0'],
+      [20, '#74c476'],
+      [30, '#31a354'],
+      [40, '#006d2c']
+    ]
   }
 };
 
@@ -104,15 +122,17 @@ export const ChoroplethMap: React.FC = () => {
 
   const MAPBOX_TOKEN = 'pk.eyJ1Ijoiamd0b2xlbnRpbm8iLCJhIjoiY21jMmNycWRiMDc0ajJqcHZoaDYyeTJ1NiJ9.Dns6WOql16BUQ4l7otaeww';
 
-  const getColorForValue = (value: number, metric: MetricType) => {
+  const getColorForValue = (value: number, metric: MetricType): string => {
     const config = metricConfigs[metric];
-    const values = regionData.map(r => r[metric]);
-    const min = Math.min(...values);
-    const max = Math.max(...values);
+    const stops = config.colorStops;
     
-    const normalized = (value - min) / (max - min);
-    const colorIndex = Math.floor(normalized * (config.colorScale.length - 1));
-    return config.colorScale[Math.min(colorIndex, config.colorScale.length - 1)];
+    // Find the appropriate color based on value
+    for (let i = stops.length - 1; i >= 0; i--) {
+      if (value >= stops[i][0]) {
+        return stops[i][1];
+      }
+    }
+    return stops[0][1]; // fallback to first color
   };
 
   const getRegionValue = (regionName: string): number => {
@@ -133,7 +153,7 @@ export const ChoroplethMap: React.FC = () => {
         zoom: 5.5,
         pitch: 0,
         bearing: 0,
-        interactive: false,
+        interactive: true,
         scrollZoom: false,
         boxZoom: false,
         dragRotate: false,
@@ -162,27 +182,40 @@ export const ChoroplethMap: React.FC = () => {
   const addChoroplethLayer = () => {
     if (!map.current) return;
 
-    // Add GeoJSON source
+    // Add GeoJSON source with enriched data
+    const enrichedGeoJSON = {
+      ...philippineRegionsGeoJSON,
+      features: philippineRegionsGeoJSON.features.map(feature => {
+        const regionName = feature.properties.name;
+        const regionStats = regionData.find(r => r.region === regionName);
+        return {
+          ...feature,
+          properties: {
+            ...feature.properties,
+            totalSales: regionStats?.totalSales || 0,
+            transactions: regionStats?.transactions || 0,
+            marketShare: regionStats?.marketShare || 0
+          }
+        };
+      })
+    };
+
     map.current.addSource('ph-regions', {
       type: 'geojson',
-      data: philippineRegionsGeoJSON as any
+      data: enrichedGeoJSON as any
     });
 
-    // Add fill layer
+    // Add fill layer with expression-based coloring
     map.current.addLayer({
       id: 'ph-regions-fill',
       type: 'fill',
       source: 'ph-regions',
       paint: {
         'fill-color': [
-          'case',
-          ...philippineRegionsGeoJSON.features.flatMap(feature => {
-            const regionName = feature.properties.name;
-            const value = getRegionValue(regionName);
-            const color = getColorForValue(value, selectedMetric);
-            return [['==', ['get', 'name'], regionName], color];
-          }),
-          '#cccccc' // fallback color
+          'interpolate',
+          ['linear'],
+          ['get', selectedMetric],
+          ...metricConfigs[selectedMetric].colorStops.flat()
         ],
         'fill-opacity': 0.8
       }
@@ -195,7 +228,8 @@ export const ChoroplethMap: React.FC = () => {
       source: 'ph-regions',
       paint: {
         'line-color': '#ffffff',
-        'line-width': 2
+        'line-width': 2,
+        'line-opacity': 0.8
       }
     });
 
@@ -211,27 +245,33 @@ export const ChoroplethMap: React.FC = () => {
       map.current.getCanvas().style.cursor = 'pointer';
       
       const feature = e.features[0];
-      const regionName = feature.properties?.name;
-      const region = regionData.find(r => r.region === regionName);
+      const props = feature.properties;
+      const config = metricConfigs[selectedMetric];
+      const value = props?.[selectedMetric] || 0;
       
-      if (region) {
-        const config = metricConfigs[selectedMetric];
-        const value = region[selectedMetric];
-        
+      if (props) {
         popup.setLngLat(e.lngLat)
           .setHTML(`
-            <div class="p-3">
-              <h3 class="font-semibold text-gray-900 mb-2">${regionName}</h3>
+            <div class="p-3 min-w-48">
+              <h3 class="font-semibold text-gray-900 mb-2">${props.name}</h3>
               <div class="space-y-1 text-sm">
                 <div class="flex justify-between">
                   <span class="text-gray-600">${config.label}:</span>
                   <span class="font-medium">${config.formatter(value)}</span>
                 </div>
                 <div class="flex justify-between">
+                  <span class="text-gray-600">Transactions:</span>
+                  <span class="font-medium">${(props.transactions || 0).toLocaleString()}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-600">Market Share:</span>
+                  <span class="font-medium">${props.marketShare || 0}%</span>
+                </div>
+                <div class="flex justify-between">
                   <span class="text-gray-600">Rank:</span>
                   <span class="font-medium">#${regionData
                     .sort((a, b) => b[selectedMetric] - a[selectedMetric])
-                    .findIndex(r => r.region === regionName) + 1}</span>
+                    .findIndex(r => r.region === props.name) + 1}</span>
                 </div>
               </div>
             </div>
@@ -250,16 +290,12 @@ export const ChoroplethMap: React.FC = () => {
   const updateChoroplethLayer = () => {
     if (!map.current || !map.current.getSource('ph-regions')) return;
 
-    // Update fill colors based on selected metric
+    // Update fill colors based on selected metric using interpolation
     map.current.setPaintProperty('ph-regions-fill', 'fill-color', [
-      'case',
-      ...philippineRegionsGeoJSON.features.flatMap(feature => {
-        const regionName = feature.properties.name;
-        const value = getRegionValue(regionName);
-        const color = getColorForValue(value, selectedMetric);
-        return [['==', ['get', 'name'], regionName], color];
-      }),
-      '#cccccc' // fallback color
+      'interpolate',
+      ['linear'],
+      ['get', selectedMetric],
+      ...metricConfigs[selectedMetric].colorStops.flat()
     ]);
   };
 
@@ -277,7 +313,7 @@ export const ChoroplethMap: React.FC = () => {
         <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="text-base xl:text-lg font-semibold text-gray-900">Regional Performance Distribution</h3>
-            <p className="text-xs xl:text-sm text-gray-600">True choropleth mapping of Philippine regions</p>
+            <p className="text-xs xl:text-sm text-gray-600">True choropleth mapping with actual region boundaries</p>
           </div>
           <MapPin className="h-5 w-5 text-gray-400" />
         </div>
@@ -301,24 +337,20 @@ export const ChoroplethMap: React.FC = () => {
       <div className="relative">
         <div ref={mapContainer} className="w-full h-96" />
         
-        {/* Color Legend */}
+        {/* Gradient Legend */}
         <div className="absolute bottom-4 left-4 bg-white rounded-lg shadow-lg p-3 border">
           <div className="text-xs font-semibold text-gray-700 mb-2">
             {metricConfigs[selectedMetric].label}
           </div>
-          <div className="flex items-center gap-1 text-xs">
+          <div className="flex items-center gap-1 text-xs mb-2">
             <span>Low</span>
-            {metricConfigs[selectedMetric].colorScale.map((color, index) => (
-              <div 
-                key={index}
-                className="w-4 h-4 border border-gray-300"
-                style={{ backgroundColor: color }}
-              />
-            ))}
+            <div className="w-32 h-4 rounded" style={{
+              background: `linear-gradient(to right, ${metricConfigs[selectedMetric].colorStops.map(stop => stop[1]).join(', ')})`
+            }}></div>
             <span>High</span>
           </div>
-          <div className="text-xs text-gray-500 mt-1">
-            Regions colored by actual boundaries
+          <div className="text-xs text-gray-500">
+            Regions filled by actual polygon boundaries
           </div>
         </div>
       </div>
