@@ -373,18 +373,31 @@ export class RealDataService implements DataService {
 
   async getProductSubstitution(): Promise<any[]> {
     try {
-      // Try to get real substitution patterns from customer behavior
+      // Try to get real substitution patterns from the substitutions table
       const { data, error } = await supabase
-        .from('substitution_patterns')
-        .select('*');
+        .from('substitutions')
+        .select(`
+          *,
+          original_product:products!original_product_id(name),
+          substitute_product:products!substitute_product_id(name)
+        `);
 
-      if (error) throw error;
+      if (error) {
+        console.log('No substitution data available, using fallback');
+        throw error;
+      }
 
-      return data || [];
+      // Transform the data to match the expected format
+      return data?.map(sub => ({
+        from: sub.original_product?.name || 'Unknown Product',
+        to: sub.substitute_product?.name || 'Unknown Product', 
+        flow: 1 // Since we don't have flow percentages, use 1 as placeholder
+      })) || [];
       
     } catch (error) {
       console.error('Failed to fetch product substitution:', error);
-      throw error;
+      // Return empty array so the hook can fall back to mock data
+      return [];
     }
   }
 }
