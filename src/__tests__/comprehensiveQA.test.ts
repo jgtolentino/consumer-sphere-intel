@@ -90,10 +90,10 @@ describe('Comprehensive QA Audit - 5,000 Mock Records', () => {
     it('should calculate correct total metrics', async () => {
       const allTransactions = await mockDataService.getTransactions();
       
-      const totalRevenue = allTransactions.reduce((sum, t) => sum + t.total, 0);
+      const totalRevenue = allTransactions.reduce((sum: number, t: any) => sum + (Number(t.total) || 0), 0);
       const avgBasketSize = totalRevenue / allTransactions.length;
-      const totalItems = allTransactions.reduce((sum, t) => 
-        sum + t.basket.reduce((itemSum, item) => itemSum + item.units, 0), 0
+      const totalItems = allTransactions.reduce((sum: number, t: any) => 
+        sum + (t.basket?.reduce((itemSum: number, item: any) => itemSum + (Number(item.units) || 0), 0) || 0), 0
       );
       
       expect(allTransactions.length).toBe(5000);
@@ -112,8 +112,8 @@ describe('Comprehensive QA Audit - 5,000 Mock Records', () => {
       expect(combined.length).toBe(ncr.length + bicol.length);
       
       // Validate all filtered transactions are from correct regions
-      ncr.forEach(t => expect(t.region).toBe('NCR'));
-      bicol.forEach(t => expect(t.region).toBe('Bicol Region'));
+      ncr.forEach((t: any) => expect(String(t.region)).toBe('NCR'));
+      bicol.forEach((t: any) => expect(String(t.region)).toBe('Bicol Region'));
     });
 
     it('should filter data correctly by brand', async () => {
@@ -122,10 +122,10 @@ describe('Comprehensive QA Audit - 5,000 Mock Records', () => {
       });
       
       expect(alaska.length).toBeGreaterThan(0);
-      alaska.forEach(t => {
-        const hasAlaskaBrand = t.basket.some(item => 
-          item.brand.includes('Alaska Evaporated Milk') || 
-          item.brand.includes('Alaska Condensed Milk')
+      alaska.forEach((t: any) => {
+        const hasAlaskaBrand = t.basket?.some((item: any) => 
+          String(item.brand).includes('Alaska Evaporated Milk') || 
+          String(item.brand).includes('Alaska Condensed Milk')
         );
         expect(hasAlaskaBrand).toBe(true);
       });
@@ -142,8 +142,8 @@ describe('Comprehensive QA Audit - 5,000 Mock Records', () => {
       expect(recentTransactions.length).toBeGreaterThan(0);
       expect(recentTransactions.length).toBeLessThan(5000);
       
-      recentTransactions.forEach(t => {
-        expect(new Date(t.date).getTime()).toBeGreaterThanOrEqual(thirtyDaysAgo.getTime());
+      recentTransactions.forEach((t: any) => {
+        expect(new Date(String(t.date)).getTime()).toBeGreaterThanOrEqual(thirtyDaysAgo.getTime());
       });
     });
   });
@@ -156,7 +156,7 @@ describe('Comprehensive QA Audit - 5,000 Mock Records', () => {
       const regionValidation = validateKpiSums(
         mockTransactions, 
         allTransactions, 
-        'region'
+        'region' as keyof typeof mockTransactions[0]
       );
       
       expect(regionValidation.isValid).toBe(true);
@@ -173,7 +173,7 @@ describe('Comprehensive QA Audit - 5,000 Mock Records', () => {
         const cityValidation = validateKpiSums(
           mockTransactions,
           regionTransactions,
-          'city'
+          'city' as keyof typeof mockTransactions[0]
         );
         
         expect(cityValidation.isValid).toBe(true);
@@ -190,8 +190,8 @@ describe('Comprehensive QA Audit - 5,000 Mock Records', () => {
       
       // Create a map of brand counts
       const brandCounts = new Map<string, number>();
-      allTransactions.forEach(txn => {
-        const brandsInBasket = new Set(txn.basket.map(item => item.brand));
+      allTransactions.forEach((txn: any) => {
+        const brandsInBasket = new Set(txn.basket?.map((item: any) => String(item.brand)) || []);
         brandsInBasket.forEach(brand => {
           brandCounts.set(brand, (brandCounts.get(brand) || 0) + 1);
         });
@@ -263,16 +263,16 @@ describe('Comprehensive QA Audit - 5,000 Mock Records', () => {
       });
       
       // Validate all filtered transactions meet criteria
-      filtered.forEach(txn => {
-        expect(['NCR', 'CALABARZON']).toContain(txn.region);
+      filtered.forEach((txn: any) => {
+        expect(['NCR', 'CALABARZON']).toContain(String(txn.region));
         
-        const hasValidBrand = txn.basket.some(item => 
-          ['Alaska Evaporated Milk', 'Oishi Prawn Crackers'].includes(item.brand)
+        const hasValidBrand = txn.basket?.some((item: any) => 
+          ['Alaska Evaporated Milk', 'Oishi Prawn Crackers'].includes(String(item.brand))
         );
         expect(hasValidBrand).toBe(true);
         
-        const hasValidCategory = txn.basket.some(item => 
-          ['Dairy', 'Snacks'].includes(item.category)
+        const hasValidCategory = txn.basket?.some((item: any) => 
+          ['Dairy', 'Snacks'].includes(String(item.category))
         );
         expect(hasValidCategory).toBe(true);
       });
@@ -377,17 +377,17 @@ describe('Comprehensive QA Audit - 5,000 Mock Records', () => {
       });
       
       // Simulate export data structure
-      const exportRows = exportData.map(txn => ({
-        id: txn.id,
-        date: txn.date,
-        time: txn.time,
-        region: txn.region,
-        city: txn.city,
-        barangay: txn.barangay,
-        total: txn.total,
-        itemCount: txn.basket.reduce((sum, item) => sum + item.units, 0),
-        brands: [...new Set(txn.basket.map(item => item.brand))].join(', '),
-        payment: txn.consumer_profile.payment
+      const exportRows = exportData.map((txn: any) => ({
+        id: String(txn.id),
+        date: String(txn.date),
+        time: String(txn.time),
+        region: String(txn.region),
+        city: String(txn.city),
+        barangay: String(txn.barangay),
+        total: Number(txn.total) || 0,
+        itemCount: txn.basket?.reduce((sum: number, item: any) => sum + (Number(item.units) || 0), 0) || 0,
+        brands: [...new Set(txn.basket?.map((item: any) => String(item.brand)) || [])].join(', '),
+        payment: String(txn.consumer_profile?.payment || '')
       }));
       
       expect(exportRows.length).toBe(exportData.length);
@@ -443,16 +443,16 @@ describe('Comprehensive QA Audit - 5,000 Mock Records', () => {
         expect(Array.isArray(result)).toBe(true);
         
         // Validate filtered results meet criteria
-        result.forEach(txn => {
+        result.forEach((txn: any) => {
           if (filters.regions) {
-            expect(filters.regions).toContain(txn.region);
+            expect(filters.regions).toContain(String(txn.region));
           }
           if (filters.categories) {
-            const hasCategory = txn.basket.some(item => filters.categories!.includes(item.category));
+            const hasCategory = txn.basket?.some((item: any) => filters.categories!.includes(String(item.category)));
             expect(hasCategory).toBe(true);
           }
           if (filters.brands) {
-            const hasBrand = txn.basket.some(item => filters.brands!.includes(item.brand));
+            const hasBrand = txn.basket?.some((item: any) => filters.brands!.includes(String(item.brand)));
             expect(hasBrand).toBe(true);
           }
         });
