@@ -13,11 +13,11 @@ const FMCG_BASELINES = {
   dailyTransactions: 1250, // Medium store
   marketShareDistribution: [34.2, 25.2, 21.1, 22.8, 9.8, 15.4], // Top 6 regions
   brandDistribution: [
-    { name: 'Alaska', category: 'Dairy & Beverages', marketShare: 28.5, revenue: 45000000 },
-    { name: 'Oishi', category: 'Snacks', marketShare: 24.2, revenue: 38000000 },
-    { name: 'Peerless', category: 'Beverages', marketShare: 18.7, revenue: 29000000 },
-    { name: 'Del Monte', category: 'Food Products', marketShare: 16.3, revenue: 26000000 },
-    { name: 'JTI', category: 'Tobacco', marketShare: 12.3, revenue: 19000000 }
+    { name: 'JTI', category: 'Tobacco', marketShare: 35.8, revenue: 125000000 },
+    { name: 'Alaska', category: 'Dairy & Beverages', marketShare: 28.5, revenue: 89000000 },
+    { name: 'Oishi', category: 'Snacks', marketShare: 24.2, revenue: 76000000 },
+    { name: 'Del Monte', category: 'Food Products', marketShare: 18.7, revenue: 58000000 },
+    { name: 'Peerless', category: 'Beverages', marketShare: 16.3, revenue: 51000000 }
   ]
 };
 
