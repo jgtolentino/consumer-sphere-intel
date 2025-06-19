@@ -1,3 +1,4 @@
+
 import { useQuery } from '@tanstack/react-query';
 import { useDataService } from '../providers/DataProvider';
 
@@ -24,15 +25,15 @@ export const useProductSubstitution = () => {
         
         throw new Error('No real data available');
       } catch (error) {
-        console.log('🔄 Using FMCG baseline substitution patterns');
+        console.log('🔄 Using competitive substitution patterns (TBWA vs Competitors)');
         
-        // Professional FMCG substitution patterns - only TBWA client products
+        // Realistic competitive substitution patterns - TBWA clients losing to competitors
         return [
-          { from: 'Alaska Milk', to: 'Alaska Condensada', flow: 45 },
-          { from: 'Oishi Prawn Crackers', to: 'Oishi Smart C+', flow: 32 },
-          { from: 'Del Monte Corned Beef', to: 'Del Monte Italian Style', flow: 28 },
-          { from: 'Peerless Orange', to: 'Peerless Apple', flow: 21 },
-          { from: 'JTI Winston', to: 'JTI Mevius', flow: 15 }
+          { from: 'Alaska Milk', to: 'Nestlé Bear Brand', flow: 35 },
+          { from: 'Oishi Prawn Crackers', to: 'Jack n Jill Piattos', flow: 28 },
+          { from: 'Del Monte Corned Beef', to: 'Purefoods Corned Beef', flow: 22 },
+          { from: 'JTI Winston', to: 'Philip Morris Marlboro', flow: 31 },
+          { from: 'Peerless Shampoo', to: 'Unilever Sunsilk', flow: 18 }
         ];
       }
     },

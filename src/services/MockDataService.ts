@@ -234,13 +234,106 @@ export class MockDataService implements DataService {
   }
 
   async getProductSubstitution(): Promise<any[]> {
-    // Return FMCG product substitution patterns for TBWA clients
+    // Return competitive substitution patterns - TBWA losing to competitors
     return [
-      { from: 'Alaska Milk', to: 'Alaska Condensada', flow: 45 },
-      { from: 'Oishi Prawn Crackers', to: 'Oishi Smart C+', flow: 32 },
-      { from: 'Del Monte Corned Beef', to: 'Del Monte Italian Style', flow: 28 },
-      { from: 'Peerless Orange', to: 'Peerless Apple', flow: 21 },
-      { from: 'JTI Winston', to: 'JTI Mevius', flow: 15 }
+      { from: 'Alaska Milk', to: 'Nestlé Bear Brand', flow: 35 },
+      { from: 'Oishi Prawn Crackers', to: 'Jack n Jill Piattos', flow: 28 },
+      { from: 'Del Monte Corned Beef', to: 'Purefoods Corned Beef', flow: 22 },
+      { from: 'JTI Winston', to: 'Philip Morris Marlboro', flow: 31 },
+      { from: 'Peerless Shampoo', to: 'Unilever Sunsilk', flow: 18 }
     ];
+  }
+
+  async getComprehensiveAnalytics(): Promise<any> {
+    // Process transactions to get comprehensive analytics
+    const fmcgTransactions = this.filterFMCGTransactions(mockTransactions);
+    
+    // Company/Brand analytics
+    const companyAnalytics = this.processBrandAnalytics(fmcgTransactions);
+    
+    // Regional analytics  
+    const regionalAnalytics = this.processRegionalAnalytics(fmcgTransactions);
+    
+    // Time series analytics
+    const timeSeries = this.processTimeSeriesAnalytics(fmcgTransactions);
+    
+    return {
+      companyAnalytics,
+      regionalAnalytics,
+      timeSeries,
+      summary: {
+        totalTransactions: fmcgTransactions.length,
+        totalRevenue: fmcgTransactions.reduce((sum, t) => sum + t.total, 0),
+        avgTransactionValue: fmcgTransactions.reduce((sum, t) => sum + t.total, 0) / fmcgTransactions.length,
+        uniqueProducts: new Set(fmcgTransactions.flatMap(t => t.basket.map(item => item.sku))).size
+      }
+    };
+  }
+
+  private processBrandAnalytics(transactions: any[]) {
+    const brandStats: Record<string, { revenue: number; transactions: number }> = {};
+    
+    transactions.forEach(transaction => {
+      transaction.basket.forEach((item: any) => {
+        if (!brandStats[item.brand]) {
+          brandStats[item.brand] = { revenue: 0, transactions: 0 };
+        }
+        brandStats[item.brand].revenue += item.price;
+        brandStats[item.brand].transactions += 1;
+      });
+    });
+    
+    return Object.entries(brandStats)
+      .map(([brand, stats]) => ({
+        name: brand,
+        revenue: stats.revenue,
+        transactions: stats.transactions,
+        marketShare: (stats.revenue / Object.values(brandStats).reduce((sum, s) => sum + s.revenue, 0)) * 100
+      }))
+      .sort((a, b) => b.revenue - a.revenue)
+      .slice(0, 10); // Top 10 brands
+  }
+  
+  private processRegionalAnalytics(transactions: any[]) {
+    const regionStats: Record<string, { revenue: number; transactions: number }> = {};
+    
+    transactions.forEach(transaction => {
+      if (!regionStats[transaction.region]) {
+        regionStats[transaction.region] = { revenue: 0, transactions: 0 };
+      }
+      regionStats[transaction.region].revenue += transaction.total;
+      regionStats[transaction.region].transactions += 1;
+    });
+    
+    return Object.entries(regionStats)
+      .map(([region, stats]) => ({
+        region,
+        revenue: stats.revenue,
+        transactions: stats.transactions,
+        marketShare: (stats.revenue / Object.values(regionStats).reduce((sum, s) => sum + s.revenue, 0)) * 100
+      }))
+      .sort((a, b) => b.revenue - a.revenue);
+  }
+  
+  private processTimeSeriesAnalytics(transactions: any[]) {
+    const dailyStats: Record<string, { volume: number; value: number }> = {};
+    
+    transactions.forEach(transaction => {
+      const date = transaction.date;
+      if (!dailyStats[date]) {
+        dailyStats[date] = { volume: 0, value: 0 };
+      }
+      dailyStats[date].volume += 1;
+      dailyStats[date].value += transaction.total;
+    });
+    
+    return Object.entries(dailyStats)
+      .map(([date, stats]) => ({
+        date,
+        volume: stats.volume,
+        value: stats.value
+      }))
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+      .slice(-30); // Last 30 days
   }
 }
