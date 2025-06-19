@@ -1,3 +1,4 @@
+
 // src/utils/regionNormalizer.ts
 
 // 1. Canonical region name map for PH (edit/add as needed)
@@ -48,27 +49,14 @@ export const REGION_NAME_MAP: Record<string, string> = {
   'nir': 'Negros Island Region',
   // Abbreviations for other regions
   'ilocos': 'Ilocos Region',
-  'ilocosregion': 'Ilocos Region',
   'cagayan': 'Cagayan Valley',
-  'cagayanvalley': 'Cagayan Valley',
   'bicol': 'Bicol Region',
-  'bicolregion': 'Bicol Region',
   'westernvis': 'Western Visayas',
-  'westernvisayas': 'Western Visayas',
   'centralvis': 'Central Visayas',
-  'centralvisayas': 'Central Visayas',
   'easternvis': 'Eastern Visayas',
-  'easternvisayas': 'Eastern Visayas',
   'zamboanga': 'Zamboanga Peninsula',
-  'zamboangapeninsula': 'Zamboanga Peninsula',
   'northernmind': 'Northern Mindanao',
-  'northernmindanao': 'Northern Mindanao',
   'davao': 'Davao Region',
-  'davaoregion': 'Davao Region',
-  'centralluzon': 'Central Luzon',
-  'mimaropa': 'MIMAROPA',
-  'soccsksargen': 'SOCCSKSARGEN',
-  'caraga': 'Caraga',
   // Handle case variations
   'southerntagalog': 'CALABARZON'
 };

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -210,7 +209,7 @@ export const ChoroplethMap: React.FC = () => {
     // Debug region mappings (only in development)
     if (process.env.NODE_ENV === 'development') {
       const geoRegions = philippineRegionsGeoJSON.features.map(f => 
-        f.properties.NAME_1 || f.properties.name || f.properties.REGION || 'Unknown'
+        f.properties.name || 'Unknown'
       );
       const dataRegions = regionData.map(r => r.region);
       debugRegionMappings(geoRegions, dataRegions);
@@ -220,11 +219,7 @@ export const ChoroplethMap: React.FC = () => {
     const enrichedGeoJSON = {
       ...philippineRegionsGeoJSON,
       features: philippineRegionsGeoJSON.features.map(feature => {
-        const geoRegionRaw = 
-          feature.properties.NAME_1 ||
-          feature.properties.name ||
-          feature.properties.REGION ||
-          'Unknown Region';
+        const geoRegionRaw = feature.properties.name || 'Unknown Region';
         
         // Use canonical name normalization for bulletproof matching
         const geoRegion = getCanonicalRegionName(geoRegionRaw);
