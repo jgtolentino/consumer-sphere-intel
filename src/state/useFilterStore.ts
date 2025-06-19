@@ -7,12 +7,16 @@ interface FilterState {
   barangays: string[];
   categories: string[];
   brands: string[];
+  skus: string[];
   setDateRange: (range: { from: Date | null; to: Date | null }) => void;
   setBarangays: (barangays: string[]) => void;
   setCategories: (categories: string[]) => void;
   setBrands: (brands: string[]) => void;
-  setFilter: (type: 'categories' | 'brands' | 'barangays', values: string[]) => void;
+  setSkus: (skus: string[]) => void;
+  setFilter: (type: 'categories' | 'brands' | 'barangays' | 'dateRange' | 'skus', values: any) => void;
   clearFilters: () => void;
+  reset: () => void;
+  getQueryString: () => string;
   getMasterLists: () => {
     allRegions: string[];
     allCategories: string[];
@@ -56,21 +60,65 @@ export const useFilterStore = create<FilterState>()(
       barangays: [],
       categories: [],
       brands: [],
+      skus: [],
       
       setDateRange: (range) => set({ dateRange: range }),
       setBarangays: (barangays) => set({ barangays }),
       setCategories: (categories) => set({ categories }),
       setBrands: (brands) => set({ brands }),
+      setSkus: (skus) => set({ skus }),
       
       setFilter: (type, values) => {
-        set({ [type]: values });
+        if (type === 'dateRange') {
+          set({ dateRange: values });
+        } else {
+          set({ [type]: values });
+        }
       },
       
       clearFilters: () => set({ 
         barangays: [], 
         categories: [], 
-        brands: [] 
+        brands: [],
+        skus: []
       }),
+
+      reset: () => set({ 
+        dateRange: { 
+          from: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+          to: new Date() 
+        },
+        barangays: [], 
+        categories: [], 
+        brands: [],
+        skus: []
+      }),
+
+      getQueryString: () => {
+        const state = get();
+        const params = new URLSearchParams();
+        
+        if (state.dateRange.from) {
+          params.set('from', state.dateRange.from.toISOString());
+        }
+        if (state.dateRange.to) {
+          params.set('to', state.dateRange.to.toISOString());
+        }
+        if (state.barangays.length > 0) {
+          params.set('barangays', state.barangays.join(','));
+        }
+        if (state.categories.length > 0) {
+          params.set('categories', state.categories.join(','));
+        }
+        if (state.brands.length > 0) {
+          params.set('brands', state.brands.join(','));
+        }
+        if (state.skus.length > 0) {
+          params.set('skus', state.skus.join(','));
+        }
+        
+        return params.toString();
+      },
       
       getMasterLists: () => ({
         allRegions: MASTER_REGIONS,
@@ -85,7 +133,8 @@ export const useFilterStore = create<FilterState>()(
         dateRange: state.dateRange,
         barangays: state.barangays,
         categories: state.categories,
-        brands: state.brands
+        brands: state.brands,
+        skus: state.skus
       })
     }
   )

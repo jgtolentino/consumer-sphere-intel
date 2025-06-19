@@ -10,6 +10,29 @@ interface ValidationResult {
     validRecords: number;
     errorRate: number;
   };
+  stats?: {
+    totalTransactions: number;
+    clientTransactions: number;
+    competitorTransactions: number;
+    clientPercentage: number;
+    totalRevenue: number;
+    uniqueRegions: number;
+    uniqueCities: number;
+    uniqueBarangays: number;
+    uniqueBrands: number;
+    uniqueSkus: number;
+    substitutionCount: number;
+    aiRecommendationCount: number;
+  };
+}
+
+interface KpiSumValidationResult {
+  isValid: boolean;
+  details: {
+    parentCount: number;
+    childrenSum: number;
+    groups: Record<string, number>;
+  };
 }
 
 export class DataIntegrityValidator {
@@ -27,6 +50,9 @@ export class DataIntegrityValidator {
       const transactions = await this.dataService.getTransactions();
       const totalRecords = transactions.length;
       let validRecords = 0;
+
+      // Calculate stats
+      const stats = this.calculateStats(transactions);
 
       // Validate each transaction
       transactions.forEach((transaction, index) => {
@@ -57,7 +83,8 @@ export class DataIntegrityValidator {
           totalRecords,
           validRecords,
           errorRate
-        }
+        },
+        stats
       };
     } catch (error) {
       return {
@@ -71,6 +98,92 @@ export class DataIntegrityValidator {
         }
       };
     }
+  }
+
+  validateTransactions(transactions: any[]): ValidationResult {
+    const errors: string[] = [];
+    const warnings: string[] = [];
+    let validRecords = 0;
+    
+    const stats = this.calculateStats(transactions);
+
+    transactions.forEach((transaction, index) => {
+      const transactionErrors = this.validateTransaction(transaction, index);
+      if (transactionErrors.length === 0) {
+        validRecords++;
+      } else {
+        errors.push(...transactionErrors);
+      }
+    });
+
+    const errorRate = transactions.length > 0 ? ((transactions.length - validRecords) / transactions.length) * 100 : 0;
+
+    return {
+      isValid: errors.length === 0,
+      errors,
+      warnings,
+      summary: {
+        totalRecords: transactions.length,
+        validRecords,
+        errorRate
+      },
+      stats
+    };
+  }
+
+  private calculateStats(transactions: any[]) {
+    const clientBrands = ['Alaska Milk', 'Oishi', 'Jack n Jill']; // Sample client brands
+    
+    let clientTransactions = 0;
+    let totalRevenue = 0;
+    let substitutionCount = 0;
+    let aiRecommendationCount = 0;
+    
+    const uniqueRegions = new Set();
+    const uniqueCities = new Set();
+    const uniqueBarangays = new Set();
+    const uniqueBrands = new Set();
+    const uniqueSkus = new Set();
+
+    transactions.forEach(txn => {
+      // Count client transactions
+      const hasClientBrand = txn.basket?.some((item: any) => 
+        clientBrands.some(brand => String(item.brand).includes(brand))
+      );
+      if (hasClientBrand) clientTransactions++;
+
+      // Sum revenue
+      totalRevenue += Number(txn.total) || 0;
+
+      // Count substitutions and AI recommendations
+      if (txn.substitution_from && txn.substitution_to) substitutionCount++;
+      if (txn.ai_recommendation) aiRecommendationCount++;
+
+      // Track unique values
+      uniqueRegions.add(txn.region);
+      uniqueCities.add(txn.city);
+      uniqueBarangays.add(txn.barangay);
+      
+      txn.basket?.forEach((item: any) => {
+        uniqueBrands.add(item.brand);
+        uniqueSkus.add(item.sku);
+      });
+    });
+
+    return {
+      totalTransactions: transactions.length,
+      clientTransactions,
+      competitorTransactions: transactions.length - clientTransactions,
+      clientPercentage: transactions.length > 0 ? (clientTransactions / transactions.length) * 100 : 0,
+      totalRevenue,
+      uniqueRegions: uniqueRegions.size,
+      uniqueCities: uniqueCities.size,
+      uniqueBarangays: uniqueBarangays.size,
+      uniqueBrands: uniqueBrands.size,
+      uniqueSkus: uniqueSkus.size,
+      substitutionCount,
+      aiRecommendationCount
+    };
   }
 
   private validateTransaction(transaction: any, index: number): string[] {
@@ -141,6 +254,30 @@ export class DataIntegrityValidator {
       };
     }
   }
+}
+
+export function validateKpiSums(
+  parentData: any[],
+  childData: any[],
+  groupByField: string
+): KpiSumValidationResult {
+  const groups: Record<string, number> = {};
+  
+  childData.forEach(item => {
+    const key = String(item[groupByField]);
+    groups[key] = (groups[key] || 0) + 1;
+  });
+
+  const childrenSum = Object.values(groups).reduce((sum, count) => sum + count, 0);
+
+  return {
+    isValid: childrenSum === childData.length,
+    details: {
+      parentCount: parentData.length,
+      childrenSum,
+      groups
+    }
+  };
 }
 
 export const dataIntegrityValidator = new DataIntegrityValidator();

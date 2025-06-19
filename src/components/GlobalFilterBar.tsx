@@ -23,6 +23,15 @@ export const GlobalFilterBar: React.FC = () => {
 
   const masterLists = getMasterLists();
 
+  const handleDateRangeChange = (range: any) => {
+    if (range) {
+      setDateRange({
+        from: range.from || null,
+        to: range.to || null
+      });
+    }
+  };
+
   return (
     <div className="bg-white dark:bg-scout-navy border-b border-gray-200 dark:border-scout-dark px-4 py-3">
       <div className="flex flex-wrap items-center gap-4">
@@ -42,7 +51,7 @@ export const GlobalFilterBar: React.FC = () => {
             <CalendarComponent
               mode="range"
               selected={dateRange}
-              onSelect={(range) => range && setDateRange(range)}
+              onSelect={handleDateRangeChange}
               numberOfMonths={2}
             />
           </PopoverContent>
