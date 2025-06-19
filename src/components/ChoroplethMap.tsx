@@ -2,9 +2,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { MapPin } from 'lucide-react';
+import { MapPin, TrendingUp, Users, DollarSign } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { philippineRegionsGeoJSON } from '../data/philippineRegions';
+import { useFilterStore } from '../state/useFilterStore';
+import { useDrillDownStore } from '../state/useDrillDownStore';
 
 interface RegionData {
   region: string;
@@ -14,56 +16,35 @@ interface RegionData {
   marketShare: number;
 }
 
+// Comprehensive Philippines regional data with complete coverage
 const regionData: RegionData[] = [
-  {
-    region: 'Metro Manila',
-    coordinates: [121.0244, 14.6042],
-    totalSales: 4200000,
-    transactions: 53400,
-    marketShare: 34
-  },
-  {
-    region: 'Cebu',
-    coordinates: [123.8854, 10.3157],
-    totalSales: 2800000,
-    transactions: 35600,
-    marketShare: 23
-  },
-  {
-    region: 'Davao',
-    coordinates: [125.6144, 7.0731],
-    totalSales: 1900000,
-    transactions: 24200,
-    marketShare: 15
-  },
-  {
-    region: 'Iloilo',
-    coordinates: [120.7935, 10.7202],
-    totalSales: 1200000,
-    transactions: 15300,
-    marketShare: 10
-  },
-  {
-    region: 'Baguio',
-    coordinates: [120.5960, 16.4023],
-    totalSales: 950000,
-    transactions: 12100,
-    marketShare: 8
-  },
-  {
-    region: 'CALABARZON',
-    coordinates: [121.2, 14.2],
-    totalSales: 3100000,
-    transactions: 39500,
-    marketShare: 25
-  },
-  {
-    region: 'Central Luzon',
-    coordinates: [120.8, 15.3],
-    totalSales: 2600000,
-    transactions: 33000,
-    marketShare: 21
-  }
+  // Major Metro Areas
+  { region: 'National Capital Region', coordinates: [121.0244, 14.6042], totalSales: 4200000, transactions: 53400, marketShare: 34 },
+  { region: 'CALABARZON', coordinates: [121.2, 14.2], totalSales: 3100000, transactions: 39500, marketShare: 25 },
+  { region: 'Central Luzon', coordinates: [120.8, 15.3], totalSales: 2600000, transactions: 33000, marketShare: 21 },
+  { region: 'Central Visayas', coordinates: [123.8854, 10.3157], totalSales: 2800000, transactions: 35600, marketShare: 23 },
+  { region: 'Western Visayas', coordinates: [120.7935, 10.7202], totalSales: 1200000, transactions: 15300, marketShare: 10 },
+  { region: 'Davao Region', coordinates: [125.6144, 7.0731], totalSales: 1900000, transactions: 24200, marketShare: 15 },
+  
+  // Northern Luzon
+  { region: 'Ilocos Region', coordinates: [120.4, 17.6], totalSales: 850000, transactions: 10800, marketShare: 7 },
+  { region: 'Cagayan Valley', coordinates: [121.8, 17.6], totalSales: 620000, transactions: 7900, marketShare: 5 },
+  { region: 'Cordillera Administrative Region', coordinates: [120.6, 16.4], totalSales: 750000, transactions: 9600, marketShare: 6 },
+  
+  // Southern Luzon
+  { region: 'Bicol Region', coordinates: [123.4, 13.6], totalSales: 720000, transactions: 9200, marketShare: 6 },
+  { region: 'MIMAROPA', coordinates: [121.0, 13.0], totalSales: 480000, transactions: 6100, marketShare: 4 },
+  
+  // Visayas
+  { region: 'Eastern Visayas', coordinates: [125.0, 11.2], totalSales: 590000, transactions: 7500, marketShare: 5 },
+  { region: 'Negros Island Region', coordinates: [123.0, 10.0], totalSales: 680000, transactions: 8700, marketShare: 6 },
+  
+  // Mindanao
+  { region: 'Northern Mindanao', coordinates: [124.5, 8.5], totalSales: 1100000, transactions: 14000, marketShare: 9 },
+  { region: 'SOCCSKSARGEN', coordinates: [124.8, 6.2], totalSales: 780000, transactions: 9900, marketShare: 6 },
+  { region: 'Zamboanga Peninsula', coordinates: [122.1, 7.3], totalSales: 520000, transactions: 6600, marketShare: 4 },
+  { region: 'CARAGA', coordinates: [126.0, 8.5], totalSales: 420000, transactions: 5400, marketShare: 3 },
+  { region: 'Bangsamoro Autonomous Region in Muslim Mindanao', coordinates: [124.3, 7.2], totalSales: 380000, transactions: 4800, marketShare: 3 }
 ];
 
 type MetricType = 'totalSales' | 'transactions' | 'marketShare';
@@ -75,17 +56,19 @@ interface MetricConfig {
   colorStops: [number, string][];
 }
 
+// Scout Analytics theme-aligned color schemes
 const metricConfigs: Record<MetricType, MetricConfig> = {
   totalSales: {
     label: 'Total Sales',
     unit: '₱',
     formatter: (value) => `₱${(value / 1000000).toFixed(1)}M`,
     colorStops: [
-      [0, '#fff5f0'],
-      [1000000, '#fdcc8a'],
-      [2000000, '#fc8d59'],
-      [3000000, '#e34a33'],
-      [4500000, '#b30000']
+      [0, '#F5F6FA'],           // Scout Light
+      [500000, '#E8F4F8'],      // Light Scout Teal
+      [1000000, '#B8E6E0'],     // Medium Scout Teal
+      [2000000, '#36CFC9'],     // Scout Teal
+      [3000000, '#2F3A4F'],     // Scout Dark
+      [4500000, '#0A2540']      // Scout Navy
     ]
   },
   transactions: {
@@ -93,11 +76,12 @@ const metricConfigs: Record<MetricType, MetricConfig> = {
     unit: '',
     formatter: (value) => `${(value / 1000).toFixed(1)}K`,
     colorStops: [
-      [0, '#f7fbff'],
-      [15000, '#c6dbef'],
-      [25000, '#6baed6'],
-      [35000, '#3182bd'],
-      [55000, '#08519c']
+      [0, '#F5F6FA'],           // Scout Light
+      [8000, '#E8F4F8'],        // Light Scout Teal
+      [15000, '#B8E6E0'],       // Medium Scout Teal
+      [25000, '#36CFC9'],       // Scout Teal
+      [35000, '#2F3A4F'],       // Scout Dark
+      [55000, '#0A2540']        // Scout Navy
     ]
   },
   marketShare: {
@@ -105,11 +89,12 @@ const metricConfigs: Record<MetricType, MetricConfig> = {
     unit: '%',
     formatter: (value) => `${value}%`,
     colorStops: [
-      [0, '#f7fcf5'],
-      [10, '#c7e9c0'],
-      [20, '#74c476'],
-      [30, '#31a354'],
-      [40, '#006d2c']
+      [0, '#F5F6FA'],           // Scout Light
+      [5, '#E8F4F8'],           // Light Scout Teal
+      [10, '#B8E6E0'],          // Medium Scout Teal
+      [20, '#36CFC9'],          // Scout Teal
+      [30, '#2F3A4F'],          // Scout Dark
+      [40, '#0A2540']           // Scout Navy
     ]
   }
 };
@@ -119,6 +104,12 @@ export const ChoroplethMap: React.FC = () => {
   const map = useRef<mapboxgl.Map | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [selectedMetric, setSelectedMetric] = useState<MetricType>('totalSales');
+  const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
+  const [hoveredRegion, setHoveredRegion] = useState<string | null>(null);
+  
+  // State management for cross-filtering
+  const { setFilter } = useFilterStore();
+  const { drillDown } = useDrillDownStore();
 
   const MAPBOX_TOKEN = 'pk.eyJ1Ijoiamd0b2xlbnRpbm8iLCJhIjoiY21jMmNycWRiMDc0ajJqcHZoaDYyeTJ1NiJ9.Dns6WOql16BUQ4l7otaeww';
 
@@ -138,6 +129,37 @@ export const ChoroplethMap: React.FC = () => {
   const getRegionValue = (regionName: string): number => {
     const region = regionData.find(r => r.region === regionName);
     return region ? region[selectedMetric] : 0;
+  };
+
+  const handleRegionClick = (regionName: string) => {
+    console.log('Region clicked:', regionName);
+    
+    // Toggle selection
+    if (selectedRegion === regionName) {
+      setSelectedRegion(null);
+      setFilter('barangays', []); // Clear regional filter
+    } else {
+      setSelectedRegion(regionName);
+      setFilter('barangays', [regionName]); // Apply regional filter
+      
+      // Drill down to region level
+      drillDown({
+        type: 'region',
+        value: regionName.toLowerCase().replace(/\s+/g, '-'),
+        label: regionName
+      });
+    }
+  };
+
+  const getRegionStats = (regionName: string) => {
+    const region = regionData.find(r => r.region === regionName);
+    if (!region) return null;
+    
+    const rank = regionData
+      .sort((a, b) => b[selectedMetric] - a[selectedMetric])
+      .findIndex(r => r.region === regionName) + 1;
+    
+    return { ...region, rank };
   };
 
   useEffect(() => {
@@ -182,19 +204,38 @@ export const ChoroplethMap: React.FC = () => {
   const addChoroplethLayer = () => {
     if (!map.current) return;
 
-    // Add GeoJSON source with enriched data
+    // Enhanced GeoJSON with complete data join - ensures ALL regions have data
     const enrichedGeoJSON = {
       ...philippineRegionsGeoJSON,
       features: philippineRegionsGeoJSON.features.map(feature => {
-        const regionName = feature.properties.name;
-        const regionStats = regionData.find(r => r.region === regionName);
+        const regionName = feature.properties.name || feature.properties.REGION || feature.properties.NAME_1;
+        
+        // Try multiple name matching strategies for complete coverage
+        let regionStats = regionData.find(r => r.region === regionName);
+        if (!regionStats) {
+          // Fallback matching for common name variations
+          regionStats = regionData.find(r => 
+            r.region.toLowerCase().includes(regionName?.toLowerCase() || '') ||
+            regionName?.toLowerCase().includes(r.region.toLowerCase())
+          );
+        }
+        
+        // Ensure every region has data - use defaults if no match
+        const safeStats = regionStats || {
+          totalSales: 0,
+          transactions: 0,
+          marketShare: 0
+        };
+        
         return {
           ...feature,
           properties: {
             ...feature.properties,
-            totalSales: regionStats?.totalSales || 0,
-            transactions: regionStats?.transactions || 0,
-            marketShare: regionStats?.marketShare || 0
+            name: regionName,
+            totalSales: safeStats.totalSales,
+            transactions: safeStats.transactions,
+            marketShare: safeStats.marketShare,
+            hasData: !!regionStats
           }
         };
       })
@@ -205,39 +246,65 @@ export const ChoroplethMap: React.FC = () => {
       data: enrichedGeoJSON as any
     });
 
-    // Add fill layer with expression-based coloring
+    // Enhanced fill layer with hover and selection states
     map.current.addLayer({
       id: 'ph-regions-fill',
       type: 'fill',
       source: 'ph-regions',
       paint: {
         'fill-color': [
-          'interpolate',
-          ['linear'],
-          ['get', selectedMetric],
-          ...metricConfigs[selectedMetric].colorStops.flat()
+          'case',
+          ['boolean', ['feature-state', 'selected'], false],
+          '#0A2540', // Scout Navy for selected
+          ['boolean', ['feature-state', 'hover'], false],
+          '#36CFC9', // Scout Teal for hover
+          [
+            'interpolate',
+            ['linear'],
+            ['get', selectedMetric],
+            ...metricConfigs[selectedMetric].colorStops.flat()
+          ]
         ],
-        'fill-opacity': 0.8
+        'fill-opacity': [
+          'case',
+          ['boolean', ['feature-state', 'selected'], false],
+          0.9,
+          ['boolean', ['feature-state', 'hover'], false],
+          0.8,
+          0.7
+        ]
       }
     });
 
-    // Add border layer
+    // Enhanced border layer with selection highlighting
     map.current.addLayer({
       id: 'ph-regions-border',
       type: 'line',
       source: 'ph-regions',
       paint: {
-        'line-color': '#ffffff',
-        'line-width': 2,
-        'line-opacity': 0.8
+        'line-color': [
+          'case',
+          ['boolean', ['feature-state', 'selected'], false],
+          '#36CFC9', // Scout Teal border for selected
+          '#ffffff'
+        ],
+        'line-width': [
+          'case',
+          ['boolean', ['feature-state', 'selected'], false],
+          3,
+          1
+        ],
+        'line-opacity': 0.9
       }
     });
 
-    // Add hover effects and popups
+    // Enhanced hover and click interactions
     const popup = new mapboxgl.Popup({
       closeButton: false,
       closeOnClick: false
     });
+
+    let hoveredStateId: string | number | null = null;
 
     map.current.on('mouseenter', 'ph-regions-fill', (e) => {
       if (!map.current || !e.features || e.features.length === 0) return;
@@ -246,34 +313,76 @@ export const ChoroplethMap: React.FC = () => {
       
       const feature = e.features[0];
       const props = feature.properties;
-      const config = metricConfigs[selectedMetric];
-      const value = props?.[selectedMetric] || 0;
+      const regionName = props?.name;
+      
+      // Update hover state
+      if (hoveredStateId !== null) {
+        map.current.setFeatureState(
+          { source: 'ph-regions', id: hoveredStateId },
+          { hover: false }
+        );
+      }
+      hoveredStateId = feature.id;
+      map.current.setFeatureState(
+        { source: 'ph-regions', id: hoveredStateId },
+        { hover: true }
+      );
+      
+      setHoveredRegion(regionName);
       
       if (props) {
+        const config = metricConfigs[selectedMetric];
+        const value = props[selectedMetric] || 0;
+        const hasData = props.hasData;
+        const rank = regionData
+          .sort((a, b) => b[selectedMetric] - a[selectedMetric])
+          .findIndex(r => r.region === regionName) + 1;
+        
         popup.setLngLat(e.lngLat)
           .setHTML(`
-            <div class="p-3 min-w-48">
-              <h3 class="font-semibold text-gray-900 mb-2">${props.name}</h3>
-              <div class="space-y-1 text-sm">
-                <div class="flex justify-between">
-                  <span class="text-gray-600">${config.label}:</span>
-                  <span class="font-medium">${config.formatter(value)}</span>
-                </div>
-                <div class="flex justify-between">
-                  <span class="text-gray-600">Transactions:</span>
-                  <span class="font-medium">${(props.transactions || 0).toLocaleString()}</span>
-                </div>
-                <div class="flex justify-between">
-                  <span class="text-gray-600">Market Share:</span>
-                  <span class="font-medium">${props.marketShare || 0}%</span>
-                </div>
-                <div class="flex justify-between">
-                  <span class="text-gray-600">Rank:</span>
-                  <span class="font-medium">#${regionData
-                    .sort((a, b) => b[selectedMetric] - a[selectedMetric])
-                    .findIndex(r => r.region === props.name) + 1}</span>
-                </div>
+            <div class="p-4 min-w-56 bg-white rounded-lg shadow-lg border">
+              <div class="flex items-center gap-2 mb-3">
+                <MapPin class="h-4 w-4 text-scout-teal" />
+                <h3 class="font-semibold text-scout-navy">${regionName}</h3>
               </div>
+              
+              ${hasData ? `
+                <div class="space-y-2 text-sm">
+                  <div class="flex justify-between items-center p-2 bg-scout-light rounded">
+                    <span class="text-scout-dark flex items-center gap-1">
+                      <DollarSign class="h-3 w-3" />
+                      ${config.label}:
+                    </span>
+                    <span class="font-semibold text-scout-navy">${config.formatter(value)}</span>
+                  </div>
+                  <div class="flex justify-between items-center p-2 bg-scout-light rounded">
+                    <span class="text-scout-dark flex items-center gap-1">
+                      <TrendingUp class="h-3 w-3" />
+                      Transactions:
+                    </span>
+                    <span class="font-semibold text-scout-navy">${(props.transactions || 0).toLocaleString()}</span>
+                  </div>
+                  <div class="flex justify-between items-center p-2 bg-scout-light rounded">
+                    <span class="text-scout-dark flex items-center gap-1">
+                      <Users class="h-3 w-3" />
+                      Market Share:
+                    </span>
+                    <span class="font-semibold text-scout-navy">${props.marketShare || 0}%</span>
+                  </div>
+                  <div class="flex justify-between items-center p-2 bg-scout-teal/10 rounded">
+                    <span class="text-scout-dark">Regional Rank:</span>
+                    <span class="font-bold text-scout-navy">#${rank}</span>
+                  </div>
+                </div>
+                <div class="mt-3 text-xs text-scout-teal border-t pt-2">
+                  Click to drill down and filter data
+                </div>
+              ` : `
+                <div class="text-center py-2">
+                  <div class="text-scout-dark text-sm">No data available</div>
+                  <div class="text-xs text-gray-500 mt-1">Region not in dataset</div>
+                </div>
+              `}
             </div>
           `)
           .addTo(map.current);
@@ -282,8 +391,39 @@ export const ChoroplethMap: React.FC = () => {
 
     map.current.on('mouseleave', 'ph-regions-fill', () => {
       if (!map.current) return;
+      
       map.current.getCanvas().style.cursor = '';
+      
+      // Clear hover state
+      if (hoveredStateId !== null) {
+        map.current.setFeatureState(
+          { source: 'ph-regions', id: hoveredStateId },
+          { hover: false }
+        );
+      }
+      hoveredStateId = null;
+      setHoveredRegion(null);
       popup.remove();
+    });
+
+    // Enhanced click handler with cross-filtering
+    map.current.on('click', 'ph-regions-fill', (e) => {
+      if (!map.current || !e.features || e.features.length === 0) return;
+      
+      const feature = e.features[0];
+      const regionName = feature.properties?.name;
+      
+      if (regionName) {
+        handleRegionClick(regionName);
+        
+        // Update selection state
+        map.current.querySourceFeatures('ph-regions').forEach((f) => {
+          map.current!.setFeatureState(
+            { source: 'ph-regions', id: f.id },
+            { selected: f.properties?.name === regionName && selectedRegion !== regionName }
+          );
+        });
+      }
     });
   };
 
@@ -307,51 +447,149 @@ export const ChoroplethMap: React.FC = () => {
     };
   }, []);
 
+  // Get top performing regions for stats panel
+  const topRegions = regionData
+    .sort((a, b) => b[selectedMetric] - a[selectedMetric])
+    .slice(0, 5);
+
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-      <div className="p-4 xl:p-6 border-b border-gray-100">
+      {/* Enhanced Header with Scout Analytics styling */}
+      <div className="p-4 xl:p-6 border-b border-gray-100 bg-gradient-to-r from-scout-light to-white">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="text-base xl:text-lg font-semibold text-gray-900">Regional Performance Distribution</h3>
-            <p className="text-xs xl:text-sm text-gray-600">True choropleth mapping with actual region boundaries</p>
+            <h3 className="text-base xl:text-lg font-semibold text-scout-navy">Interactive Regional Performance Map</h3>
+            <p className="text-xs xl:text-sm text-scout-dark">Click regions to drill down • Hover for detailed insights</p>
           </div>
-          <MapPin className="h-5 w-5 text-gray-400" />
+          <div className="flex items-center gap-2">
+            <MapPin className="h-5 w-5 text-scout-teal" />
+            {selectedRegion && (
+              <div className="px-3 py-1 bg-scout-teal/10 text-scout-navy rounded-full text-xs font-medium">
+                {selectedRegion} selected
+              </div>
+            )}
+          </div>
         </div>
         
-        {/* Metric Selector */}
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-gray-700">Metric:</span>
-          <Select value={selectedMetric} onValueChange={(value: MetricType) => setSelectedMetric(value)}>
-            <SelectTrigger className="w-40">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="totalSales">Total Sales</SelectItem>
-              <SelectItem value="transactions">Transactions</SelectItem>
-              <SelectItem value="marketShare">Market Share</SelectItem>
-            </SelectContent>
-          </Select>
+        {/* Enhanced Controls */}
+        <div className="flex items-center justify-between flex-wrap gap-4">
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-medium text-scout-navy">Metric:</span>
+            <Select value={selectedMetric} onValueChange={(value: MetricType) => setSelectedMetric(value)}>
+              <SelectTrigger className="w-48 border-scout-teal/20 focus:border-scout-teal">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="totalSales">💰 Total Sales</SelectItem>
+                <SelectItem value="transactions">📊 Transactions</SelectItem>
+                <SelectItem value="marketShare">📈 Market Share</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          {/* Real-time stats */}
+          <div className="flex items-center gap-4 text-xs text-scout-dark">
+            <div className="flex items-center gap-1">
+              <div className="w-2 h-2 bg-scout-teal rounded-full"></div>
+              <span>{regionData.length} regions mapped</span>
+            </div>
+            {hoveredRegion && (
+              <div className="flex items-center gap-1">
+                <div className="w-2 h-2 bg-scout-navy rounded-full"></div>
+                <span>Viewing: {hoveredRegion}</span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
       
-      <div className="relative">
-        <div ref={mapContainer} className="w-full h-96" />
-        
-        {/* Gradient Legend */}
-        <div className="absolute bottom-4 left-4 bg-white rounded-lg shadow-lg p-3 border">
-          <div className="text-xs font-semibold text-gray-700 mb-2">
-            {metricConfigs[selectedMetric].label}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-0">
+        {/* Main Map Area */}
+        <div className="lg:col-span-3 relative">
+          <div ref={mapContainer} className="w-full h-96 lg:h-[500px]" />
+          
+          {/* Enhanced Scout-themed Legend */}
+          <div className="absolute bottom-4 left-4 bg-white rounded-lg shadow-lg p-4 border border-scout-teal/20">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-3 h-3 bg-scout-teal rounded-full"></div>
+              <div className="text-sm font-semibold text-scout-navy">
+                {metricConfigs[selectedMetric].label}
+              </div>
+            </div>
+            <div className="flex items-center gap-2 text-xs mb-2">
+              <span className="text-scout-dark">Low</span>
+              <div className="w-32 h-3 rounded-full border border-scout-teal/20" style={{
+                background: `linear-gradient(to right, ${metricConfigs[selectedMetric].colorStops.map(stop => stop[1]).join(', ')})`
+              }}></div>
+              <span className="text-scout-dark">High</span>
+            </div>
+            <div className="text-xs text-scout-dark/60">
+              Interactive choropleth • Click to filter
+            </div>
           </div>
-          <div className="flex items-center gap-1 text-xs mb-2">
-            <span>Low</span>
-            <div className="w-32 h-4 rounded" style={{
-              background: `linear-gradient(to right, ${metricConfigs[selectedMetric].colorStops.map(stop => stop[1]).join(', ')})`
-            }}></div>
-            <span>High</span>
+
+          {/* Data Coverage Indicator */}
+          <div className="absolute top-4 left-4 bg-white/90 backdrop-blur rounded-lg p-2 border border-scout-teal/20">
+            <div className="text-xs text-scout-navy font-medium">Coverage</div>
+            <div className="text-xs text-scout-dark">
+              {regionData.filter(r => r[selectedMetric] > 0).length}/{regionData.length} regions
+            </div>
           </div>
-          <div className="text-xs text-gray-500">
-            Regions filled by actual polygon boundaries
+        </div>
+
+        {/* Enhanced Stats Panel */}
+        <div className="lg:col-span-1 bg-scout-light/30 p-4 border-l border-gray-100">
+          <h4 className="text-sm font-semibold text-scout-navy mb-4 flex items-center gap-2">
+            <TrendingUp className="h-4 w-4 text-scout-teal" />
+            Top Performers
+          </h4>
+          
+          <div className="space-y-3">
+            {topRegions.map((region, index) => {
+              const isSelected = selectedRegion === region.region;
+              const isHovered = hoveredRegion === region.region;
+              
+              return (
+                <div 
+                  key={region.region}
+                  className={`p-3 rounded-lg border transition-all cursor-pointer ${
+                    isSelected 
+                      ? 'bg-scout-navy text-white border-scout-navy' 
+                      : isHovered 
+                        ? 'bg-scout-teal/10 border-scout-teal' 
+                        : 'bg-white border-gray-200 hover:border-scout-teal/40'
+                  }`}
+                  onClick={() => handleRegionClick(region.region)}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className={`text-xs font-medium ${isSelected ? 'text-scout-teal' : 'text-scout-dark'}`}>
+                      #{index + 1}
+                    </div>
+                    <div className={`text-xs ${isSelected ? 'text-white' : 'text-scout-teal'}`}>
+                      {metricConfigs[selectedMetric].formatter(region[selectedMetric])}
+                    </div>
+                  </div>
+                  <div className={`text-sm font-medium mb-1 ${isSelected ? 'text-white' : 'text-scout-navy'}`}>
+                    {region.region}
+                  </div>
+                  <div className={`text-xs ${isSelected ? 'text-scout-teal' : 'text-scout-dark'}`}>
+                    {region.marketShare}% market share
+                  </div>
+                </div>
+              );
+            })}
           </div>
+
+          {selectedRegion && (
+            <div className="mt-4 pt-4 border-t border-scout-teal/20">
+              <button
+                onClick={() => handleRegionClick(selectedRegion)}
+                className="w-full px-3 py-2 text-xs bg-scout-teal text-white rounded-lg hover:bg-scout-navy transition-colors"
+              >
+                Clear Selection
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
