@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { philippineRegionsGeoJSON } from '../data/philippineRegions';
 import { useFilterStore } from '../state/useFilterStore';
 import { useDrillDownStore } from '../state/useDrillDownStore';
+import { getCanonicalRegionName, debugRegionMappings } from '../utils/regionNormalizer';
 
 interface RegionData {
   region: string;
@@ -127,7 +128,8 @@ export const ChoroplethMap: React.FC = () => {
   };
 
   const getRegionValue = (regionName: string): number => {
-    const region = regionData.find(r => r.region === regionName);
+    const canonicalName = getCanonicalRegionName(regionName);
+    const region = regionData.find(r => getCanonicalRegionName(r.region) === canonicalName);
     return region ? region[selectedMetric] : 0;
   };
 
@@ -152,12 +154,13 @@ export const ChoroplethMap: React.FC = () => {
   };
 
   const getRegionStats = (regionName: string) => {
-    const region = regionData.find(r => r.region === regionName);
+    const canonicalName = getCanonicalRegionName(regionName);
+    const region = regionData.find(r => getCanonicalRegionName(r.region) === canonicalName);
     if (!region) return null;
     
     const rank = regionData
       .sort((a, b) => b[selectedMetric] - a[selectedMetric])
-      .findIndex(r => r.region === regionName) + 1;
+      .findIndex(r => getCanonicalRegionName(r.region) === canonicalName) + 1;
     
     return { ...region, rank };
   };
@@ -204,24 +207,40 @@ export const ChoroplethMap: React.FC = () => {
   const addChoroplethLayer = () => {
     if (!map.current) return;
 
-    // Enhanced GeoJSON with complete data join - ensures ALL regions have data
+    // Debug region mappings (only in development)
+    if (process.env.NODE_ENV === 'development') {
+      const geoRegions = philippineRegionsGeoJSON.features.map(f => 
+        f.properties.NAME_1 || f.properties.name || f.properties.REGION || 'Unknown'
+      );
+      const dataRegions = regionData.map(r => r.region);
+      debugRegionMappings(geoRegions, dataRegions);
+    }
+
+    // Production-grade GeoJSON with robust canonical region matching
     const enrichedGeoJSON = {
       ...philippineRegionsGeoJSON,
       features: philippineRegionsGeoJSON.features.map(feature => {
-        const regionName = feature.properties.name || feature.properties.REGION || feature.properties.NAME_1;
+        const geoRegionRaw = 
+          feature.properties.NAME_1 ||
+          feature.properties.name ||
+          feature.properties.REGION ||
+          'Unknown Region';
         
-        // Try multiple name matching strategies for complete coverage
-        let regionStats = regionData.find(r => r.region === regionName);
-        if (!regionStats) {
-          // Fallback matching for common name variations
-          regionStats = regionData.find(r => 
-            r.region.toLowerCase().includes(regionName?.toLowerCase() || '') ||
-            regionName?.toLowerCase().includes(r.region.toLowerCase())
-          );
+        // Use canonical name normalization for bulletproof matching
+        const geoRegion = getCanonicalRegionName(geoRegionRaw);
+        
+        // Find matching data using canonical names
+        const match = regionData.find(
+          r => getCanonicalRegionName(r.region) === geoRegion
+        );
+
+        // Optional: debug log for unmatched regions
+        if (!match && process.env.NODE_ENV === 'development') {
+          console.warn(`🚨 No match for region: [${geoRegionRaw}] → [${geoRegion}]`);
         }
         
-        // Ensure every region has data - use defaults if no match
-        const safeStats = regionStats || {
+        // Use matched data or safe defaults
+        const safeStats = match || {
           totalSales: 0,
           transactions: 0,
           marketShare: 0
@@ -231,11 +250,12 @@ export const ChoroplethMap: React.FC = () => {
           ...feature,
           properties: {
             ...feature.properties,
-            name: regionName,
+            name: geoRegion, // Use canonical name for consistency
+            originalName: geoRegionRaw, // Keep original for debugging
             totalSales: safeStats.totalSales,
             transactions: safeStats.transactions,
             marketShare: safeStats.marketShare,
-            hasData: !!regionStats
+            hasData: !!match
           }
         };
       })
