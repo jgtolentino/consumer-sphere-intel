@@ -7,12 +7,21 @@ import { ChoroplethMap } from '../components/ChoroplethMap';
 import { ShoppingCart, DollarSign, Package, MapPin } from 'lucide-react';
 import { useTransactions } from '../hooks/useTransactions';
 import { useComprehensiveAnalytics } from '../hooks/useComprehensiveAnalytics';
+import { getTopBrands } from '../data/mockData';
 
 const Overview: React.FC = () => {
   console.log('Overview component rendering - START');
   
-  const { data: transactionData, isLoading } = useTransactions();
+  // Use real transaction data from API and comprehensive analytics
+  const { data: transactionData, isLoading, error } = useTransactions();
   const { data: analytics } = useComprehensiveAnalytics();
+
+  // Calculate KPIs from real transaction data
+  const totalTransactions = transactionData?.total || 0;
+  const totalRevenue = transactionData?.totalValue || 0;
+  const avgBasketSize = transactionData?.avgBasketSize || 0;
+  const avgTransactionValue = transactionData?.avgTransactionValue || 0;
+  const topBrands = getTopBrands();
 
   if (isLoading) {
     return (
@@ -24,12 +33,14 @@ const Overview: React.FC = () => {
       </div>
     );
   }
-
-  // Use real transaction data or fallback to mock data
-  const totalTransactions = transactionData?.total || 0;
-  const totalRevenue = transactionData?.totalValue || 0;
-  const avgBasketSize = transactionData?.avgBasketSize || 0;
-  const avgTransactionValue = transactionData?.avgTransactionValue || 0;
+  
+  console.log('Real transaction data:', {
+    total: totalTransactions,
+    totalValue: totalRevenue,
+    avgValue: avgBasketSize,
+    isLoading,
+    error
+  });
   
   const kpis = [
     {
@@ -75,6 +86,42 @@ const Overview: React.FC = () => {
 
   console.log('KPIs data:', kpis);
   console.log('About to render Overview JSX');
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4 xl:space-y-6 w-full max-w-none">
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-1/3 mb-2"></div>
+          <div className="h-4 bg-gray-200 rounded w-1/2 mb-6"></div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 xl:gap-6 mb-6">
+            {[1,2,3,4].map(i => (
+              <div key={i} className="bg-white rounded-xl p-6 shadow-sm">
+                <div className="h-4 bg-gray-200 rounded w-2/3 mb-2"></div>
+                <div className="h-8 bg-gray-200 rounded w-1/2 mb-2"></div>
+                <div className="h-3 bg-gray-200 rounded w-1/3"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    console.error('Transaction data error:', error);
+    return (
+      <div className="space-y-4 xl:space-y-6 w-full max-w-none">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <h3 className="text-red-800 font-semibold">Error Loading Data</h3>
+          <p className="text-red-600 text-sm mt-1">
+            Failed to load transaction data. Please check your connection and try again.
+          </p>
+          <p className="text-red-500 text-xs mt-2">Error: {error?.message}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#F5F6FA] p-4 md:p-6">

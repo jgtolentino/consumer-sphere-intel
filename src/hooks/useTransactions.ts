@@ -18,11 +18,26 @@ export const useTransactions = () => {
 
       const transactions = await dataService.getTransactions(filters);
       
-      // Process data for dashboard KPIs
-      const totalValue = transactions.reduce((sum, t) => sum + (t.total || 0), 0);
-      const totalItems = transactions.reduce((sum, t) => 
-        sum + (t.basket?.reduce((itemSum: number, item: any) => itemSum + item.units, 0) || 0), 0
-      );
+      console.log('Raw transactions from API:', transactions.length, transactions.slice(0, 2));
+      
+      // Process data for dashboard KPIs - fix field mapping
+      const totalValue = transactions.reduce((sum, t) => {
+        // Try multiple possible field names for total amount
+        const amount = t.total_amount || t.total || t.amount || t.gross_peso_value || 0;
+        return sum + amount;
+      }, 0);
+      
+      const totalItems = transactions.reduce((sum, t) => {
+        // Handle transaction_items for real data vs basket for mock data
+        if (t.transaction_items && Array.isArray(t.transaction_items)) {
+          return sum + t.transaction_items.reduce((itemSum: number, item: any) => 
+            itemSum + (item.quantity || item.units || 0), 0);
+        } else if (t.basket && Array.isArray(t.basket)) {
+          return sum + t.basket.reduce((itemSum: number, item: any) => 
+            itemSum + (item.units || item.quantity || 0), 0);
+        }
+        return sum;
+      }, 0);
 
       return {
         total: transactions.length,
@@ -58,12 +73,14 @@ const processTimeSeriesData = (data: any[]) => {
   const grouped: Record<string, { volume: number; value: number }> = {};
   
   data.forEach(transaction => {
-    const date = new Date(transaction.created_at).toISOString().split('T')[0];
+    const date = new Date(transaction.created_at || transaction.date).toISOString().split('T')[0];
     if (!grouped[date]) {
       grouped[date] = { volume: 0, value: 0 };
     }
     grouped[date].volume += 1;
-    grouped[date].value += transaction.total_amount || 0;
+    // Try multiple field names for amount
+    const amount = transaction.total_amount || transaction.total || transaction.amount || transaction.gross_peso_value || 0;
+    grouped[date].value += amount;
   });
 
   return Object.entries(grouped).map(([date, metrics]) => ({
@@ -73,7 +90,10 @@ const processTimeSeriesData = (data: any[]) => {
 };
 
 const processValueDistribution = (data: any[]) => {
-  const values = data.map(d => d.total || 0).sort((a, b) => a - b);
+  const values = data.map(d => {
+    // Try multiple field names for amount
+    return d.total_amount || d.total || d.amount || d.gross_peso_value || 0;
+  }).sort((a, b) => a - b);
   const len = values.length;
   
   if (len === 0) return { min: 0, q1: 0, median: 0, q3: 0, max: 0 };

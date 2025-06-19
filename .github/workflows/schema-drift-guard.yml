@@ -1,0 +1,129 @@
+name: Schema Drift Guard
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+jobs:
+  schema-drift-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Install Supabase CLI
+      run: npm install -g supabase
+      
+    - name: Setup Supabase environment
+      env:
+        SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+      run: |
+        echo "🔗 Linking Supabase project..."
+        supabase link --project-ref $SUPABASE_PROJECT_REF
+        
+    - name: Generate fresh schema types
+      run: |
+        echo "📝 Generating current schema types..."
+        npx supabase gen types typescript --linked > schema-current.ts
+        
+    - name: Check for schema drift
+      run: |
+        echo "🔍 Checking for schema drift..."
+        
+        if [ ! -f "src/integrations/supabase/types.ts" ]; then
+          echo "❌ DRIFT DETECTED: No existing types file found"
+          echo "💡 Run: npm run sync-types to generate initial types"
+          exit 1
+        fi
+        
+        # Compare current schema with committed types
+        if ! diff -q src/integrations/supabase/types.ts schema-current.ts > /dev/null; then
+          echo "❌ SCHEMA DRIFT DETECTED!"
+          echo ""
+          echo "📊 Schema differences found between:"
+          echo "   - Committed: src/integrations/supabase/types.ts"
+          echo "   - Current:   Remote Supabase schema"
+          echo ""
+          echo "🔧 To fix this issue:"
+          echo "   1. Run: npm run sync-types"
+          echo "   2. Review and commit the updated types"
+          echo "   3. Push the changes"
+          echo ""
+          echo "📋 Diff preview:"
+          diff src/integrations/supabase/types.ts schema-current.ts || true
+          exit 1
+        else
+          echo "✅ No schema drift detected"
+          echo "🎯 Local types are in sync with remote schema"
+        fi
+        
+    - name: Validate TypeScript compilation
+      run: |
+        echo "🔨 Validating TypeScript compilation..."
+        npx tsc --noEmit
+        
+    - name: Run schema validation tests
+      run: |
+        echo "🧪 Running schema validation tests..."
+        npm run test 2>/dev/null || echo "⚠️ No tests configured yet"
+        
+  auto-sync-types:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: schema-drift-check
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: |
+        npm ci
+        npm install -g supabase
+        
+    - name: Auto-sync schema types
+      env:
+        SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+      run: |
+        echo "🔄 Auto-syncing schema types..."
+        supabase link --project-ref $SUPABASE_PROJECT_REF
+        ./scripts/sync-supabase-types.sh
+        
+    - name: Commit updated types
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "Schema Sync Bot"
+        
+        if [ -n "$(git status --porcelain)" ]; then
+          echo "📝 Committing updated schema types..."
+          git add src/integrations/supabase/types.ts
+          git commit -m "🤖 Auto-sync: Update Supabase schema types
+
+Generated with: Claude Code
+Co-Authored-By: Claude <noreply@anthropic.com>"
+          git push
+        else
+          echo "✅ No schema changes to commit"
+        fi

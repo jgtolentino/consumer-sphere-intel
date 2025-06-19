@@ -50,11 +50,11 @@ const heatmapData: RegionHeatmapData[] = [
 
 export const GeoHeatmap: React.FC = () => {
   const getHeatmapColor = (percentage: number) => {
-    if (percentage >= 30) return 'bg-red-500';
-    if (percentage >= 20) return 'bg-orange-500';
-    if (percentage >= 15) return 'bg-yellow-500';
-    if (percentage >= 10) return 'bg-green-500';
-    return 'bg-blue-500';
+    if (percentage >= 30) return 'bg-scout-navy';
+    if (percentage >= 20) return 'bg-scout-teal';
+    if (percentage >= 15) return 'bg-scout-dark';
+    if (percentage >= 10) return 'bg-scout-teal/70';
+    return 'bg-scout-teal/40';
   };
 
   const getHeatmapSize = (percentage: number) => {
@@ -78,7 +78,7 @@ export const GeoHeatmap: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Philippines Map Visualization */}
         <div className="relative">
-          <div className="relative w-full h-64 bg-gradient-to-b from-blue-50 to-green-50 rounded-lg border border-gray-200 overflow-hidden">
+          <div className="relative w-full h-64 bg-gradient-to-b from-scout-light to-scout-teal/10 rounded-lg border border-gray-200 overflow-hidden">
             {/* Simplified Philippines outline */}
             <div className="absolute inset-0 bg-gray-100 opacity-20 rounded-lg"></div>
             
@@ -114,23 +114,23 @@ export const GeoHeatmap: React.FC = () => {
             <div className="text-xs text-gray-600 mb-2">Market Share</div>
             <div className="flex items-center gap-4 text-xs">
               <div className="flex items-center gap-1">
-                <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                <div className="w-3 h-3 bg-scout-navy rounded-full"></div>
                 <span>30%+</span>
               </div>
               <div className="flex items-center gap-1">
-                <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                <div className="w-3 h-3 bg-scout-teal rounded-full"></div>
                 <span>20-29%</span>
               </div>
               <div className="flex items-center gap-1">
-                <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                <div className="w-3 h-3 bg-scout-dark rounded-full"></div>
                 <span>15-19%</span>
               </div>
               <div className="flex items-center gap-1">
-                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                <div className="w-3 h-3 bg-scout-teal/70 rounded-full"></div>
                 <span>10-14%</span>
               </div>
               <div className="flex items-center gap-1">
-                <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                <div className="w-3 h-3 bg-scout-teal/40 rounded-full"></div>
                 <span>&lt;10%</span>
               </div>
             </div>

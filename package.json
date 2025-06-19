@@ -15,7 +15,11 @@
     "qa:audit": "tsx src/scripts/runQAAudit.ts",
     "qa:validate": "npm run test -- src/__tests__/comprehensiveQA.test.ts",
     "qa:full": "npm run qa:audit && npm run qa:validate",
-    "verify": "npm run lint && npm run test:run && npm run qa:audit"
+    "verify": "npm run lint && npm run test:run && npm run qa:audit",
+    "sync-types": "./scripts/sync-supabase-types.sh",
+    "check-drift": "node scripts/check-schema-drift.cjs",
+    "auto-attach": "npm run sync-types && npm run check-drift",
+    "validate-schema": "npm run check-drift && npm run build"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",

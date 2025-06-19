@@ -1,0 +1,71 @@
+name: "Consumer Sphere Intel - RepoSynth Agent"
+version: "2.0.0"
+description: "Advanced repository synthesis agent with auto-attach capabilities"
+
+capabilities:
+  - schema_diff_engine
+  - mapping_generation  
+  - etl_automation
+  - realtime_data_attach       # NEW: Auto-attach realtime sync
+  - ci_schema_guard           # NEW: Schema drift protection
+  - type_generation           # NEW: Automatic type sync
+  - drift_detection          # NEW: Schema drift monitoring
+
+auto_attach:
+  enabled: true
+  realtime_sync:
+    tables:
+      - transactions
+      - transaction_items
+      - products
+      - brands
+      - customers
+    events: ["INSERT", "UPDATE", "DELETE"]
+    refresh_strategy: "invalidate_queries"
+  
+  schema_sync:
+    auto_generate: true
+    command: "npx supabase gen types typescript --linked > src/integrations/supabase/types.ts"
+    validation: "npm run validate-schema"
+    
+  drift_protection:
+    enabled: true
+    fail_on_drift: true
+    ci_integration: true
+    check_command: "npm run check-drift"
+
+monitoring:
+  realtime_connection: true
+  schema_consistency: true
+  data_pipeline_health: true
+  auto_recovery: true
+
+integrations:
+  supabase:
+    realtime: true
+    type_generation: true
+    schema_monitoring: true
+  
+  github_actions:
+    schema_guard: true
+    auto_sync: true
+    drift_protection: true
+
+commands:
+  sync_types: "./scripts/sync-supabase-types.sh"
+  check_drift: "node scripts/check-schema-drift.js"
+  auto_attach: "npm run auto-attach"
+  validate: "npm run validate-schema"
+
+alerts:
+  - type: "schema_drift"
+    action: "block_deployment"
+    notify: ["dev-team"]
+  
+  - type: "realtime_disconnect"
+    action: "fallback_to_polling"
+    notify: ["ops-team"]
+    
+  - type: "type_mismatch"
+    action: "regenerate_types"
+    notify: ["dev-team"]

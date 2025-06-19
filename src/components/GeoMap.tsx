@@ -166,8 +166,8 @@ export const GeoMap: React.FC = () => {
       markerEl.style.cssText = `
         width: ${markerSize};
         height: ${markerSize};
-        background: ${isSelected ? '#2AB5B0' : '#36CFC9'};
-        border: 3px solid ${isSelected ? '#0A2540' : 'white'};
+        background: ${isSelected ? '#0A2540' : '#36CFC9'};
+        border: 3px solid ${isSelected ? '#36CFC9' : 'white'};
         border-radius: 50%;
         cursor: pointer;
         box-shadow: 0 2px 8px rgba(0,0,0,0.2);

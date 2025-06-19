@@ -43,13 +43,13 @@ export const ActiveFilters: React.FC = () => {
           <span className="text-sm font-medium text-gray-700">Active Filters:</span>
           
           {(dateRange.from || dateRange.to) && (
-            <div className="flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+            <div className="flex items-center bg-scout-teal/10 text-scout-navy px-3 py-1 rounded-full text-sm">
               <span>
                 {dateRange.from?.toLocaleDateString()} - {dateRange.to?.toLocaleDateString()}
               </span>
               <button
                 onClick={() => removeFilter('dateRange')}
-                className="ml-2 hover:bg-blue-200 rounded-full p-0.5"
+                className="ml-2 hover:bg-scout-teal/20 rounded-full p-0.5"
               >
                 <X className="h-3 w-3" />
               </button>
@@ -57,11 +57,11 @@ export const ActiveFilters: React.FC = () => {
           )}
           
           {barangays.map(region => (
-            <div key={region} className="flex items-center bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
+            <div key={region} className="flex items-center bg-scout-teal/10 text-scout-navy px-3 py-1 rounded-full text-sm">
               <span>Region: {region}</span>
               <button
                 onClick={() => removeFilter('barangays', region)}
-                className="ml-2 hover:bg-green-200 rounded-full p-0.5"
+                className="ml-2 hover:bg-scout-teal/20 rounded-full p-0.5"
               >
                 <X className="h-3 w-3" />
               </button>
@@ -69,11 +69,11 @@ export const ActiveFilters: React.FC = () => {
           ))}
           
           {brands.map(brand => (
-            <div key={brand} className="flex items-center bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm">
+            <div key={brand} className="flex items-center bg-scout-dark/10 text-scout-navy px-3 py-1 rounded-full text-sm">
               <span>Brand: {brand}</span>
               <button
                 onClick={() => removeFilter('brands', brand)}
-                className="ml-2 hover:bg-purple-200 rounded-full p-0.5"
+                className="ml-2 hover:bg-scout-dark/20 rounded-full p-0.5"
               >
                 <X className="h-3 w-3" />
               </button>
@@ -81,11 +81,11 @@ export const ActiveFilters: React.FC = () => {
           ))}
           
           {categories.map(category => (
-            <div key={category} className="flex items-center bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm">
+            <div key={category} className="flex items-center bg-scout-teal/20 text-scout-navy px-3 py-1 rounded-full text-sm">
               <span>Category: {category}</span>
               <button
                 onClick={() => removeFilter('categories', category)}
-                className="ml-2 hover:bg-yellow-200 rounded-full p-0.5"
+                className="ml-2 hover:bg-scout-teal/30 rounded-full p-0.5"
               >
                 <X className="h-3 w-3" />
               </button>

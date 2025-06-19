@@ -1,0 +1,248 @@
+{
+  "supabaseSchema": {
+    "public": {
+      "fields": {
+        "public": "{\n    Tables: {\n      brands: {\n        Row: {\n          category: string",
+        "created_at": "string",
+        "id": "number\n          is_tbwa: boolean"
+      },
+      "source": "supabase"
+    },
+    "Insert": {
+      "fields": {
+        "Insert": "{\n          checkout_seconds?: number",
+        "Update": "{\n          checkout_seconds?: number",
+        "Relationships": "[]\n      }\n    }\n    Views: {\n      basket_analytics: {\n        Row: {\n          checkout_seconds: number",
+        "store_location": "string",
+        "total_amount": "number",
+        "total_items": "number",
+        "transaction_date": "string",
+        "transaction_id": "number",
+        "unique_products": "number"
+      },
+      "source": "supabase"
+    },
+    "brand_analytics": {
+      "fields": {
+        "brand_analytics": "{\n        Row: {\n          avg_price: number",
+        "brand_id": "number",
+        "brand_name": "string",
+        "category": "string",
+        "total_revenue": "number",
+        "total_units": "number",
+        "transaction_count": "number"
+      },
+      "source": "supabase"
+    },
+    "customer_analytics": {
+      "fields": {
+        "customer_analytics": "{\n        Row: {\n          avg_order_value: number",
+        "customer_age": "number",
+        "customer_gender": "string",
+        "last_purchase_date": "string",
+        "total_spent": "number",
+        "transaction_count": "number"
+      },
+      "source": "supabase"
+    },
+    "daily_trends": {
+      "fields": {
+        "daily_trends": "{\n        Row: {\n          avg_transaction_value: number",
+        "date": "string",
+        "total_revenue": "number",
+        "total_units_sold": "number",
+        "transaction_count": "number",
+        "unique_products_sold": "number"
+      },
+      "source": "supabase"
+    },
+    "mv_daily_metrics": {
+      "fields": {
+        "mv_daily_metrics": "{\n        Row: {\n          avg_transaction: number",
+        "date": "string",
+        "store_id": "number",
+        "total_revenue": "number",
+        "transaction_count": "number",
+        "unique_customers": "number",
+        "weekday_transactions": "number",
+        "weekend_transactions": "number"
+      },
+      "source": "supabase"
+    },
+    "substitution_analytics": {
+      "fields": {
+        "substitution_analytics": "{\n        Row: {\n          original_product_id: number",
+        "original_product_name": "string",
+        "reason": "string",
+        "substitute_product_id": "number",
+        "substituted_product_name": "string",
+        "substitution_date": "string",
+        "substitution_id": "number",
+        "times_substituted": "number"
+      },
+      "source": "supabase"
+    }
+  },
+  "mockDataSchema": {
+    "Transaction": {
+      "fields": {
+        "id": {
+          "type": "string",
+          "nullable": false
+        },
+        "date": {
+          "type": "string",
+          "nullable": false
+        },
+        "time": {
+          "type": "string",
+          "nullable": false
+        },
+        "duration_seconds": {
+          "type": "number",
+          "nullable": false
+        },
+        "region": {
+          "type": "string",
+          "nullable": false
+        },
+        "city": {
+          "type": "string",
+          "nullable": false
+        },
+        "barangay": {
+          "type": "string",
+          "nullable": false
+        },
+        "location_id": {
+          "type": "string",
+          "nullable": false
+        },
+        "channel": {
+          "type": "string",
+          "nullable": false
+        },
+        "basket": {
+          "type": "BasketItem[]",
+          "nullable": false
+        },
+        "total": {
+          "type": "number",
+          "nullable": false
+        },
+        "consumer_profile": {
+          "type": "ConsumerProfile",
+          "nullable": false
+        },
+        "substitution_from": {
+          "type": "string",
+          "nullable": true
+        },
+        "substitution_to": {
+          "type": "string",
+          "nullable": true
+        },
+        "requested_as": {
+          "type": "'branded' | 'unbranded' | 'unsure'",
+          "nullable": false
+        },
+        "request_type": {
+          "type": "'verbal' | 'pointing' | 'indirect'",
+          "nullable": false
+        },
+        "storeowner_suggested": {
+          "type": "boolean",
+          "nullable": false
+        },
+        "accepted_suggestion": {
+          "type": "boolean",
+          "nullable": false
+        },
+        "ai_recommendation_id": {
+          "type": "string",
+          "nullable": true
+        }
+      },
+      "source": "mock_data"
+    },
+    "BasketItem": {
+      "fields": {
+        "sku": {
+          "type": "string",
+          "nullable": false
+        },
+        "brand": {
+          "type": "string",
+          "nullable": false
+        },
+        "category": {
+          "type": "string",
+          "nullable": false
+        },
+        "units": {
+          "type": "number",
+          "nullable": false
+        },
+        "price": {
+          "type": "number",
+          "nullable": false
+        }
+      },
+      "source": "mock_data"
+    },
+    "ConsumerProfile": {
+      "fields": {
+        "gender": {
+          "type": "string",
+          "nullable": false
+        },
+        "age_bracket": {
+          "type": "string",
+          "nullable": false
+        },
+        "inferred_income": {
+          "type": "string",
+          "nullable": false
+        },
+        "payment": {
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "source": "mock_data"
+    }
+  },
+  "differences": [
+    {
+      "type": "Structure Mismatch",
+      "severity": "ERROR",
+      "description": "Mock data uses nested JSON objects, Supabase uses normalized tables",
+      "suggestion": "Create ETL pipeline to denormalize Transaction.basket → transaction_items"
+    },
+    {
+      "type": "ID Field Type",
+      "severity": "WARNING",
+      "description": "Mock uses string IDs, Supabase uses bigint IDs",
+      "suggestion": "Add ID transformation logic in ETL pipeline"
+    },
+    {
+      "type": "Missing Tables",
+      "severity": "INFO",
+      "description": "Supabase has device management tables not in mock data",
+      "suggestion": "These are for production IoT features, can be populated separately"
+    },
+    {
+      "type": "Complex Fields",
+      "severity": "WARNING",
+      "description": "Mock data has nested objects (consumer_profile, basket)",
+      "suggestion": "Flatten and normalize these into separate tables"
+    }
+  ],
+  "mappingRecommendations": [
+    "Transaction → transactions (main transaction data)",
+    "BasketItem[] → transaction_items (denormalized basket)",
+    "ConsumerProfile → customers (customer demographics)",
+    "Location data → stores (store information)",
+    "Brand/SKU data → products + brands (product catalog)"
+  ]
+}

@@ -1,0 +1,27 @@
+configuration:
+  data_sources:
+    - name: "mock_data"
+      type: "json"
+      scan_patterns:
+        - "src/data/*.ts"
+        - "mockTransactions.json"
+        - "*.json"
+    - name: "supabase"
+      type: "postgres"
+      connection_env: "${SUPABASE_URL}"
+      key_env: "${SUPABASE_ANON_KEY}"
+      schema: "public"
+
+mapping_rules:
+  auto_generate: true
+  similarity_threshold: 0.7
+  
+validation:
+  row_count_tolerance: 0.05
+  type_safety: true
+  foreign_key_integrity: true
+
+output:
+  format: "yaml"
+  include_suggestions: true
+  generate_etl_scripts: true
