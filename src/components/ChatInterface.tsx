@@ -6,6 +6,7 @@ import { Input } from './ui/input';
 import { Card } from './ui/card';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { handleRetailBotQuery } from '../api/retailbot';
+import { useDataMode } from '../hooks/useDataMode';
 
 interface Message {
   id: string;
@@ -17,13 +18,14 @@ interface Message {
 }
 
 export const ChatInterface: React.FC = () => {
+  const { isMock } = useDataMode();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
       type: 'bot',
-      content: 'Hello! I\'m RetailBot, your AI retail analytics assistant. I can help you analyze mock sales data, brand performance, and consumer insights. What would you like to explore?',
+      content: 'Hello! I\'m RetailBot, your AI retail analytics assistant. I can help you analyze sales data, brand performance, and consumer insights. What would you like to explore?',
       timestamp: new Date().toISOString(),
-      dataSource: 'mock'
+      dataSource: isMock ? 'mock' : 'live'
     }
   ]);
   const [inputValue, setInputValue] = useState('');
@@ -78,7 +80,7 @@ export const ChatInterface: React.FC = () => {
         type: 'bot',
         content: 'I apologize, but I encountered an error. Please try again.',
         timestamp: new Date().toISOString(),
-        dataSource: 'mock'
+        dataSource: isMock ? 'mock' : 'live'
       };
       setMessages(prev => [...prev, errorMessage]);
     } finally {
@@ -94,7 +96,7 @@ export const ChatInterface: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-white dark:bg-scout-navy">
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((message) => (
@@ -105,21 +107,21 @@ export const ChatInterface: React.FC = () => {
             }`}
           >
             {message.type === 'bot' && (
-              <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                <Bot className="w-4 h-4 text-blue-600" />
+              <div className="flex-shrink-0 w-8 h-8 bg-scout-teal/10 rounded-full flex items-center justify-center">
+                <Bot className="w-4 h-4 text-scout-teal" />
               </div>
             )}
             
             <div className={`max-w-3xl ${message.type === 'user' ? 'order-first' : ''}`}>
               <Card className={`p-3 ${
                 message.type === 'user' 
-                  ? 'bg-blue-600 text-white ml-auto' 
-                  : 'bg-white border border-gray-200'
+                  ? 'bg-scout-navy text-white ml-auto dark:bg-scout-teal dark:text-scout-navy' 
+                  : 'bg-scout-light dark:bg-scout-dark border-scout-teal/10'
               }`}>
                 <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                 
-                {message.dataSource && (
-                  <div className="mt-2 pt-2 border-t border-gray-200 text-xs text-gray-500">
+                {message.dataSource && isMock && (
+                  <div className="mt-2 pt-2 border-t border-scout-teal/20 text-xs text-scout-dark/70 dark:text-gray-400">
                     Data Source: {message.dataSource}
                   </div>
                 )}
@@ -127,21 +129,27 @@ export const ChatInterface: React.FC = () => {
 
               {/* Chart rendering */}
               {message.chart && (
-                <Card className="mt-3 p-4 bg-gray-50">
+                <Card className="mt-3 p-4 bg-scout-light dark:bg-scout-dark border-scout-teal/10">
                   <div className="flex items-center space-x-2 mb-3">
-                    <BarChart3 className="w-4 h-4 text-gray-600" />
-                    <span className="text-sm font-medium text-gray-700">
+                    <BarChart3 className="w-4 h-4 text-scout-teal" />
+                    <span className="text-sm font-medium text-scout-navy dark:text-scout-teal">
                       {message.chart.title || 'Chart Data'}
                     </span>
                   </div>
                   <div className="h-64">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={message.chart.data}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="name" />
-                        <YAxis />
-                        <Tooltip />
-                        <Bar dataKey="value" fill="#3B82F6" />
+                        <CartesianGrid strokeDasharray="3 3" stroke="#36CFC9" opacity={0.1} />
+                        <XAxis dataKey="name" stroke="#0A2540" fontSize={12} />
+                        <YAxis stroke="#0A2540" fontSize={12} />
+                        <Tooltip 
+                          contentStyle={{ 
+                            backgroundColor: '#FFFFFF', 
+                            border: '1px solid #36CFC9',
+                            borderRadius: '8px'
+                          }} 
+                        />
+                        <Bar dataKey="value" fill="#36CFC9" />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
@@ -150,8 +158,8 @@ export const ChatInterface: React.FC = () => {
             </div>
 
             {message.type === 'user' && (
-              <div className="flex-shrink-0 w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                <User className="w-4 h-4 text-gray-600" />
+              <div className="flex-shrink-0 w-8 h-8 bg-scout-navy/10 rounded-full flex items-center justify-center">
+                <User className="w-4 h-4 text-scout-navy dark:text-scout-teal" />
               </div>
             )}
           </div>
@@ -159,14 +167,14 @@ export const ChatInterface: React.FC = () => {
         
         {isLoading && (
           <div className="flex items-start space-x-3">
-            <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-              <Bot className="w-4 h-4 text-blue-600" />
+            <div className="flex-shrink-0 w-8 h-8 bg-scout-teal/10 rounded-full flex items-center justify-center">
+              <Bot className="w-4 h-4 text-scout-teal" />
             </div>
-            <Card className="p-3 bg-white border border-gray-200">
+            <Card className="p-3 bg-scout-light dark:bg-scout-dark border-scout-teal/10">
               <div className="flex space-x-1">
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                <div className="w-2 h-2 bg-scout-teal rounded-full animate-bounce"></div>
+                <div className="w-2 h-2 bg-scout-teal rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                <div className="w-2 h-2 bg-scout-teal rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
               </div>
             </Card>
           </div>
@@ -176,25 +184,26 @@ export const ChatInterface: React.FC = () => {
       </div>
 
       {/* Input */}
-      <div className="border-t border-gray-200 p-4">
+      <div className="border-t border-scout-teal/10 p-4 bg-white dark:bg-scout-navy">
         <div className="flex space-x-2">
           <Input
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="Ask me about sales data, brand performance, or regional trends..."
-            className="flex-1"
+            className="flex-1 border-scout-teal/20 focus:border-scout-teal focus:ring-scout-teal"
             disabled={isLoading}
           />
           <Button 
             onClick={handleSendMessage}
             disabled={!inputValue.trim() || isLoading}
             size="icon"
+            className="bg-scout-teal hover:bg-scout-teal/90 text-white"
           >
             <Send className="w-4 h-4" />
           </Button>
         </div>
-        <div className="mt-2 text-xs text-gray-500">
+        <div className="mt-2 text-xs text-scout-dark/70 dark:text-gray-400">
           💡 Try asking: "Show me Alaska Milk sales" or "Compare brand performance"
         </div>
       </div>
