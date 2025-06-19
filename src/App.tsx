@@ -17,6 +17,7 @@ import Regional from './pages/Regional';
 import BrandAnalytics from './pages/BrandAnalytics';
 import RetailBot from './pages/RetailBot';
 import Settings from './pages/Settings';
+import NotFound from './pages/NotFound';
 import { DataProvider } from './providers/DataProvider';
 
 const queryClient = new QueryClient({
@@ -58,6 +59,7 @@ const AppContent: React.FC = () => {
                 <Route path="/brands" element={<BrandAnalytics />} />
                 <Route path="/chat" element={<RetailBot />} />
                 <Route path="/settings" element={<Settings />} />
+                <Route path="*" element={<NotFound />} />
               </Routes>
             </div>
           </main>
