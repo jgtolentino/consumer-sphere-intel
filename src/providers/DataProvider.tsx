@@ -29,6 +29,7 @@ interface DataProviderProps {
 export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
   const [dataService, setDataService] = useState<DataService>(() => {
     const config = getDataConfig();
+    // Always default to mock for public deployment to prevent auth issues
     return config.mode === 'mock' 
       ? new MockDataService() 
       : new RealDataService(config.apiBaseUrl!);

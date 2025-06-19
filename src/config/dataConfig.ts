@@ -10,7 +10,8 @@ export const getDataConfig = (): DataConfig => {
   const runtimeMode = localStorage.getItem('dataMode') as 'mock' | 'real' | null;
   const envMode = (import.meta.env.VITE_DATA_MODE || 'mock') as 'mock' | 'real';
   
-  // Use runtime mode if available, otherwise fall back to environment
+  // For public deployment, default to mock mode unless explicitly set
+  // This prevents auth issues on public Vercel deployment
   const mode = runtimeMode || envMode;
   
   return {
