@@ -35,33 +35,35 @@ const AppContent: React.FC = () => {
   console.log('AppContent rendering - route should work');
   
   return (
-    <div className="min-h-screen bg-[#F5F6FA] dark:bg-[#0A2540] w-full">
+    <div className="min-h-screen bg-[#F5F6FA] dark:bg-[#0A2540] flex flex-col">
       <Navbar />
       
-      {/* Fixed layout: sidebar and main content side by side */}
-      <div className="flex w-full h-[calc(100vh-4rem)]">
-        {/* Sidebar - fixed width, always visible on desktop */}
-        <Sidebar />
+      {/* Main layout container */}
+      <div className="flex flex-1 h-[calc(100vh-4rem)]">
+        {/* Sidebar - fixed width on desktop, hidden on mobile */}
+        <div className="hidden lg:block w-64 flex-shrink-0">
+          <Sidebar />
+        </div>
         
-        {/* Main content container - takes remaining space, never overlapped */}
-        <div className="flex-1 flex flex-col min-w-0 w-full lg:w-[calc(100vw-16rem)]">
+        {/* Main content area */}
+        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
           {/* Filter bar */}
-          <GlobalFilterBar />
+          <div className="flex-shrink-0">
+            <GlobalFilterBar />
+          </div>
           
-          {/* Main content with proper spacing */}
-          <main className="flex-1 p-4 md:p-6 overflow-auto bg-[#F5F6FA] dark:bg-[#0A2540]">
-            <div className="max-w-full min-w-0 w-full">
-              <Routes>
-                <Route path="/" element={<Overview />} />
-                <Route path="/trends" element={<TransactionTrends />} />
-                <Route path="/products" element={<ProductMix />} />
-                <Route path="/regional" element={<Regional />} />
-                <Route path="/brands" element={<BrandAnalytics />} />
-                <Route path="/chat" element={<RetailBot />} />
-                <Route path="/settings" element={<Settings />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </div>
+          {/* Scrollable content */}
+          <main className="flex-1 overflow-auto">
+            <Routes>
+              <Route path="/" element={<Overview />} />
+              <Route path="/trends" element={<TransactionTrends />} />
+              <Route path="/products" element={<ProductMix />} />
+              <Route path="/regional" element={<Regional />} />
+              <Route path="/brands" element={<BrandAnalytics />} />
+              <Route path="/chat" element={<RetailBot />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
           </main>
         </div>
       </div>
