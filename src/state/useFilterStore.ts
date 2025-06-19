@@ -1,85 +1,92 @@
 
-
 import { create } from 'zustand';
-import { tbwaClientBrands, competitorBrands, regions } from '../data/mockData';
-
-interface DateRange {
-  from: Date | null;
-  to: Date | null;
-}
+import { persist } from 'zustand/middleware';
 
 interface FilterState {
-  dateRange: DateRange;
+  dateRange: { from: Date | null; to: Date | null };
   barangays: string[];
   categories: string[];
   brands: string[];
-  skus: string[];
-  setFilter: <K extends keyof Omit<FilterState, 'setFilter' | 'reset' | 'getQueryString' | 'getMasterLists'>>(
-    key: K, 
-    value: FilterState[K]
-  ) => void;
-  reset: () => void;
-  getQueryString: () => string;
+  setDateRange: (range: { from: Date | null; to: Date | null }) => void;
+  setBarangays: (barangays: string[]) => void;
+  setCategories: (categories: string[]) => void;
+  setBrands: (brands: string[]) => void;
+  setFilter: (type: 'categories' | 'brands' | 'barangays', values: string[]) => void;
+  clearFilters: () => void;
   getMasterLists: () => {
     allRegions: string[];
-    allBrands: string[];
     allCategories: string[];
+    allBrands: string[];
     allCompanies: string[];
   };
 }
 
-const defaultState = {
-  dateRange: { from: null, to: null },
-  barangays: [],
-  categories: [],
-  brands: [],
-  skus: []
-};
+// FMCG-focused master data lists
+const MASTER_REGIONS = [
+  'Metro Manila', 'Calabarzon', 'Central Luzon', 'Western Visayas', 
+  'Central Visayas', 'Northern Mindanao', 'Davao Region', 'Ilocos Region',
+  'Cagayan Valley', 'Bicol Region', 'Eastern Visayas', 'Zamboanga Peninsula'
+];
 
-export const useFilterStore = create<FilterState>((set, get) => ({
-  ...defaultState,
-  
-  setFilter: (key, value) => set((state) => ({ ...state, [key]: value })),
-  
-  reset: () => set(defaultState),
-  
-  getQueryString: () => {
-    const state = get();
-    const { setFilter, reset, getQueryString, getMasterLists, ...filters } = state;
-    
-    const params = new URLSearchParams();
-    
-    if (filters.dateRange.from) {
-      params.set('from', filters.dateRange.from.toISOString());
-    }
-    if (filters.dateRange.to) {
-      params.set('to', filters.dateRange.to.toISOString());
-    }
-    if (filters.barangays.length > 0) {
-      params.set('barangays', filters.barangays.join(','));
-    }
-    if (filters.categories.length > 0) {
-      params.set('categories', filters.categories.join(','));
-    }
-    if (filters.brands.length > 0) {
-      params.set('brands', filters.brands.join(','));
-    }
-    if (filters.skus.length > 0) {
-      params.set('skus', filters.skus.join(','));
-    }
-    
-    return params.toString();
-  },
+const MASTER_CATEGORIES = [
+  'Beverages', 'Snacks', 'Personal Care', 'Household', 'Dairy', 
+  'Condiments', 'Instant Foods', 'Health & Wellness', 'Baby Care'
+];
 
-  getMasterLists: () => {
-    const allBrands = [...tbwaClientBrands, ...competitorBrands];
-    
-    return {
-      allRegions: regions.map(r => r.name).sort(),
-      allBrands: [...new Set(allBrands.map(b => b.name))].sort(),
-      allCategories: [...new Set(allBrands.map(b => b.category))].sort(),
-      allCompanies: [...new Set(allBrands.map(b => b.company))].sort()
-    };
-  }
-}));
+const MASTER_BRANDS = [
+  'Coca-Cola', 'Pepsi', 'Alaska Milk', 'Nestlé', 'Unilever',
+  'Procter & Gamble', 'Oishi', 'Jack n Jill', 'Century Tuna',
+  'Lucky Me!', 'Maggi', 'Head & Shoulders', 'Palmolive', 'Colgate'
+];
 
+const MASTER_COMPANIES = [
+  'Coca-Cola Philippines', 'Pepsi-Cola Products Philippines',
+  'Alaska Milk Corporation', 'Nestlé Philippines', 'Unilever Philippines',
+  'Procter & Gamble Philippines', 'Liwayway Marketing Corporation',
+  'Universal Robina Corporation', 'Century Pacific Food'
+];
+
+export const useFilterStore = create<FilterState>()(
+  persist(
+    (set, get) => ({
+      dateRange: { 
+        from: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // 30 days ago
+        to: new Date() 
+      },
+      barangays: [],
+      categories: [],
+      brands: [],
+      
+      setDateRange: (range) => set({ dateRange: range }),
+      setBarangays: (barangays) => set({ barangays }),
+      setCategories: (categories) => set({ categories }),
+      setBrands: (brands) => set({ brands }),
+      
+      setFilter: (type, values) => {
+        set({ [type]: values });
+      },
+      
+      clearFilters: () => set({ 
+        barangays: [], 
+        categories: [], 
+        brands: [] 
+      }),
+      
+      getMasterLists: () => ({
+        allRegions: MASTER_REGIONS,
+        allCategories: MASTER_CATEGORIES,
+        allBrands: MASTER_BRANDS,
+        allCompanies: MASTER_COMPANIES
+      })
+    }),
+    {
+      name: 'scout-filters',
+      partialize: (state) => ({
+        dateRange: state.dateRange,
+        barangays: state.barangays,
+        categories: state.categories,
+        brands: state.brands
+      })
+    }
+  )
+);

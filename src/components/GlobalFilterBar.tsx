@@ -1,163 +1,170 @@
 
 import React from 'react';
-import { Calendar, X, Filter, RotateCcw, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Calendar, MapPin, Package, Tag } from 'lucide-react';
+import { Button } from './ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
+import { Calendar as CalendarComponent } from './ui/calendar';
+import { Checkbox } from './ui/checkbox';
 import { useFilterStore } from '../state/useFilterStore';
-import { tbwaClientBrands, competitorBrands } from '../data/mockData';
+import { format } from 'date-fns';
 
 export const GlobalFilterBar: React.FC = () => {
   const { 
     dateRange, 
+    setDateRange, 
     barangays, 
+    setBarangays, 
     categories, 
-    brands,
-    setFilter, 
-    reset 
+    setCategories, 
+    brands, 
+    setBrands,
+    getMasterLists 
   } = useFilterStore();
 
-  const hasActiveFilters = dateRange.from || dateRange.to || 
-    barangays.length || categories.length || brands.length;
-
-  const activeFilterCount = [
-    dateRange.from || dateRange.to ? 1 : 0,
-    barangays.length,
-    categories.length,
-    brands.length
-  ].reduce((sum, count) => sum + count, 0);
-
-  // All 17 Philippine regions
-  const regionOptions = [
-    'NCR', 'Ilocos Region', 'Cagayan Valley', 'Central Luzon', 'CALABARZON', 
-    'MIMAROPA', 'Bicol Region', 'Western Visayas', 'Central Visayas', 
-    'Eastern Visayas', 'Zamboanga Peninsula', 'Northern Mindanao', 
-    'Davao Region', 'SOCCSKSARGEN', 'Caraga', 'CAR', 'BARMM'
-  ];
-  
-  const allBrands = [...tbwaClientBrands, ...competitorBrands];
-  const brandOptions = [...new Set(allBrands.map(b => b.name))].sort();
-  const categoryOptions = [...new Set(allBrands.map(b => b.category))].sort();
-
-  const scrollFilters = (direction: 'left' | 'right') => {
-    const container = document.getElementById('filter-scroll-container');
-    if (container) {
-      const scrollAmount = 200;
-      container.scrollBy({ 
-        left: direction === 'left' ? -scrollAmount : scrollAmount, 
-        behavior: 'smooth' 
-      });
-    }
-  };
+  const masterLists = getMasterLists();
 
   return (
-    <div className="bg-white dark:bg-[#2F3A4F] border-b border-gray-200 dark:border-gray-700 sticky top-16 z-40 shadow-sm">
-      <div className="px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between py-4">
-          <div className="flex items-center space-x-4 min-w-0 flex-1">
-            <div className="flex items-center space-x-2 flex-shrink-0">
-              <Filter className="h-4 w-4 text-gray-500" />
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Filters</span>
-              {activeFilterCount > 0 && (
-                <span className="bg-gradient-to-r from-blue-100 to-teal-100 text-blue-800 text-xs px-2 py-1 rounded-full font-medium">
-                  {activeFilterCount} active
-                </span>
-              )}
-            </div>
-            
-            <div className="relative flex-1 min-w-0">
-              <button 
-                onClick={() => scrollFilters('left')}
-                className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-[#2F3A4F] border border-gray-300 dark:border-gray-600 rounded-full p-1 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700"
-                aria-label="Scroll filters left"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </button>
-              
-              <div 
-                id="filter-scroll-container"
-                className="flex items-center space-x-2 overflow-x-auto scrollbar-hide px-8"
-                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-              >
-                <div className="flex items-center space-x-1 flex-shrink-0">
-                  <Calendar className="h-4 w-4 text-gray-400" />
-                  <input
-                    type="date"
-                    value={dateRange.from ? dateRange.from.toISOString().split('T')[0] : ''}
-                    onChange={(e) => setFilter('dateRange', { 
-                      ...dateRange, 
-                      from: e.target.value ? new Date(e.target.value) : null 
-                    })}
-                    className="border border-gray-300 dark:border-gray-600 rounded px-3 py-1 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-[#2F3A4F] text-gray-900 dark:text-gray-100"
-                  />
-                  <span className="text-gray-400">to</span>
-                  <input
-                    type="date"
-                    value={dateRange.to ? dateRange.to.toISOString().split('T')[0] : ''}
-                    onChange={(e) => setFilter('dateRange', { 
-                      ...dateRange, 
-                      to: e.target.value ? new Date(e.target.value) : null 
-                    })}
-                    className="border border-gray-300 dark:border-gray-600 rounded px-3 py-1 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-[#2F3A4F] text-gray-900 dark:text-gray-100"
-                  />
-                </div>
-                
-                <select
-                  multiple
-                  value={barangays}
-                  onChange={(e) => setFilter('barangays', Array.from(e.target.selectedOptions, option => option.value))}
-                  className="border border-gray-300 dark:border-gray-600 rounded px-3 py-1 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent min-w-32 bg-white dark:bg-[#2F3A4F] text-gray-900 dark:text-gray-100 flex-shrink-0"
-                >
-                  <option value="" disabled>Region</option>
-                  {regionOptions.map(option => (
-                    <option key={option} value={option}>{option}</option>
-                  ))}
-                </select>
-                
-                <select
-                  multiple
-                  value={brands}
-                  onChange={(e) => setFilter('brands', Array.from(e.target.selectedOptions, option => option.value))}
-                  className="border border-gray-300 dark:border-gray-600 rounded px-3 py-1 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent min-w-32 bg-white dark:bg-[#2F3A4F] text-gray-900 dark:text-gray-100 flex-shrink-0"
-                >
-                  <option value="" disabled>Brand</option>
-                  {brandOptions.map(option => (
-                    <option key={option} value={option}>{option}</option>
-                  ))}
-                </select>
-                
-                <select
-                  multiple
-                  value={categories}
-                  onChange={(e) => setFilter('categories', Array.from(e.target.selectedOptions, option => option.value))}
-                  className="border border-gray-300 dark:border-gray-600 rounded px-3 py-1 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent min-w-32 bg-white dark:bg-[#2F3A4F] text-gray-900 dark:text-gray-100 flex-shrink-0"
-                >
-                  <option value="" disabled>Category</option>
-                  {categoryOptions.map(option => (
-                    <option key={option} value={option}>{option}</option>
-                  ))}
-                </select>
+    <div className="bg-white dark:bg-scout-navy border-b border-gray-200 dark:border-scout-dark px-4 py-3">
+      <div className="flex flex-wrap items-center gap-4">
+        
+        {/* Date Range Filter */}
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" size="sm" className="h-9">
+              <Calendar className="mr-2 h-4 w-4" />
+              {dateRange.from && dateRange.to 
+                ? `${format(dateRange.from, 'MMM dd')} - ${format(dateRange.to, 'MMM dd')}`
+                : 'Select dates'
+              }
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <CalendarComponent
+              mode="range"
+              selected={dateRange}
+              onSelect={(range) => range && setDateRange(range)}
+              numberOfMonths={2}
+            />
+          </PopoverContent>
+        </Popover>
+
+        {/* Location Filter */}
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" size="sm" className="h-9">
+              <MapPin className="mr-2 h-4 w-4" />
+              Locations ({barangays.length})
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-80">
+            <div className="space-y-2">
+              <h4 className="font-medium text-sm">Select Locations</h4>
+              <div className="max-h-48 overflow-y-auto space-y-2">
+                {masterLists.allRegions.map((region) => (
+                  <div key={region} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={region}
+                      checked={barangays.includes(region)}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          setBarangays([...barangays, region]);
+                        } else {
+                          setBarangays(barangays.filter(b => b !== region));
+                        }
+                      }}
+                    />
+                    <label htmlFor={region} className="text-sm">{region}</label>
+                  </div>
+                ))}
               </div>
-              
-              <button 
-                onClick={() => scrollFilters('right')}
-                className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-[#2F3A4F] border border-gray-300 dark:border-gray-600 rounded-full p-1 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700"
-                aria-label="Scroll filters right"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </button>
             </div>
-          </div>
-          
-          {hasActiveFilters && (
-            <button
-              onClick={reset}
-              className="flex items-center space-x-1 text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 px-3 py-1 rounded-lg flex-shrink-0 ml-4"
+          </PopoverContent>
+        </Popover>
+
+        {/* Category Filter */}
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" size="sm" className="h-9">
+              <Package className="mr-2 h-4 w-4" />
+              Categories ({categories.length})
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-80">
+            <div className="space-y-2">
+              <h4 className="font-medium text-sm">Select Categories</h4>
+              <div className="max-h-48 overflow-y-auto space-y-2">
+                {masterLists.allCategories.map((category) => (
+                  <div key={category} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={category}
+                      checked={categories.includes(category)}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          setCategories([...categories, category]);
+                        } else {
+                          setCategories(categories.filter(c => c !== category));
+                        }
+                      }}
+                    />
+                    <label htmlFor={category} className="text-sm">{category}</label>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
+
+        {/* Brand Filter */}
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" size="sm" className="h-9">
+              <Tag className="mr-2 h-4 w-4" />
+              Brands ({brands.length})
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-80">
+            <div className="space-y-2">
+              <h4 className="font-medium text-sm">Select Brands</h4>
+              <div className="max-h-48 overflow-y-auto space-y-2">
+                {masterLists.allBrands.map((brand) => (
+                  <div key={brand} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={brand}
+                      checked={brands.includes(brand)}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          setBrands([...brands, brand]);
+                        } else {
+                          setBrands(brands.filter(b => b !== brand));
+                        }
+                      }}
+                    />
+                    <label htmlFor={brand} className="text-sm">{brand}</label>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
+
+        {/* Active Filter Count */}
+        {(barangays.length > 0 || categories.length > 0 || brands.length > 0) && (
+          <div className="ml-auto">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => {
+                setBarangays([]);
+                setCategories([]);
+                setBrands([]);
+              }}
+              className="text-scout-teal hover:text-scout-teal/80"
             >
-              <RotateCcw className="h-4 w-4" />
-              <span>Reset</span>
-            </button>
-          )}
-        </div>
+              Clear Filters
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
 };
-
