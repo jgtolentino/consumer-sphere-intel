@@ -7,6 +7,7 @@ import { ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { Navbar } from './components/Navbar';
 import { GlobalFilterBar } from './components/GlobalFilterBar';
 import { Sidebar } from './components/Sidebar';
@@ -24,8 +25,13 @@ import { DataProvider } from './providers/DataProvider';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
+      staleTime: 5 * 60 * 1000,
       refetchOnWindowFocus: false,
+      retry: (failureCount, error) => {
+        // Don't retry on certain errors
+        if (error?.message?.includes('PGRST')) return false;
+        return failureCount < 2;
+      },
     },
   },
 });
@@ -60,7 +66,6 @@ const AppContent: React.FC = () => {
     <div className="min-h-screen bg-[#F5F6FA] dark:bg-[#0A2540] flex flex-col">
       <Navbar />
       
-      {/* Page Zoom Controls */}
       <div className="fixed top-20 right-4 z-50 flex items-center gap-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-2">
         <button
           onClick={zoomOut}
@@ -95,21 +100,16 @@ const AppContent: React.FC = () => {
         </button>
       </div>
       
-      {/* Main layout container */}
       <div className="flex flex-1 h-[calc(100vh-4rem)]">
-        {/* Sidebar - fixed width on desktop, hidden on mobile */}
         <div className="hidden lg:block w-64 flex-shrink-0">
           <Sidebar />
         </div>
         
-        {/* Main content area */}
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-          {/* Filter bar */}
           <div className="flex-shrink-0">
             <GlobalFilterBar />
           </div>
           
-          {/* Scrollable content with zoom transformation */}
           <main 
             className="flex-1 overflow-auto"
             style={{
@@ -119,16 +119,18 @@ const AppContent: React.FC = () => {
               height: zoomLevel < 100 ? `${10000 / zoomLevel}%` : 'auto'
             }}
           >
-            <Routes>
-              <Route path="/" element={<Overview />} />
-              <Route path="/trends" element={<TransactionTrends />} />
-              <Route path="/products" element={<ProductMix />} />
-              <Route path="/regional" element={<Regional />} />
-              <Route path="/brands" element={<BrandAnalytics />} />
-              <Route path="/chat" element={<RetailBot />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+            <ErrorBoundary>
+              <Routes>
+                <Route path="/" element={<Overview />} />
+                <Route path="/trends" element={<TransactionTrends />} />
+                <Route path="/products" element={<ProductMix />} />
+                <Route path="/regional" element={<Regional />} />
+                <Route path="/brands" element={<BrandAnalytics />} />
+                <Route path="/chat" element={<RetailBot />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </ErrorBoundary>
           </main>
         </div>
       </div>
@@ -140,19 +142,21 @@ const App: React.FC = () => {
   console.log('App component rendering - should mount correctly');
   
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-        <TooltipProvider>
-          <DataProvider>
-            <Toaster />
-            <Sonner />
-            <Router>
-              <AppContent />
-            </Router>
-          </DataProvider>
-        </TooltipProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+          <TooltipProvider>
+            <DataProvider>
+              <Toaster />
+              <Sonner />
+              <Router>
+                <AppContent />
+              </Router>
+            </DataProvider>
+          </TooltipProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 };
 

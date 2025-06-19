@@ -11,9 +11,9 @@ export class RealDataService implements DataService {
       .from('transactions')
       .select(`
         *,
-        transaction_items(
+        transaction_items!transaction_items_transaction_id_fkey(
           quantity,
-          price,
+          unit_price,
           products(name, category, brands(name, category))
         )
       `);
@@ -31,7 +31,7 @@ export class RealDataService implements DataService {
 
     // Use pagination to get more than 1000 records
     const allData: any[] = [];
-    const pageSize = 1000; // Supabase default limit
+    const pageSize = 1000;
     let page = 0;
     const maxRecords = SUPABASE_LIMITS.transactions;
 
@@ -48,13 +48,12 @@ export class RealDataService implements DataService {
       }
 
       if (!data || data.length === 0) {
-        break; // No more records
+        break;
       }
 
       allData.push(...data);
       page++;
 
-      // Stop if we've reached our limit or got less than a full page
       if (data.length < pageSize || allData.length >= maxRecords) {
         break;
       }
@@ -62,7 +61,6 @@ export class RealDataService implements DataService {
 
     console.log(`Total FMCG transactions after filtering: ${allData.length}`);
 
-    // Transform to match mock data structure
     return allData.slice(0, maxRecords).map(transaction => ({
       id: transaction.id,
       date: transaction.created_at,
@@ -77,7 +75,7 @@ export class RealDataService implements DataService {
         category: item.products?.brands?.category || 'Unknown',
         brand: item.products?.brands?.name || 'Unknown',
         units: item.quantity,
-        price: item.price * item.quantity
+        price: (item.unit_price || 0) * item.quantity
       })) || []
     }));
   }
@@ -90,7 +88,6 @@ export class RealDataService implements DataService {
 
     if (error) throw error;
 
-    // Group by region and calculate totals
     const regionStats = data?.reduce((acc: any, transaction: any) => {
       const region = transaction.store_location;
       if (!acc[region]) {
@@ -144,6 +141,7 @@ export class RealDataService implements DataService {
       .from('transaction_items')
       .select(`
         quantity,
+        unit_price,
         products(name, category, brands(name, category))
       `);
 
@@ -153,7 +151,7 @@ export class RealDataService implements DataService {
       category: item.products?.brands?.category || 'Unknown',
       sku: item.products?.name || 'Unknown',
       units: item.quantity,
-      price: 0 // Price not available in this structure
+      price: (item.unit_price || 0) * item.quantity
     })) || [];
 
     return {
@@ -163,7 +161,6 @@ export class RealDataService implements DataService {
     };
   }
 
-  // Enhanced analytics methods
   async getSubstitutionData(): Promise<any> {
     const { data, error } = await supabase
       .from('substitutions')
@@ -203,7 +200,7 @@ export class RealDataService implements DataService {
       requestTypes: Object.entries(requestTypes).map(([type, count]) => ({
         type,
         count,
-        percentage: 0 // Calculate if needed
+        percentage: 0
       })),
       storekeperInfluence: [],
       averageDuration: 0,
@@ -232,7 +229,6 @@ export class RealDataService implements DataService {
       }
     });
 
-    // Convert sets to arrays
     Object.keys(hierarchy).forEach(region => {
       Object.keys(hierarchy[region].cities).forEach(city => {
         hierarchy[region].cities[city].barangays = Array.from(hierarchy[region].cities[city].barangays);
@@ -240,6 +236,63 @@ export class RealDataService implements DataService {
     });
 
     return hierarchy;
+  }
+
+  async getCategoryMix(): Promise<any[]> {
+    try {
+      const { data, error } = await supabase
+        .from('transaction_items')
+        .select(`
+          quantity,
+          unit_price,
+          products!inner(category)
+        `);
+
+      if (error) throw error;
+
+      const categoryStats: Record<string, { value: number; count: number }> = {};
+      
+      data?.forEach((item: any) => {
+        const category = item.products?.category || 'Unknown';
+        const value = (item.quantity || 0) * (item.unit_price || 0);
+        
+        if (!categoryStats[category]) {
+          categoryStats[category] = { value: 0, count: 0 };
+        }
+        categoryStats[category].value += value;
+        categoryStats[category].count += item.quantity || 0;
+      });
+
+      const totalValue = Object.values(categoryStats).reduce((sum, cat) => sum + cat.value, 0);
+      
+      return Object.entries(categoryStats)
+        .map(([name, stats]) => ({
+          name,
+          value: stats.value,
+          percentage: totalValue > 0 ? (stats.value / totalValue) * 100 : 0
+        }))
+        .sort((a, b) => b.value - a.value);
+        
+    } catch (error) {
+      console.error('Failed to fetch category mix:', error);
+      throw error;
+    }
+  }
+
+  async getProductSubstitution(): Promise<any[]> {
+    try {
+      const { data, error } = await supabase
+        .from('substitutions')
+        .select('*');
+
+      if (error) throw error;
+
+      return data || [];
+      
+    } catch (error) {
+      console.error('Failed to fetch product substitution:', error);
+      throw error;
+    }
   }
 
   // Helper methods
@@ -319,72 +372,5 @@ export class RealDataService implements DataService {
       }))
       .sort((a, b) => b.revenue - a.revenue)
       .slice(0, 10);
-  }
-
-  // Product Mix methods
-  async getCategoryMix(): Promise<any[]> {
-    try {
-      // Try to get real category mix data from transactions
-      const { data, error } = await supabase
-        .from('transactions')
-        .select(`
-          transaction_items (
-            products (
-              category
-            ),
-            quantity,
-            unit_price
-          )
-        `);
-
-      if (error) throw error;
-
-      // Process category mix from real data
-      const categoryStats: Record<string, { value: number; count: number }> = {};
-      
-      data?.forEach((transaction: any) => {
-        transaction.transaction_items?.forEach((item: any) => {
-          const category = item.products?.category || 'Unknown';
-          const value = (item.quantity || 0) * (item.unit_price || 0);
-          
-          if (!categoryStats[category]) {
-            categoryStats[category] = { value: 0, count: 0 };
-          }
-          categoryStats[category].value += value;
-          categoryStats[category].count += item.quantity || 0;
-        });
-      });
-
-      const totalValue = Object.values(categoryStats).reduce((sum, cat) => sum + cat.value, 0);
-      
-      return Object.entries(categoryStats)
-        .map(([name, stats]) => ({
-          name,
-          value: stats.value,
-          percentage: totalValue > 0 ? (stats.value / totalValue) * 100 : 0
-        }))
-        .sort((a, b) => b.value - a.value);
-        
-    } catch (error) {
-      console.error('Failed to fetch category mix:', error);
-      throw error;
-    }
-  }
-
-  async getProductSubstitution(): Promise<any[]> {
-    try {
-      // Try to get real substitution patterns from customer behavior
-      const { data, error } = await supabase
-        .from('substitution_patterns')
-        .select('*');
-
-      if (error) throw error;
-
-      return data || [];
-      
-    } catch (error) {
-      console.error('Failed to fetch product substitution:', error);
-      throw error;
-    }
   }
 }
