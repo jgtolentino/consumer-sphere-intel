@@ -6,7 +6,6 @@ import { Input } from './ui/input';
 import { Card } from './ui/card';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { handleRetailBotQuery } from '../api/retailbot';
-import { useDataMode } from '../hooks/useDataMode';
 
 interface Message {
   id: string;
@@ -18,14 +17,13 @@ interface Message {
 }
 
 export const ChatInterface: React.FC = () => {
-  const { isMock } = useDataMode();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
       type: 'bot',
       content: 'Hello! I\'m RetailBot, your AI retail analytics assistant. I can help you analyze sales data, brand performance, and consumer insights. What would you like to explore?',
       timestamp: new Date().toISOString(),
-      dataSource: isMock ? 'mock' : 'live'
+      dataSource: 'live'
     }
   ]);
   const [inputValue, setInputValue] = useState('');
@@ -69,7 +67,7 @@ export const ChatInterface: React.FC = () => {
         content: response.reply,
         chart: response.chart,
         timestamp: response.timestamp,
-        dataSource: response.data_source
+        dataSource: 'live'
       };
 
       setMessages(prev => [...prev, botMessage]);
@@ -80,7 +78,7 @@ export const ChatInterface: React.FC = () => {
         type: 'bot',
         content: 'I apologize, but I encountered an error. Please try again.',
         timestamp: new Date().toISOString(),
-        dataSource: isMock ? 'mock' : 'live'
+        dataSource: 'live'
       };
       setMessages(prev => [...prev, errorMessage]);
     } finally {
@@ -119,12 +117,6 @@ export const ChatInterface: React.FC = () => {
                   : 'bg-scout-light dark:bg-scout-dark border-scout-teal/10'
               }`}>
                 <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                
-                {message.dataSource && isMock && (
-                  <div className="mt-2 pt-2 border-t border-scout-teal/20 text-xs text-scout-dark/70 dark:text-gray-400">
-                    Data Source: {message.dataSource}
-                  </div>
-                )}
               </Card>
 
               {/* Chart rendering */}

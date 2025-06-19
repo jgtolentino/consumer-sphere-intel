@@ -1,13 +1,10 @@
 
 import React from 'react';
-import { Bot, MessageCircle, Zap, Database } from 'lucide-react';
+import { Bot, MessageCircle, Zap } from 'lucide-react';
 import { ChatInterface } from '../components/ChatInterface';
 import { Card } from '../components/ui/card';
-import { useDataMode } from '../hooks/useDataMode';
 
 const RetailBot: React.FC = () => {
-  const { isMock } = useDataMode();
-
   return (
     <div className="space-y-6 p-6">
       <div className="flex justify-between items-center">
@@ -15,12 +12,6 @@ const RetailBot: React.FC = () => {
           <h1 className="text-3xl font-bold text-scout-navy dark:text-scout-teal">RetailBot</h1>
           <p className="text-scout-dark dark:text-gray-300 mt-1">AI-powered retail analytics assistant</p>
         </div>
-        {isMock && (
-          <div className="flex items-center space-x-2 text-sm text-scout-teal bg-scout-light dark:bg-scout-dark px-4 py-2 rounded-lg border border-scout-teal/20">
-            <Database className="w-4 h-4" />
-            <span className="font-medium">Mock Data Mode - QA Testing</span>
-          </div>
-        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-[calc(100vh-200px)]">
@@ -30,9 +21,6 @@ const RetailBot: React.FC = () => {
             <div className="flex items-center space-x-3 p-4 border-b border-scout-teal/10">
               <Bot className="h-6 w-6 text-scout-teal" />
               <h3 className="text-lg font-semibold text-scout-navy dark:text-scout-teal">Chat with RetailBot</h3>
-              {isMock && (
-                <span className="text-xs bg-scout-light text-scout-navy px-2 py-1 rounded">Mock Data</span>
-              )}
             </div>
             <div className="flex-1 min-h-0">
               <ChatInterface />
@@ -94,8 +82,8 @@ const RetailBot: React.FC = () => {
 
           <Card className="p-4 scout-card border-scout-teal/10">
             <div className="text-xs text-scout-dark/70 dark:text-gray-400 space-y-1">
-              <p><strong>Data Source:</strong> {isMock ? 'Mock Dataset' : 'Live Database'}</p>
-              <p><strong>Mode:</strong> {isMock ? 'QA Testing' : 'Production'}</p>
+              <p><strong>Data Source:</strong> Live Database</p>
+              <p><strong>Mode:</strong> Production</p>
               <p><strong>Last Updated:</strong> {new Date().toLocaleString('en-PH')}</p>
             </div>
           </Card>

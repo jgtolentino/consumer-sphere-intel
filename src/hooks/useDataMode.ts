@@ -1,48 +1,26 @@
-import { useState, useCallback } from 'react';
 
-export type DataMode = 'mock' | 'real';
+import { useCallback } from 'react';
+
+export type DataMode = 'real';
 
 export function useDataMode() {
-  // Get initial mode from localStorage, fallback to env variable, then to mock
-  const getInitialMode = (): DataMode => {
-    const stored = localStorage.getItem('dataMode') as DataMode;
-    if (stored === 'mock' || stored === 'real') {
-      return stored;
-    }
-    
-    // Fallback to environment variable
-    const envMode = import.meta.env.VITE_DATA_MODE;
-    return envMode === 'real' ? 'real' : 'mock';
-  };
+  // Always return 'real' mode - production only
+  const mode: DataMode = 'real';
 
-  const [mode, setMode] = useState<DataMode>(getInitialMode);
-
+  // No-op functions to maintain API compatibility
   const toggleMode = useCallback(() => {
-    const newMode: DataMode = mode === 'mock' ? 'real' : 'mock';
-    setMode(newMode);
-    localStorage.setItem('dataMode', newMode);
-    
-    // Dispatch custom event to notify other components
-    window.dispatchEvent(new CustomEvent('dataModeChanged', { detail: newMode }));
-    
-    // Optional: Force reload to ensure clean state
-    // You can remove this if you prefer seamless switching
-    setTimeout(() => {
-      window.location.reload();
-    }, 100);
-  }, [mode]);
+    console.warn('Data mode toggle disabled - production mode only');
+  }, []);
 
   const setDataMode = useCallback((newMode: DataMode) => {
-    setMode(newMode);
-    localStorage.setItem('dataMode', newMode);
-    window.dispatchEvent(new CustomEvent('dataModeChanged', { detail: newMode }));
+    console.warn('Data mode switching disabled - production mode only');
   }, []);
 
   return { 
     mode, 
     toggleMode, 
     setDataMode,
-    isReal: mode === 'real',
-    isMock: mode === 'mock'
+    isReal: true,
+    isMock: false
   };
 }
