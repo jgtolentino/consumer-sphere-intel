@@ -18,8 +18,10 @@
     "verify": "npm run lint && npm run test:run && npm run qa:audit",
     "sync-types": "./scripts/sync-supabase-types.sh",
     "check-drift": "node scripts/check-schema-drift.cjs",
-    "auto-attach": "npm run sync-types && npm run check-drift",
-    "validate-schema": "npm run check-drift && npm run build"
+    "check-schema-drift": "node scripts/check-schema-drift.js",
+    "auto-attach": "npm run sync-types && npm run check-schema-drift",
+    "validate-schema": "npm run check-schema-drift && npm run build",
+    "schema:test": "npm test -- src/__tests__/schemaDrift.test.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
@@ -58,6 +60,7 @@
     "date-fns": "^3.6.0",
     "embla-carousel-react": "^8.3.0",
     "input-otp": "^1.2.4",
+    "js-yaml": "^4.1.0",
     "lucide-react": "^0.462.0",
     "mapbox-gl": "^3.13.0",
     "next-themes": "^0.3.0",

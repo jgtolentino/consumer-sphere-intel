@@ -1,23 +1,24 @@
 
 import React, { createContext, useContext, ReactNode, useState, useEffect } from 'react';
-import { MockDataService } from '../services/MockDataService';
-import { RealDataService } from '../services/RealDataService';
+import { MockDataServiceV2 } from '../services/MockDataService.v2';
+import { RealDataServiceV2 } from '../services/RealDataService.v2';
 import { getDataConfig } from '../config/dataConfig';
 import { useRealtimeSync, useAutoRefresh } from '../hooks/useRealtimeSync';
+import { TransactionWithDetails, RegionalData, BrandPerformance, CategoryMix, ProductSubstitution, ConsumerInsight } from '../schema';
 
 export interface DataService {
-  getTransactions: (filters?: any) => Promise<any[]>;
-  getRegionalData: () => Promise<any[]>;
-  getBrandData: () => Promise<any[]>;
-  getConsumerData: () => Promise<any>;
+  getTransactions: (filters?: any) => Promise<TransactionWithDetails[]>;
+  getRegionalData: () => Promise<RegionalData[]>;
+  getBrandData: () => Promise<BrandPerformance[]>;
+  getConsumerData: () => Promise<ConsumerInsight[]>;
   getProductData: () => Promise<any>;
-  // New methods for enhanced analytics
+  // Enhanced analytics methods
   getSubstitutionData?: () => Promise<any>;
   getBehavioralData?: () => Promise<any>;
   getLocationHierarchy?: () => Promise<any>;
   // Product Mix methods
-  getCategoryMix: () => Promise<any[]>;
-  getProductSubstitution: () => Promise<any[]>;
+  getCategoryMix: () => Promise<CategoryMix[]>;
+  getProductSubstitution: () => Promise<ProductSubstitution[]>;
 }
 
 const DataContext = createContext<DataService | null>(null);
@@ -31,8 +32,8 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
     const config = getDataConfig();
     // Always default to mock for public deployment to prevent auth issues
     return config.mode === 'mock' 
-      ? new MockDataService() 
-      : new RealDataService(config.apiBaseUrl!);
+      ? new MockDataServiceV2() 
+      : new RealDataServiceV2(config.apiBaseUrl!);
   });
 
   // 🚀 AUTO-ATTACH: Enable realtime sync for real data mode
@@ -49,8 +50,8 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
     const handleDataModeChange = () => {
       const config = getDataConfig();
       const newService = config.mode === 'mock' 
-        ? new MockDataService() 
-        : new RealDataService(config.apiBaseUrl!);
+        ? new MockDataServiceV2() 
+        : new RealDataServiceV2(config.apiBaseUrl!);
       setDataService(newService);
       
       console.log(`🔄 Data mode changed to: ${config.mode}`);
