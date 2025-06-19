@@ -183,7 +183,7 @@ const TransactionTrends: React.FC = () => {
         </div>
       </div>
 
-      {/* Time Series Chart - REMOVED zoom controls */}
+      {/* Time Series Chart */}
       <div className="scout-card p-6">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-semibold text-scout-navy">Transaction Volume & Value Trends</h3>
@@ -246,7 +246,7 @@ const TransactionTrends: React.FC = () => {
         <BoxPlot data={valueDistribution} height={300} />
       </div>
 
-      {/* Regional Transaction Performance - Fixed colors */}
+      {/* Regional Transaction Performance */}
       <div className="scout-card p-6">
         <h3 className="text-lg font-semibold mb-4 text-scout-navy">Regional Transaction Performance</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
