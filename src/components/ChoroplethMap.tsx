@@ -171,8 +171,8 @@ export const ChoroplethMap: React.FC = () => {
       const regionEl = document.createElement('div');
       regionEl.className = 'choropleth-region';
       regionEl.style.cssText = `
-        width: 80px;
-        height: 60px;
+        width: 90px;
+        height: 70px;
         background: ${color};
         border: 2px solid white;
         border-radius: 8px;
@@ -184,7 +184,7 @@ export const ChoroplethMap: React.FC = () => {
         align-items: center;
         justify-content: center;
         color: ${selectedMetric === 'totalSales' && value > 3000000 ? 'white' : 'black'};
-        font-size: 10px;
+        font-size: 11px;
         font-weight: bold;
         text-align: center;
         line-height: 1.1;
@@ -270,7 +270,7 @@ export const ChoroplethMap: React.FC = () => {
       </div>
       
       <div className="relative">
-        <div ref={mapContainer} className="w-full h-64 xl:h-80" />
+        <div ref={mapContainer} className="w-full h-96" />
         
         {/* Color Legend */}
         <div className="absolute bottom-4 left-4 bg-white rounded-lg shadow-lg p-3 border">
