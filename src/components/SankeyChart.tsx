@@ -1,14 +1,19 @@
 
 import React from 'react';
+import { useProductSubstitution } from '../hooks/useProductSubstitution';
 
 export const SankeyChart: React.FC = () => {
-  const sankeyData = [
-    { from: 'Samsung Galaxy A54', to: 'iPhone 14', flow: 45 },
-    { from: 'Samsung Galaxy A54', to: 'Xiaomi Redmi Note', flow: 32 },
-    { from: 'Nestle Coffee', to: 'Kopiko Coffee', flow: 28 },
-    { from: 'Unilever Shampoo', to: 'P&G Shampoo', flow: 21 },
-    { from: 'Nike Shoes', to: 'Adidas Shoes', flow: 15 }
-  ];
+  const { data: substitutionData, isLoading } = useProductSubstitution();
+
+  if (isLoading) {
+    return (
+      <div className="h-80 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+      </div>
+    );
+  }
+
+  const sankeyData = substitutionData || [];
 
   return (
     <div className="h-80 flex flex-col justify-center">

@@ -10,10 +10,16 @@ import { SkuTable } from '../components/SkuTable';
 import { BrandPerformanceChart } from '../components/BrandPerformanceChart';
 import { ActiveFilters } from '../components/ActiveFilters';
 import { DrillDownBreadcrumb } from '../components/DrillDownBreadcrumb';
+import { useCategoryMix } from '../hooks/useCategoryMix';
+import { useProductSubstitution } from '../hooks/useProductSubstitution';
 
 const ProductMix: React.FC = () => {
   const navigate = useNavigate();
   const { setFilter } = useFilterStore();
+  
+  // Use hooks to fetch real data with FMCG fallbacks
+  const { data: categoryMixData, isLoading: categoryLoading, error: categoryError } = useCategoryMix();
+  const { data: substitutionData, isLoading: substitutionLoading } = useProductSubstitution();
 
   const handleCategoryClick = (category: string) => {
     setFilter('categories', [category]);
@@ -27,13 +33,29 @@ const ProductMix: React.FC = () => {
     { title: 'Substitution Rate', value: '23%', change: '-2%', trend: 'down' as const, icon: <ArrowRightLeft className="h-5 w-5" /> }
   ];
 
-  const categoryMixData = [
-    { name: 'Electronics', value: 4200000, percentage: 35 },
-    { name: 'Groceries', value: 3100000, percentage: 26 },
-    { name: 'Health & Beauty', value: 2800000, percentage: 23 },
-    { name: 'Clothing', value: 1200000, percentage: 10 },
-    { name: 'Beverages', value: 700000, percentage: 6 }
-  ];
+  if (categoryLoading) {
+    return (
+      <div className="min-h-screen bg-[#F5F6FA] flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading FMCG product data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (categoryError) {
+    return (
+      <div className="min-h-screen bg-[#F5F6FA] flex items-center justify-center">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 max-w-md">
+          <h3 className="text-red-800 font-semibold">Error Loading Product Data</h3>
+          <p className="text-red-600 text-sm mt-1">
+            Failed to load product mix data. Using FMCG baseline data.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#F5F6FA]">
@@ -68,37 +90,22 @@ const ProductMix: React.FC = () => {
             ))}
           </div>
 
-          {/* Category Performance Cards */}
+          {/* Category Performance Cards - Top 3 FMCG Categories */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 cursor-pointer hover:shadow-md hover:border-[#36CFC9]/30 transition-all duration-200"
-                 onClick={() => handleCategoryClick('Electronics')}>
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-gray-900">Electronics</h3>
-                <Package className="h-5 w-5 text-blue-600" />
+            {categoryMixData?.slice(0, 3).map((category, index) => (
+              <div key={category.name} 
+                   className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 cursor-pointer hover:shadow-md hover:border-[#36CFC9]/30 transition-all duration-200"
+                   onClick={() => handleCategoryClick(category.name)}>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-semibold text-gray-900">{category.name}</h3>
+                  {index === 0 && <Package className="h-5 w-5 text-blue-600" />}
+                  {index === 1 && <ShoppingBag className="h-5 w-5 text-teal-600" />}
+                  {index === 2 && <Star className="h-5 w-5 text-purple-600" />}
+                </div>
+                <p className="text-2xl font-bold text-gray-900">₱{(category.value / 1000000).toFixed(1)}M</p>
+                <p className="text-green-600 text-sm font-medium">{category.percentage.toFixed(1)}% market share</p>
               </div>
-              <p className="text-2xl font-bold text-gray-900">₱4.2M</p>
-              <p className="text-green-600 text-sm font-medium">+18% from last month</p>
-            </div>
-            
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 cursor-pointer hover:shadow-md hover:border-[#36CFC9]/30 transition-all duration-200"
-                 onClick={() => handleCategoryClick('Groceries')}>
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-gray-900">Groceries</h3>
-                <ShoppingBag className="h-5 w-5 text-teal-600" />
-              </div>
-              <p className="text-2xl font-bold text-gray-900">₱3.1M</p>
-              <p className="text-green-600 text-sm font-medium">+12% from last month</p>
-            </div>
-            
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 cursor-pointer hover:shadow-md hover:border-[#36CFC9]/30 transition-all duration-200"
-                 onClick={() => handleCategoryClick('Health & Beauty')}>
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-gray-900">Health & Beauty</h3>
-                <Star className="h-5 w-5 text-purple-600" />
-              </div>
-              <p className="text-2xl font-bold text-gray-900">₱2.8M</p>
-              <p className="text-green-600 text-sm font-medium">+15% from last month</p>
-            </div>
+            ))}
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

@@ -220,4 +220,27 @@ export class MockDataService implements DataService {
       percentage: (withRecommendations / mockTransactions.length) * 100
     };
   }
+
+  // Product Mix methods
+  async getCategoryMix(): Promise<any[]> {
+    // Return FMCG category mix based on TBWA client brands
+    return [
+      { name: 'Tobacco', value: 125000000, percentage: 31.3 },
+      { name: 'Dairy & Beverages', value: 89000000, percentage: 22.3 },
+      { name: 'Snacks', value: 76000000, percentage: 19.0 },
+      { name: 'Food Products', value: 58000000, percentage: 14.5 },
+      { name: 'Beverages', value: 51000000, percentage: 12.8 }
+    ];
+  }
+
+  async getProductSubstitution(): Promise<any[]> {
+    // Return FMCG product substitution patterns for TBWA clients
+    return [
+      { from: 'Alaska Milk', to: 'Alaska Condensada', flow: 45 },
+      { from: 'Oishi Prawn Crackers', to: 'Oishi Smart C+', flow: 32 },
+      { from: 'Del Monte Corned Beef', to: 'Del Monte Italian Style', flow: 28 },
+      { from: 'Peerless Orange', to: 'Peerless Apple', flow: 21 },
+      { from: 'JTI Winston', to: 'JTI Mevius', flow: 15 }
+    ];
+  }
 }

@@ -15,6 +15,9 @@ export interface DataService {
   getSubstitutionData?: () => Promise<any>;
   getBehavioralData?: () => Promise<any>;
   getLocationHierarchy?: () => Promise<any>;
+  // Product Mix methods
+  getCategoryMix: () => Promise<any[]>;
+  getProductSubstitution: () => Promise<any[]>;
 }
 
 const DataContext = createContext<DataService | null>(null);

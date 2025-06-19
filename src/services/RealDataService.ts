@@ -320,4 +320,71 @@ export class RealDataService implements DataService {
       .sort((a, b) => b.revenue - a.revenue)
       .slice(0, 10);
   }
+
+  // Product Mix methods
+  async getCategoryMix(): Promise<any[]> {
+    try {
+      // Try to get real category mix data from transactions
+      const { data, error } = await supabase
+        .from('transactions')
+        .select(`
+          transaction_items (
+            products (
+              category
+            ),
+            quantity,
+            unit_price
+          )
+        `);
+
+      if (error) throw error;
+
+      // Process category mix from real data
+      const categoryStats: Record<string, { value: number; count: number }> = {};
+      
+      data?.forEach((transaction: any) => {
+        transaction.transaction_items?.forEach((item: any) => {
+          const category = item.products?.category || 'Unknown';
+          const value = (item.quantity || 0) * (item.unit_price || 0);
+          
+          if (!categoryStats[category]) {
+            categoryStats[category] = { value: 0, count: 0 };
+          }
+          categoryStats[category].value += value;
+          categoryStats[category].count += item.quantity || 0;
+        });
+      });
+
+      const totalValue = Object.values(categoryStats).reduce((sum, cat) => sum + cat.value, 0);
+      
+      return Object.entries(categoryStats)
+        .map(([name, stats]) => ({
+          name,
+          value: stats.value,
+          percentage: totalValue > 0 ? (stats.value / totalValue) * 100 : 0
+        }))
+        .sort((a, b) => b.value - a.value);
+        
+    } catch (error) {
+      console.error('Failed to fetch category mix:', error);
+      throw error;
+    }
+  }
+
+  async getProductSubstitution(): Promise<any[]> {
+    try {
+      // Try to get real substitution patterns from customer behavior
+      const { data, error } = await supabase
+        .from('substitution_patterns')
+        .select('*');
+
+      if (error) throw error;
+
+      return data || [];
+      
+    } catch (error) {
+      console.error('Failed to fetch product substitution:', error);
+      throw error;
+    }
+  }
 }
