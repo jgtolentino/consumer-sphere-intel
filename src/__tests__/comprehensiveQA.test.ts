@@ -195,7 +195,10 @@ describe('Comprehensive QA Audit - 5,000 Mock Records', () => {
         
         // Sum of all cities should equal region total
         const citySum = Object.values(cityValidation.details.groups)
-          .reduce((sum, count) => sum + count, 0);
+          .reduce((sum, count) => {
+            const countValue = Number(count) || 0;
+            return sum + countValue;
+          }, 0);
         expect(citySum).toBe(regionTransactions.length);
       }
     });
@@ -208,7 +211,8 @@ describe('Comprehensive QA Audit - 5,000 Mock Records', () => {
       allTransactions.forEach((txn: any) => {
         const brandsInBasket = new Set(txn.basket?.map((item: any) => String(item.brand)) || []);
         brandsInBasket.forEach(brand => {
-          brandCounts.set(brand, (brandCounts.get(brand) || 0) + 1);
+          const brandStr = String(brand);
+          brandCounts.set(brandStr, (brandCounts.get(brandStr) || 0) + 1);
         });
       });
       
