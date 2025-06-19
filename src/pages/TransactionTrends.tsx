@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Calendar, TrendingUp, Clock, BarChart3 } from 'lucide-react';
+import { Calendar, TrendingUp, Clock, BarChart3, Store, Package, Database } from 'lucide-react';
 import { TimeSeriesChart } from '../components/TimeSeriesChart';
 import { BoxPlot } from '../components/BoxPlot';
 import { useTransactions } from '../hooks/useTransactions';
@@ -65,23 +65,70 @@ const TransactionTrends: React.FC = () => {
           <p className="text-scout-dark mt-1">Analyze transaction patterns and volume trends</p>
         </div>
       </div>
+
+      {/* Quick Stats Section */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="scout-kpi-card">
+          <div className="flex items-center space-x-3">
+            <div className="p-3 bg-scout-teal bg-opacity-10 rounded-lg">
+              <Store className="h-6 w-6 text-scout-teal" />
+            </div>
+            <div>
+              <p className="text-sm text-scout-dark font-medium">Stores</p>
+              <p className="text-2xl font-bold text-scout-navy">47</p>
+              <p className="text-xs text-scout-teal">Active locations</p>
+            </div>
+          </div>
+        </div>
+        
+        <div className="scout-kpi-card">
+          <div className="flex items-center space-x-3">
+            <div className="p-3 bg-scout-teal bg-opacity-10 rounded-lg">
+              <Package className="h-6 w-6 text-scout-teal" />
+            </div>
+            <div>
+              <p className="text-sm text-scout-dark font-medium">SKUs</p>
+              <p className="text-2xl font-bold text-scout-navy">1,247</p>
+              <p className="text-xs text-scout-teal">Product variants</p>
+            </div>
+          </div>
+        </div>
+        
+        <div className="scout-kpi-card">
+          <div className="flex items-center space-x-3">
+            <div className="p-3 bg-scout-teal bg-opacity-10 rounded-lg">
+              <Database className="h-6 w-6 text-scout-teal" />
+            </div>
+            <div>
+              <p className="text-sm text-scout-dark font-medium">Data Points</p>
+              <p className="text-2xl font-bold text-scout-navy">2.4M</p>
+              <p className="text-xs text-scout-teal">Transaction records</p>
+            </div>
+          </div>
+        </div>
+      </div>
       
       {/* Time Controls */}
       <div className="scout-card p-4">
-        <div className="flex items-center space-x-4">
-          <Calendar className="h-5 w-5 text-scout-teal" />
-          <select className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-scout-teal focus:border-transparent">
-            {timeRanges.map(range => (
-              <option key={range} value={range}>{range}</option>
-            ))}
-          </select>
-          <button className="scout-gradient text-white px-6 py-2 rounded-lg hover:opacity-90 transition-all duration-200 font-medium">
-            Apply Filters
-          </button>
+        <div className="flex items-center justify-between flex-wrap gap-4">
+          <div className="flex items-center space-x-4">
+            <Calendar className="h-5 w-5 text-scout-teal" />
+            <select className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-scout-teal focus:border-transparent">
+              {timeRanges.map(range => (
+                <option key={range} value={range}>{range}</option>
+              ))}
+            </select>
+            <button className="scout-gradient text-white px-6 py-2 rounded-lg hover:opacity-90 transition-all duration-200 font-medium">
+              Apply Filters
+            </button>
+          </div>
+          <div className="text-sm text-scout-dark">
+            Last updated: {new Date().toLocaleString('en-PH')}
+          </div>
         </div>
       </div>
 
-      {/* Key Metrics Row */}
+      {/* Performance Metrics Row */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="scout-kpi-card">
           <div className="flex items-center space-x-3">
@@ -91,6 +138,7 @@ const TransactionTrends: React.FC = () => {
             <div>
               <p className="text-sm text-scout-dark">Peak Hour</p>
               <p className="text-xl font-bold text-scout-navy">2:00 PM</p>
+              <p className="text-xs text-scout-teal">Daily average</p>
             </div>
           </div>
         </div>
@@ -103,6 +151,7 @@ const TransactionTrends: React.FC = () => {
             <div>
               <p className="text-sm text-scout-dark">Avg. Transaction Time</p>
               <p className="text-xl font-bold text-scout-navy">3.2 min</p>
+              <p className="text-xs text-scout-teal">Per session</p>
             </div>
           </div>
         </div>
@@ -115,6 +164,7 @@ const TransactionTrends: React.FC = () => {
             <div>
               <p className="text-sm text-scout-dark">Daily Growth</p>
               <p className="text-xl font-bold text-scout-navy">+12.5%</p>
+              <p className="text-xs text-scout-teal">vs yesterday</p>
             </div>
           </div>
         </div>
@@ -127,13 +177,30 @@ const TransactionTrends: React.FC = () => {
             <div>
               <p className="text-sm text-scout-dark">Weekly Trend</p>
               <p className="text-xl font-bold text-scout-navy">+8.7%</p>
+              <p className="text-xs text-scout-teal">vs last week</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Time Series Chart */}
-      <TimeSeriesChart data={timeSeriesData} height={400} />
+      {/* Time Series Chart with Enhanced Controls */}
+      <div className="scout-card p-6">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-semibold text-scout-navy">Transaction Volume & Value Trends</h3>
+          <div className="flex space-x-2">
+            <button className="px-3 py-1 text-xs bg-scout-teal text-white rounded hover:bg-opacity-80">
+              Zoom In
+            </button>
+            <button className="px-3 py-1 text-xs bg-gray-500 text-white rounded hover:bg-opacity-80">
+              Reset Zoom
+            </button>
+            <button className="px-3 py-1 text-xs bg-scout-teal text-white rounded hover:bg-opacity-80">
+              Full Screen
+            </button>
+          </div>
+        </div>
+        <TimeSeriesChart data={timeSeriesData} height={400} />
+      </div>
 
       {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -180,7 +247,15 @@ const TransactionTrends: React.FC = () => {
       </div>
 
       {/* Box Plot for Transaction Value Distribution */}
-      <BoxPlot data={valueDistribution} height={300} />
+      <div className="scout-card p-6">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-semibold text-scout-navy">Transaction Value Distribution</h3>
+          <div className="text-sm text-scout-dark">
+            Interactive box plot - hover for details
+          </div>
+        </div>
+        <BoxPlot data={valueDistribution} height={300} />
+      </div>
 
       {/* Regional Transaction Performance */}
       <div className="scout-card p-6">

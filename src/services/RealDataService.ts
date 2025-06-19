@@ -1,59 +1,296 @@
 
+import { supabase } from '../integrations/supabase/client';
 import { DataService } from '../providers/DataProvider';
 
 export class RealDataService implements DataService {
-  constructor(private apiBaseUrl: string) {}
+  constructor(private apiBaseUrl?: string) {}
 
   async getTransactions(filters?: any): Promise<any[]> {
-    const params = new URLSearchParams();
-    
+    let query = supabase
+      .from('transactions')
+      .select(`
+        *,
+        transaction_items(
+          quantity,
+          price,
+          products(name, category, brands(name, category))
+        )
+      `);
+
+    // Apply filters
     if (filters?.dateRange?.from) {
-      params.append('from', filters.dateRange.from.toISOString());
+      query = query.gte('created_at', filters.dateRange.from.toISOString());
     }
     if (filters?.dateRange?.to) {
-      params.append('to', filters.dateRange.to.toISOString());
+      query = query.lte('created_at', filters.dateRange.to.toISOString());
     }
     if (filters?.regions?.length > 0) {
-      params.append('regions', filters.regions.join(','));
+      query = query.in('store_location', filters.regions);
     }
+
+    const { data, error } = await query.limit(5000);
     
-    const response = await fetch(`${this.apiBaseUrl}/transactions?${params}`);
-    return response.json();
+    if (error) {
+      console.error('Error fetching transactions:', error);
+      throw error;
+    }
+
+    // Transform to match mock data structure
+    return data?.map(transaction => ({
+      id: transaction.id,
+      date: transaction.created_at,
+      total: transaction.total_amount,
+      region: transaction.store_location,
+      consumer_profile: {
+        gender: transaction.customer_gender,
+        age_bracket: this.getAgeBracket(transaction.customer_age)
+      },
+      basket: transaction.transaction_items?.map((item: any) => ({
+        sku: item.products?.name || 'Unknown',
+        category: item.products?.brands?.category || 'Unknown',
+        brand: item.products?.brands?.name || 'Unknown',
+        units: item.quantity,
+        price: item.price * item.quantity
+      })) || []
+    })) || [];
   }
 
   async getRegionalData(): Promise<any[]> {
-    const response = await fetch(`${this.apiBaseUrl}/regional`);
-    return response.json();
+    const { data, error } = await supabase
+      .from('transactions')
+      .select('store_location, total_amount')
+      .not('store_location', 'is', null);
+
+    if (error) throw error;
+
+    // Group by region and calculate totals
+    const regionStats = data?.reduce((acc: any, transaction: any) => {
+      const region = transaction.store_location;
+      if (!acc[region]) {
+        acc[region] = { region, transactions: 0, revenue: 0 };
+      }
+      acc[region].transactions += 1;
+      acc[region].revenue += transaction.total_amount || 0;
+      return acc;
+    }, {});
+
+    return Object.values(regionStats || {});
   }
 
   async getBrandData(): Promise<any[]> {
-    const response = await fetch(`${this.apiBaseUrl}/brands`);
-    return response.json();
+    const { data, error } = await supabase
+      .from('brand_analytics')
+      .select('*')
+      .order('total_revenue', { ascending: false })
+      .limit(20);
+
+    if (error) throw error;
+
+    return data?.map(brand => ({
+      name: brand.brand_name,
+      revenue: brand.total_revenue,
+      transactions: brand.transaction_count,
+      category: brand.category
+    })) || [];
   }
 
   async getConsumerData(): Promise<any> {
-    const response = await fetch(`${this.apiBaseUrl}/consumers`);
-    return response.json();
+    const { data, error } = await supabase
+      .from('transactions')
+      .select('customer_gender, customer_age')
+      .not('customer_gender', 'is', null);
+
+    if (error) throw error;
+
+    const genderMix = this.processGenderMix(data || []);
+    const ageMix = this.processAgeMix(data || []);
+
+    return {
+      genderMix,
+      ageMix,
+      total: data?.length || 0
+    };
   }
 
   async getProductData(): Promise<any> {
-    const response = await fetch(`${this.apiBaseUrl}/products`);
-    return response.json();
+    const { data, error } = await supabase
+      .from('transaction_items')
+      .select(`
+        quantity,
+        products(name, category, brands(name, category))
+      `);
+
+    if (error) throw error;
+
+    const allItems = data?.map(item => ({
+      category: item.products?.brands?.category || 'Unknown',
+      sku: item.products?.name || 'Unknown',
+      units: item.quantity,
+      price: 0 // Price not available in this structure
+    })) || [];
+
+    return {
+      categoryMix: this.processCategoryMix(allItems),
+      topSkus: this.getTopSkus(allItems),
+      total: allItems.length
+    };
   }
 
-  // New methods for enhanced analytics
+  // Enhanced analytics methods
   async getSubstitutionData(): Promise<any> {
-    const response = await fetch(`${this.apiBaseUrl}/substitutions`);
-    return response.json();
+    const { data, error } = await supabase
+      .from('substitutions')
+      .select(`
+        *,
+        original_product:products!original_product_id(name),
+        substitute_product:products!substitute_product_id(name)
+      `);
+
+    if (error) throw error;
+
+    return {
+      patterns: data?.map(sub => ({
+        from: sub.original_product?.name || 'Unknown',
+        to: sub.substitute_product?.name || 'Unknown',
+        reason: sub.reason,
+        count: 1
+      })) || [],
+      totalSubstitutions: data?.length || 0
+    };
   }
 
   async getBehavioralData(): Promise<any> {
-    const response = await fetch(`${this.apiBaseUrl}/behavioral`);
-    return response.json();
+    const { data, error } = await supabase
+      .from('request_behaviors')
+      .select('*');
+
+    if (error) throw error;
+
+    const requestTypes = data?.reduce((acc: any, behavior: any) => {
+      const type = behavior.request_type || 'unknown';
+      acc[type] = (acc[type] || 0) + 1;
+      return acc;
+    }, {}) || {};
+
+    return {
+      requestTypes: Object.entries(requestTypes).map(([type, count]) => ({
+        type,
+        count,
+        percentage: 0 // Calculate if needed
+      })),
+      storekeperInfluence: [],
+      averageDuration: 0,
+      aiRecommendations: { total: 0, percentage: 0 }
+    };
   }
 
   async getLocationHierarchy(): Promise<any> {
-    const response = await fetch(`${this.apiBaseUrl}/locations/hierarchy`);
-    return response.json();
+    const { data, error } = await supabase
+      .from('stores')
+      .select('region, city, barangay');
+
+    if (error) throw error;
+
+    const hierarchy: Record<string, any> = {};
+    
+    data?.forEach(store => {
+      if (!hierarchy[store.region]) {
+        hierarchy[store.region] = { cities: {} };
+      }
+      if (!hierarchy[store.region].cities[store.city]) {
+        hierarchy[store.region].cities[store.city] = { barangays: new Set() };
+      }
+      if (store.barangay) {
+        hierarchy[store.region].cities[store.city].barangays.add(store.barangay);
+      }
+    });
+
+    // Convert sets to arrays
+    Object.keys(hierarchy).forEach(region => {
+      Object.keys(hierarchy[region].cities).forEach(city => {
+        hierarchy[region].cities[city].barangays = Array.from(hierarchy[region].cities[city].barangays);
+      });
+    });
+
+    return hierarchy;
+  }
+
+  // Helper methods
+  private getAgeBracket(age: number | null): string {
+    if (!age) return 'Unknown';
+    if (age < 25) return '18-24';
+    if (age < 35) return '25-34';
+    if (age < 45) return '35-44';
+    if (age < 55) return '45-54';
+    return '55+';
+  }
+
+  private processGenderMix(data: any[]) {
+    const genderCount: Record<string, number> = {};
+    data.forEach(item => {
+      if (item.customer_gender) {
+        genderCount[item.customer_gender] = (genderCount[item.customer_gender] || 0) + 1;
+      }
+    });
+    
+    const total = Object.values(genderCount).reduce((sum, count) => sum + count, 0);
+    return Object.entries(genderCount).map(([gender, count]) => ({
+      name: gender,
+      value: count,
+      percentage: total > 0 ? (count / total) * 100 : 0
+    }));
+  }
+
+  private processAgeMix(data: any[]) {
+    const ageCount: Record<string, number> = {};
+    data.forEach(item => {
+      if (item.customer_age) {
+        const bracket = this.getAgeBracket(item.customer_age);
+        ageCount[bracket] = (ageCount[bracket] || 0) + 1;
+      }
+    });
+    
+    const total = Object.values(ageCount).reduce((sum, count) => sum + count, 0);
+    return Object.entries(ageCount).map(([age, count]) => ({
+      name: age,
+      value: count,
+      percentage: total > 0 ? (count / total) * 100 : 0
+    }));
+  }
+
+  private processCategoryMix(items: any[]) {
+    const categoryCount: Record<string, number> = {};
+    items.forEach(item => {
+      categoryCount[item.category] = (categoryCount[item.category] || 0) + item.units;
+    });
+    
+    const total = Object.values(categoryCount).reduce((sum, count) => sum + count, 0);
+    return Object.entries(categoryCount).map(([category, count]) => ({
+      category,
+      count,
+      percentage: total > 0 ? (count / total) * 100 : 0
+    }));
+  }
+
+  private getTopSkus(items: any[]) {
+    const skuStats: Record<string, { units: number; revenue: number }> = {};
+    
+    items.forEach(item => {
+      if (!skuStats[item.sku]) {
+        skuStats[item.sku] = { units: 0, revenue: 0 };
+      }
+      skuStats[item.sku].units += item.units;
+      skuStats[item.sku].revenue += item.price;
+    });
+    
+    return Object.entries(skuStats)
+      .map(([sku, stats]) => ({
+        name: sku,
+        category: items.find(i => i.sku === sku)?.category || 'Unknown',
+        sales: stats.units,
+        revenue: stats.revenue
+      }))
+      .sort((a, b) => b.revenue - a.revenue)
+      .slice(0, 10);
   }
 }

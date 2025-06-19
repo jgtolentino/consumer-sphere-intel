@@ -176,87 +176,110 @@ export const regions: Region[] = [
   }
 ];
 
-// TBWA Client Brands - Full Expanded Structure
+// FMCG categories filter - Updated to include tobacco
+const FMCG_CATEGORIES = [
+  'Dairy & Milk Products',
+  'Snacks & Confectionery', 
+  'Beverages',
+  'Personal Care',
+  'Household Cleaning',
+  'Food & Grocery',
+  'Health & Wellness',
+  'Baby Care',
+  'Tobacco Products',
+  'Frozen Foods',
+  'Canned Goods',
+  'Condiments & Sauces',
+  'Bakery Products',
+  'Fresh Produce'
+];
+
+// TBWA Client Brands - Updated categories to match FMCG filter
 export const tbwaClientBrands: Brand[] = [
   // Alaska Milk Corporation
-  { name: "Alaska Evaporated Milk", company: "Alaska Milk Corporation", is_client: true, category: "Dairy", skus: ["Original", "Full Cream", "Low Fat"] },
-  { name: "Alaska Condensed Milk", company: "Alaska Milk Corporation", is_client: true, category: "Dairy", skus: ["Original", "Sweetened"] },
-  { name: "Alaska Powdered Milk", company: "Alaska Milk Corporation", is_client: true, category: "Dairy", skus: ["Small Pack", "Family Pack"] },
-  { name: "Krem-Top (Coffee Creamer)", company: "Alaska Milk Corporation", is_client: true, category: "Dairy", skus: ["Regular", "Sugar-Free"] },
-  { name: "Alpine (Evaporated & Condensed Milk)", company: "Alaska Milk Corporation", is_client: true, category: "Dairy", skus: ["Evaporated", "Condensed"] },
-  { name: "Cow Bell (Powdered Milk)", company: "Alaska Milk Corporation", is_client: true, category: "Dairy", skus: ["Small Pack", "Large Pack"] },
+  { name: "Alaska Evaporated Milk", company: "Alaska Milk Corporation", is_client: true, category: "Dairy & Milk Products", skus: ["Original", "Full Cream", "Low Fat"] },
+  { name: "Alaska Condensed Milk", company: "Alaska Milk Corporation", is_client: true, category: "Dairy & Milk Products", skus: ["Original", "Sweetened"] },
+  { name: "Alaska Powdered Milk", company: "Alaska Milk Corporation", is_client: true, category: "Dairy & Milk Products", skus: ["Small Pack", "Family Pack"] },
+  { name: "Krem-Top (Coffee Creamer)", company: "Alaska Milk Corporation", is_client: true, category: "Dairy & Milk Products", skus: ["Regular", "Sugar-Free"] },
+  { name: "Alpine (Evaporated & Condensed Milk)", company: "Alaska Milk Corporation", is_client: true, category: "Dairy & Milk Products", skus: ["Evaporated", "Condensed"] },
+  { name: "Cow Bell (Powdered Milk)", company: "Alaska Milk Corporation", is_client: true, category: "Dairy & Milk Products", skus: ["Small Pack", "Large Pack"] },
 
   // Oishi (Liwayway Marketing Corporation)
-  { name: "Oishi Prawn Crackers", company: "Oishi", is_client: true, category: "Snacks", skus: ["Original", "Spicy"] },
-  { name: "Oishi Pillows", company: "Oishi", is_client: true, category: "Snacks", skus: ["Chocolate", "Milk"] },
-  { name: "Oishi Marty's", company: "Oishi", is_client: true, category: "Snacks", skus: ["Baconette Strips", "Vegetarian Chicharon"] },
-  { name: "Oishi Ridges", company: "Oishi", is_client: true, category: "Snacks", skus: ["Cheese", "Sour Cream"] },
-  { name: "Oishi Bread Pan", company: "Oishi", is_client: true, category: "Snacks", skus: ["Garlic", "Cheese"] },
-  { name: "Gourmet Picks", company: "Oishi", is_client: true, category: "Snacks", skus: ["Truffle", "Sour Cream"] },
-  { name: "Crispy Patata", company: "Oishi", is_client: true, category: "Snacks", skus: ["Classic", "Barbecue"] },
+  { name: "Oishi Prawn Crackers", company: "Oishi", is_client: true, category: "Snacks & Confectionery", skus: ["Original", "Spicy"] },
+  { name: "Oishi Pillows", company: "Oishi", is_client: true, category: "Snacks & Confectionery", skus: ["Chocolate", "Milk"] },
+  { name: "Oishi Marty's", company: "Oishi", is_client: true, category: "Snacks & Confectionery", skus: ["Baconette Strips", "Vegetarian Chicharon"] },
+  { name: "Oishi Ridges", company: "Oishi", is_client: true, category: "Snacks & Confectionery", skus: ["Cheese", "Sour Cream"] },
+  { name: "Oishi Bread Pan", company: "Oishi", is_client: true, category: "Snacks & Confectionery", skus: ["Garlic", "Cheese"] },
+  { name: "Gourmet Picks", company: "Oishi", is_client: true, category: "Snacks & Confectionery", skus: ["Truffle", "Sour Cream"] },
+  { name: "Crispy Patata", company: "Oishi", is_client: true, category: "Snacks & Confectionery", skus: ["Classic", "Barbecue"] },
   { name: "Smart C+ (Vitamin Drinks)", company: "Oishi", is_client: true, category: "Beverages", skus: ["Lemon", "Orange", "Pomelo"] },
-  { name: "Oaties", company: "Oishi", is_client: true, category: "Snacks", skus: ["Milk", "Chocolate"] },
-  { name: "Hi-Ho", company: "Oishi", is_client: true, category: "Snacks", skus: ["Original"] },
-  { name: "Rinbee", company: "Oishi", is_client: true, category: "Snacks", skus: ["Cheese", "Sweet Corn"] },
-  { name: "Deli Mex", company: "Oishi", is_client: true, category: "Snacks", skus: ["Sour Cream", "Barbecue"] },
+  { name: "Oaties", company: "Oishi", is_client: true, category: "Snacks & Confectionery", skus: ["Milk", "Chocolate"] },
+  { name: "Hi-Ho", company: "Oishi", is_client: true, category: "Snacks & Confectionery", skus: ["Original"] },
+  { name: "Rinbee", company: "Oishi", is_client: true, category: "Snacks & Confectionery", skus: ["Cheese", "Sweet Corn"] },
+  { name: "Deli Mex", company: "Oishi", is_client: true, category: "Snacks & Confectionery", skus: ["Sour Cream", "Barbecue"] },
 
   // Peerless Products Manufacturing Corporation
-  { name: "Champion", company: "Peerless", is_client: true, category: "Home Care", skus: ["Detergent", "Fabric Conditioner"] },
+  { name: "Champion", company: "Peerless", is_client: true, category: "Household Cleaning", skus: ["Detergent", "Fabric Conditioner"] },
   { name: "Calla", company: "Peerless", is_client: true, category: "Personal Care", skus: ["Shampoo", "Body Wash"] },
   { name: "Hana", company: "Peerless", is_client: true, category: "Personal Care", skus: ["Shampoo", "Conditioner"] },
-  { name: "Cyclone", company: "Peerless", is_client: true, category: "Home Care", skus: ["Bleach"] },
-  { name: "Pride", company: "Peerless", is_client: true, category: "Home Care", skus: ["Dishwashing Liquid"] },
+  { name: "Cyclone", company: "Peerless", is_client: true, category: "Household Cleaning", skus: ["Bleach"] },
+  { name: "Pride", company: "Peerless", is_client: true, category: "Household Cleaning", skus: ["Dishwashing Liquid"] },
   { name: "Care Plus", company: "Peerless", is_client: true, category: "Personal Care", skus: ["Alcohol", "Hand Sanitizer"] },
 
   // Del Monte Philippines
   { name: "Del Monte Pineapple", company: "Del Monte", is_client: true, category: "Beverages", skus: ["Juice", "Chunks", "Slices"] },
-  { name: "Del Monte Tomato Sauce & Ketchup", company: "Del Monte", is_client: true, category: "Condiments", skus: ["Tomato Sauce", "Ketchup"] },
-  { name: "Del Monte Spaghetti Sauce", company: "Del Monte", is_client: true, category: "Condiments", skus: ["Italian Style", "Sweet Style"] },
-  { name: "Del Monte Fruit Cocktail", company: "Del Monte", is_client: true, category: "Canned Fruit", skus: ["Standard", "Fiesta"] },
-  { name: "Del Monte Pasta", company: "Del Monte", is_client: true, category: "Pasta", skus: ["Spaghetti", "Penne", "Elbow Macaroni"] },
-  { name: "S&W (Premium Fruit & Vegetable Products)", company: "Del Monte", is_client: true, category: "Premium Produce", skus: ["Pineapple", "Corn"] },
-  { name: "Today's (Budget-Friendly Product Line)", company: "Del Monte", is_client: true, category: "Budget", skus: ["Fruit Cocktail", "Pasta"] },
+  { name: "Del Monte Tomato Sauce & Ketchup", company: "Del Monte", is_client: true, category: "Condiments & Sauces", skus: ["Tomato Sauce", "Ketchup"] },
+  { name: "Del Monte Spaghetti Sauce", company: "Del Monte", is_client: true, category: "Condiments & Sauces", skus: ["Italian Style", "Sweet Style"] },
+  { name: "Del Monte Fruit Cocktail", company: "Del Monte", is_client: true, category: "Canned Goods", skus: ["Standard", "Fiesta"] },
+  { name: "Del Monte Pasta", company: "Del Monte", is_client: true, category: "Food & Grocery", skus: ["Spaghetti", "Penne", "Elbow Macaroni"] },
+  { name: "S&W (Premium Fruit & Vegetable Products)", company: "Del Monte", is_client: true, category: "Canned Goods", skus: ["Pineapple", "Corn"] },
+  { name: "Today's (Budget-Friendly Product Line)", company: "Del Monte", is_client: true, category: "Food & Grocery", skus: ["Fruit Cocktail", "Pasta"] },
   { name: "Fit 'n Right (Juice Drinks)", company: "Del Monte", is_client: true, category: "Beverages", skus: ["Apple", "Pineapple", "Grape"] },
 
   // Japan Tobacco International (JTI)
-  { name: "Winston", company: "JTI", is_client: true, category: "Tobacco", skus: ["Red", "Blue", "White"] },
-  { name: "Camel", company: "JTI", is_client: true, category: "Tobacco", skus: ["Blue", "Filters"] },
-  { name: "Mevius", company: "JTI", is_client: true, category: "Tobacco", skus: ["Mild Seven", "Lights"] },
-  { name: "LD", company: "JTI", is_client: true, category: "Tobacco", skus: ["Red", "Blue"] },
-  { name: "Mighty", company: "JTI", is_client: true, category: "Tobacco", skus: ["Pack"] },
-  { name: "Caster", company: "JTI", is_client: true, category: "Tobacco", skus: ["Mild", "Super Mild"] },
-  { name: "Glamour", company: "JTI", is_client: true, category: "Tobacco", skus: ["Super Slims"] }
+  { name: "Winston", company: "JTI", is_client: true, category: "Tobacco Products", skus: ["Red", "Blue", "White"] },
+  { name: "Camel", company: "JTI", is_client: true, category: "Tobacco Products", skus: ["Blue", "Filters"] },
+  { name: "Mevius", company: "JTI", is_client: true, category: "Tobacco Products", skus: ["Mild Seven", "Lights"] },
+  { name: "LD", company: "JTI", is_client: true, category: "Tobacco Products", skus: ["Red", "Blue"] },
+  { name: "Mighty", company: "JTI", is_client: true, category: "Tobacco Products", skus: ["Pack"] },
+  { name: "Caster", company: "JTI", is_client: true, category: "Tobacco Products", skus: ["Mild", "Super Mild"] },
+  { name: "Glamour", company: "JTI", is_client: true, category: "Tobacco Products", skus: ["Super Slims"] }
 ];
 
-// Competitor Brands (40% of transactions)
+// Competitor Brands (40% of transactions) - Updated categories to match FMCG filter
 export const competitorBrands: Brand[] = [
-  { name: "Nestlé Bear Brand", company: "Nestlé", is_client: false, category: "Dairy", skus: ["Powdered Milk", "Sterilized", "Ready-to-Drink"] },
+  { name: "Nestlé Bear Brand", company: "Nestlé", is_client: false, category: "Dairy & Milk Products", skus: ["Powdered Milk", "Sterilized", "Ready-to-Drink"] },
   { name: "Nestlé Milo", company: "Nestlé", is_client: false, category: "Beverages", skus: ["Powder", "Ready-to-Drink"] },
   { name: "Nescafé", company: "Nestlé", is_client: false, category: "Beverages", skus: ["Classic", "3in1", "Gold"] },
   { name: "Nestea", company: "Nestlé", is_client: false, category: "Beverages", skus: ["Lemon", "Apple", "Calamansi"] },
 
-  { name: "Surf", company: "Unilever", is_client: false, category: "Home Care", skus: ["Powder Detergent", "Liquid Detergent"] },
+  { name: "Surf", company: "Unilever", is_client: false, category: "Household Cleaning", skus: ["Powder Detergent", "Liquid Detergent"] },
   { name: "Sunsilk", company: "Unilever", is_client: false, category: "Personal Care", skus: ["Shampoo", "Conditioner"] },
   { name: "Close-Up", company: "Unilever", is_client: false, category: "Personal Care", skus: ["Red Hot", "Menthol Fresh"] },
   { name: "Lipton", company: "Unilever", is_client: false, category: "Beverages", skus: ["Yellow Label", "Green Tea"] },
 
-  { name: "Tide", company: "P&G", is_client: false, category: "Home Care", skus: ["Bar", "Powder", "Liquid"] },
-  { name: "Downy", company: "P&G", is_client: false, category: "Home Care", skus: ["Sunrise Fresh", "Antibac"] },
+  { name: "Tide", company: "P&G", is_client: false, category: "Household Cleaning", skus: ["Bar", "Powder", "Liquid"] },
+  { name: "Downy", company: "P&G", is_client: false, category: "Household Cleaning", skus: ["Sunrise Fresh", "Antibac"] },
   { name: "Pantene", company: "P&G", is_client: false, category: "Personal Care", skus: ["Shampoo", "Conditioner"] },
   { name: "Head & Shoulders", company: "P&G", is_client: false, category: "Personal Care", skus: ["Menthol", "Cool Blast"] },
 
-  { name: "Piattos", company: "Jack 'n Jill", is_client: false, category: "Snacks", skus: ["Cheese", "Sour Cream"] },
-  { name: "Chippy", company: "Jack 'n Jill", is_client: false, category: "Snacks", skus: ["BBQ", "Chili & Cheese"] },
-  { name: "Roller Coaster", company: "Jack 'n Jill", is_client: false, category: "Snacks", skus: ["Cheese", "Barbecue"] },
-  { name: "Chiz Curls", company: "Jack 'n Jill", is_client: false, category: "Snacks", skus: ["Cheese"] },
+  { name: "Piattos", company: "Jack 'n Jill", is_client: false, category: "Snacks & Confectionery", skus: ["Cheese", "Sour Cream"] },
+  { name: "Chippy", company: "Jack 'n Jill", is_client: false, category: "Snacks & Confectionery", skus: ["BBQ", "Chili & Cheese"] },
+  { name: "Roller Coaster", company: "Jack 'n Jill", is_client: false, category: "Snacks & Confectionery", skus: ["Cheese", "Barbecue"] },
+  { name: "Chiz Curls", company: "Jack 'n Jill", is_client: false, category: "Snacks & Confectionery", skus: ["Cheese"] },
 
   { name: "San Mig Light", company: "San Miguel", is_client: false, category: "Beverages", skus: ["Bottle", "Can"] },
-  { name: "Magnolia", company: "San Miguel", is_client: false, category: "Dairy", skus: ["Ice Cream", "Butter", "Cheese"] },
-  { name: "Purefoods", company: "San Miguel", is_client: false, category: "Food", skus: ["Tender Juicy", "Corned Beef"] },
+  { name: "Magnolia Ice Cream", company: "San Miguel", is_client: false, category: "Frozen Foods", skus: ["Vanilla", "Chocolate", "Strawberry"] },
+  { name: "Purefoods", company: "San Miguel", is_client: false, category: "Food & Grocery", skus: ["Tender Juicy", "Corned Beef"] },
 
-  { name: "Lactum", company: "Wyeth", is_client: false, category: "Dairy", skus: ["6+", "3+"] },
-  { name: "Lucky Me! Pancit Canton", company: "Monde Nissin", is_client: false, category: "Food", skus: ["Original", "Chilimansi", "Calamansi"] },
-  { name: "Lucky Me! Supreme", company: "Monde Nissin", is_client: false, category: "Food", skus: ["Batchoy", "Lomi"] }
+  { name: "Lactum", company: "Wyeth", is_client: false, category: "Dairy & Milk Products", skus: ["6+", "3+"] },
+  { name: "Lucky Me! Pancit Canton", company: "Monde Nissin", is_client: false, category: "Food & Grocery", skus: ["Original", "Chilimansi", "Calamansi"] },
+  { name: "Lucky Me! Supreme", company: "Monde Nissin", is_client: false, category: "Food & Grocery", skus: ["Batchoy", "Lomi"] },
+
+  // Additional FMCG competitors
+  { name: "Marlboro", company: "Philip Morris", is_client: false, category: "Tobacco Products", skus: ["Red", "Gold", "Ice Blast"] },
+  { name: "Philip Morris", company: "Philip Morris", is_client: false, category: "Tobacco Products", skus: ["Blue", "One"] },
+  { name: "Hope", company: "JT International", is_client: false, category: "Tobacco Products", skus: ["Luxury", "Menthol"] }
 ];
 
 // Combined brands array
@@ -376,7 +399,7 @@ export const generateMockTransactions = (count: number = 1000): Transaction[] =>
   return transactions;
 };
 
-// Pre-generate sample data
+// Pre-generate sample data with 5000 transactions
 export const mockTransactions = generateMockTransactions(5000);
 
 // Helper functions for analytics

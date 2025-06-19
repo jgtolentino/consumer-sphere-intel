@@ -15,45 +15,53 @@ const navigationItems = [
 
 export const Sidebar: React.FC = () => {
   return (
-    <aside className="fixed left-0 top-16 h-[calc(100vh-4rem)] min-w-[12rem] max-w-[20rem] w-[18vw] bg-white dark:bg-[#2F3A4F] border-r border-gray-200 dark:border-gray-700 shadow-sm z-50 hidden lg:block flex-shrink-0">
-      <div className="p-[1rem] xl:p-[1.5rem] h-full overflow-y-auto flex flex-col">
-        <nav className="space-y-[0.5rem] flex-1">
-          {navigationItems.map((item) => (
-            <NavLink
-              key={item.name}
-              to={item.href}
-              className={({ isActive }) =>
-                `flex items-center space-x-[0.75rem] px-[1rem] py-[0.75rem] rounded-lg transition-all duration-200 text-base font-medium ${
-                  isActive
-                    ? 'bg-[#36CFC9]/10 text-[#0A2540] dark:text-[#36CFC9] border-l-4 border-[#36CFC9] shadow-none'
-                    : 'text-[#2F3A4F] dark:text-gray-300 hover:bg-[#F5F6FA] dark:hover:bg-[#0A2540]/50 hover:text-[#0A2540] dark:hover:text-white'
-                }`
-              }
-            >
-              <item.icon className="h-[1.25rem] w-[1.25rem] flex-shrink-0" />
-              <span className="truncate">{item.name}</span>
-            </NavLink>
-          ))}
-        </nav>
-        
-        <div className="mt-auto p-[0.75rem] bg-[#F5F6FA] dark:bg-[#0A2540] rounded-lg border border-gray-100 dark:border-gray-700">
-          <h3 className="text-xs font-semibold text-[#0A2540] dark:text-[#F5F6FA] mb-[0.5rem] font-inter">Quick Stats</h3>
-          <div className="space-y-[0.25rem] text-xs text-[#2F3A4F] dark:text-gray-300">
-            <div className="flex justify-between">
-              <span>Stores:</span>
-              <span className="font-medium text-[#36CFC9]">47</span>
-            </div>
-            <div className="flex justify-between">
-              <span>SKUs:</span>
-              <span className="font-medium text-[#36CFC9]">1,247</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Data:</span>
-              <span className="font-medium text-[#36CFC9]">2.4M</span>
+    <>
+      {/* Desktop Sidebar - Fixed width, never overlaps content */}
+      <aside className="w-64 h-full bg-white dark:bg-[#2F3A4F] border-r border-gray-200 dark:border-gray-700 shadow-sm flex-shrink-0 hidden lg:flex flex-col">
+        <div className="p-4 xl:p-6 h-full overflow-y-auto flex flex-col">
+          <nav className="space-y-2 flex-1">
+            {navigationItems.map((item) => (
+              <NavLink
+                key={item.name}
+                to={item.href}
+                className={({ isActive }) =>
+                  `flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 text-base font-medium ${
+                    isActive
+                      ? 'bg-[#36CFC9]/10 text-[#0A2540] dark:text-[#36CFC9] border-l-4 border-[#36CFC9] shadow-none'
+                      : 'text-[#2F3A4F] dark:text-gray-300 hover:bg-[#F5F6FA] dark:hover:bg-[#0A2540]/50 hover:text-[#0A2540] dark:hover:text-white'
+                  }`
+                }
+              >
+                <item.icon className="h-5 w-5 flex-shrink-0" />
+                <span className="truncate">{item.name}</span>
+              </NavLink>
+            ))}
+          </nav>
+          
+          <div className="mt-auto p-3 bg-[#F5F6FA] dark:bg-[#0A2540] rounded-lg border border-gray-100 dark:border-gray-700">
+            <h3 className="text-xs font-semibold text-[#0A2540] dark:text-[#F5F6FA] mb-2 font-inter">Quick Stats</h3>
+            <div className="space-y-1 text-xs text-[#2F3A4F] dark:text-gray-300">
+              <div className="flex justify-between">
+                <span>Stores:</span>
+                <span className="font-medium text-[#36CFC9]">47</span>
+              </div>
+              <div className="flex justify-between">
+                <span>SKUs:</span>
+                <span className="font-medium text-[#36CFC9]">1,247</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Data:</span>
+                <span className="font-medium text-[#36CFC9]">2.4M</span>
+              </div>
             </div>
           </div>
         </div>
+      </aside>
+
+      {/* Mobile Navigation - Hidden by default, would need mobile menu trigger */}
+      <div className="lg:hidden">
+        {/* Mobile navigation implementation would go here */}
       </div>
-    </aside>
+    </>
   );
 };
