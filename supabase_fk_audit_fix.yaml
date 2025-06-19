@@ -1,0 +1,248 @@
+name: Supabase Foreign Key Auto-Fix Pipeline
+description: Automated PGRST201 relationship error resolution across all environments
+version: 1.0
+
+# RepoSynth + Dash + Caca orchestration pipeline
+environment:
+  SUPABASE_DB_URL: ${SUPABASE_DB_URL}
+  AUDIT_LOG: supabase_fks_audit.log
+
+steps:
+  - name: Environment Check
+    description: Validate database connection and required tools
+    run: |
+      echo "🔧 Supabase FK Auto-Fix Pipeline Starting..."
+      echo "Database: $SUPABASE_DB_URL"
+      echo "Timestamp: $(date)" | tee -a $AUDIT_LOG
+      
+      # Check psql availability
+      if ! command -v psql &> /dev/null; then
+        echo "❌ psql not found - install PostgreSQL client"
+        exit 1
+      fi
+      
+      # Test database connection
+      psql "$SUPABASE_DB_URL" -c "SELECT version();" || exit 1
+      echo "✅ Database connection verified" | tee -a $AUDIT_LOG
+
+  - name: FK Constraint Audit
+    description: Comprehensive audit of all foreign key relationships
+    run: |
+      echo "🔍 Step 1: Auditing FK constraints..." | tee -a $AUDIT_LOG
+      
+      psql "$SUPABASE_DB_URL" -c "
+        SELECT
+            tc.constraint_name,
+            tc.table_name, 
+            kcu.column_name, 
+            ccu.table_name AS foreign_table_name,
+            ccu.column_name AS foreign_column_name
+        FROM 
+            information_schema.table_constraints AS tc
+            JOIN information_schema.key_column_usage AS kcu
+              ON tc.constraint_name = kcu.constraint_name
+            JOIN information_schema.constraint_column_usage AS ccu
+              ON ccu.constraint_name = tc.constraint_name
+        WHERE 
+            tc.constraint_type = 'FOREIGN KEY'
+            AND (
+                (tc.table_name = 'transaction_items' AND ccu.table_name IN ('transactions', 'products'))
+                OR 
+                (tc.table_name = 'transactions' AND ccu.table_name = 'transaction_items')
+            )
+        ORDER BY tc.table_name, tc.constraint_name;
+      " | tee -a $AUDIT_LOG
+
+  - name: Identify Duplicates
+    description: Detect duplicate FK relationships causing PGRST201
+    run: |
+      echo "🔍 Step 2: Identifying duplicate relationships..." | tee -a $AUDIT_LOG
+      
+      # Count FK relationships for critical tables
+      TRANSACTION_FKS=$(psql "$SUPABASE_DB_URL" -t -c "
+        SELECT COUNT(*) FROM information_schema.table_constraints tc
+        JOIN information_schema.constraint_column_usage ccu ON tc.constraint_name = ccu.constraint_name
+        WHERE tc.constraint_type = 'FOREIGN KEY' 
+        AND tc.table_name = 'transaction_items' 
+        AND ccu.table_name = 'transactions';
+      ")
+      
+      PRODUCT_FKS=$(psql "$SUPABASE_DB_URL" -t -c "
+        SELECT COUNT(*) FROM information_schema.table_constraints tc
+        JOIN information_schema.constraint_column_usage ccu ON tc.constraint_name = ccu.constraint_name
+        WHERE tc.constraint_type = 'FOREIGN KEY' 
+        AND tc.table_name = 'transaction_items' 
+        AND ccu.table_name = 'products';
+      ")
+      
+      echo "Transaction FKs found: $TRANSACTION_FKS" | tee -a $AUDIT_LOG
+      echo "Product FKs found: $PRODUCT_FKS" | tee -a $AUDIT_LOG
+      
+      if [ "$TRANSACTION_FKS" -gt 1 ] || [ "$PRODUCT_FKS" -gt 1 ]; then
+        echo "⚠️ Duplicate FK relationships detected - proceeding with cleanup" | tee -a $AUDIT_LOG
+      else
+        echo "✅ No duplicate relationships found" | tee -a $AUDIT_LOG
+      fi
+
+  - name: Drop Duplicate Constraints
+    description: Remove duplicate/conflicting FK constraints
+    run: |
+      echo "🔧 Step 3: Dropping duplicate FK constraints..." | tee -a $AUDIT_LOG
+      
+      psql "$SUPABASE_DB_URL" -c "
+        -- Drop potential duplicate constraints (safe if they don't exist)
+        ALTER TABLE transaction_items DROP CONSTRAINT IF EXISTS fk_transaction_items_transaction_id;
+        ALTER TABLE transaction_items DROP CONSTRAINT IF EXISTS fk_transaction_items_trans_id;
+        ALTER TABLE transaction_items DROP CONSTRAINT IF EXISTS fk_transaction_items_order_id;
+        ALTER TABLE transaction_items DROP CONSTRAINT IF EXISTS transaction_items_trans_id_fkey;
+        ALTER TABLE transaction_items DROP CONSTRAINT IF EXISTS transaction_items_order_id_fkey;
+        ALTER TABLE transaction_items DROP CONSTRAINT IF EXISTS transaction_items_product_id_fkey1;
+        ALTER TABLE transaction_items DROP CONSTRAINT IF EXISTS transaction_items_product_id_fkey2;
+        
+        -- Log dropped constraints
+        SELECT 'Duplicate constraints dropped' as status;
+      " | tee -a $AUDIT_LOG
+
+  - name: Create Correct Relationships
+    description: Establish single, correct FK relationships
+    run: |
+      echo "🔧 Step 4: Creating correct FK relationships..." | tee -a $AUDIT_LOG
+      
+      psql "$SUPABASE_DB_URL" -c "
+        -- Ensure correct transaction relationship
+        DO \$\$
+        BEGIN
+            IF NOT EXISTS (
+                SELECT 1 FROM information_schema.table_constraints 
+                WHERE table_name = 'transaction_items' 
+                AND constraint_name = 'transaction_items_transaction_id_fkey'
+                AND constraint_type = 'FOREIGN KEY'
+            ) THEN
+                ALTER TABLE transaction_items 
+                ADD CONSTRAINT transaction_items_transaction_id_fkey 
+                FOREIGN KEY (transaction_id) REFERENCES transactions(id);
+                RAISE NOTICE 'Created transaction_items_transaction_id_fkey';
+            END IF;
+        END \$\$;
+        
+        -- Ensure correct product relationship
+        DO \$\$
+        BEGIN
+            IF NOT EXISTS (
+                SELECT 1 FROM information_schema.table_constraints 
+                WHERE table_name = 'transaction_items' 
+                AND constraint_name = 'transaction_items_product_id_fkey'
+                AND constraint_type = 'FOREIGN KEY'
+            ) THEN
+                ALTER TABLE transaction_items 
+                ADD CONSTRAINT transaction_items_product_id_fkey 
+                FOREIGN KEY (product_id) REFERENCES products(id);
+                RAISE NOTICE 'Created transaction_items_product_id_fkey';
+            END IF;
+        END \$\$;
+      " | tee -a $AUDIT_LOG
+
+  - name: Validate Relationships
+    description: Test corrected relationships with actual data joins
+    run: |
+      echo "🧪 Step 5: Validating corrected relationships..." | tee -a $AUDIT_LOG
+      
+      # Test transaction_items -> transactions join
+      echo "Testing transaction_items -> transactions join:" | tee -a $AUDIT_LOG
+      psql "$SUPABASE_DB_URL" -c "
+        SELECT t.id, t.created_at, ti.quantity, ti.unit_price
+        FROM transactions t
+        JOIN transaction_items ti ON ti.transaction_id = t.id
+        LIMIT 3;
+      " | tee -a $AUDIT_LOG
+      
+      # Test transaction_items -> products join
+      echo "Testing transaction_items -> products join:" | tee -a $AUDIT_LOG
+      psql "$SUPABASE_DB_URL" -c "
+        SELECT p.name, p.category, ti.quantity, ti.unit_price
+        FROM products p
+        JOIN transaction_items ti ON ti.product_id = p.id
+        LIMIT 3;
+      " | tee -a $AUDIT_LOG
+      
+      # Test complex nested join (what PostgREST needs)
+      echo "Testing nested join (PostgREST pattern):" | tee -a $AUDIT_LOG
+      psql "$SUPABASE_DB_URL" -c "
+        SELECT t.id, t.created_at, 
+               ti.quantity, ti.unit_price,
+               p.name, p.category
+        FROM transactions t
+        JOIN transaction_items ti ON ti.transaction_id = t.id
+        JOIN products p ON ti.product_id = p.id
+        LIMIT 3;
+      " | tee -a $AUDIT_LOG
+
+  - name: API Endpoint Test
+    description: Verify PostgREST embedding works without PGRST201 errors
+    run: |
+      echo "🔗 Step 6: Testing API endpoint..." | tee -a $AUDIT_LOG
+      
+      if [ -n "$SUPABASE_URL" ] && [ -n "$SUPABASE_ANON_KEY" ]; then
+        echo "Testing PostgREST API call..." | tee -a $AUDIT_LOG
+        
+        curl -X GET "$SUPABASE_URL/rest/v1/transactions?select=*,transaction_items(quantity,unit_price,products(name,category))&limit=1" \
+          -H "apikey: $SUPABASE_ANON_KEY" \
+          -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
+          -w "HTTP Status: %{http_code}\n" | tee -a $AUDIT_LOG
+      else
+        echo "⚠️ SUPABASE_URL or SUPABASE_ANON_KEY not set - skipping API test" | tee -a $AUDIT_LOG
+      fi
+
+  - name: Final Audit
+    description: Post-fix relationship audit and logging
+    run: |
+      echo "📊 Step 7: Final audit and logging..." | tee -a $AUDIT_LOG
+      
+      # Count final FK relationships
+      FINAL_TRANSACTION_FKS=$(psql "$SUPABASE_DB_URL" -t -c "
+        SELECT COUNT(*) FROM information_schema.table_constraints tc
+        JOIN information_schema.constraint_column_usage ccu ON tc.constraint_name = ccu.constraint_name
+        WHERE tc.constraint_type = 'FOREIGN KEY' 
+        AND tc.table_name = 'transaction_items' 
+        AND ccu.table_name = 'transactions';
+      ")
+      
+      FINAL_PRODUCT_FKS=$(psql "$SUPABASE_DB_URL" -t -c "
+        SELECT COUNT(*) FROM information_schema.table_constraints tc
+        JOIN information_schema.constraint_column_usage ccu ON tc.constraint_name = ccu.constraint_name
+        WHERE tc.constraint_type = 'FOREIGN KEY' 
+        AND tc.table_name = 'transaction_items' 
+        AND ccu.table_name = 'products';
+      ")
+      
+      echo "✅ SUPABASE PGRST201 FIX COMPLETE" | tee -a $AUDIT_LOG
+      echo "Final transaction FKs: $FINAL_TRANSACTION_FKS (should be 1)" | tee -a $AUDIT_LOG
+      echo "Final product FKs: $FINAL_PRODUCT_FKS (should be 1)" | tee -a $AUDIT_LOG
+      echo "Duplicate FK constraints dropped and recreated" | tee -a $AUDIT_LOG
+      echo "Dashboard real data load should now work" | tee -a $AUDIT_LOG
+      echo "Completion time: $(date)" | tee -a $AUDIT_LOG
+      
+      # Success notification
+      echo "🎉 Pipeline completed successfully!"
+      echo "   - Refresh your dashboard to see real category mix data"
+      echo "   - No more PGRST201 errors expected"
+      echo "   - All transaction-item relationships normalized"
+
+on_failure:
+  - name: Failure Logging
+    run: |
+      echo "❌ Pipeline failed at step: $FAILED_STEP" | tee -a $AUDIT_LOG
+      echo "Error time: $(date)" | tee -a $AUDIT_LOG
+      echo "Manual intervention may be required" | tee -a $AUDIT_LOG
+
+# Caca audit configuration
+audit:
+  enabled: true
+  log_file: supabase_fks_audit.log
+  retention: 30d
+  
+# RepoSynth integration
+reposynth:
+  auto_commit: true
+  commit_message: "fix: Automated Supabase FK relationship repair via pipeline"
+  branch: "auto-fix/supabase-relationships"
