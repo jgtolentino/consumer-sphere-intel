@@ -27,10 +27,10 @@ const Overview: React.FC = () => {
   const avgBasketSize = transactionData?.avgBasketSize || 2.3;
   const avgTransactionValue = transactionData?.avgTransactionValue || 850;
   
-  // Calculate active regions from transaction data with baseline
-  const activeRegions = transactionData?.raw ? 
-    new Set(transactionData.raw.map(t => t.region || t.store_location).filter(Boolean)).size : 
-    18; // Full Philippines coverage baseline
+  // Calculate active regions from regional analytics data (17-18 Philippine regions max)
+  const activeRegions = analytics?.regionalAnalytics ? 
+    Math.min(analytics.regionalAnalytics.length, 18) : 
+    18; // Full Philippines coverage baseline (17-18 regions)
 
   if (isLoading) {
     return (
