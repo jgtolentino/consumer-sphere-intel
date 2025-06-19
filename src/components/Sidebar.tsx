@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, TrendingUp, Package, Globe, Star, Bot } from 'lucide-react';
+import { Home, TrendingUp, Package, Globe, Star, Bot, Settings } from 'lucide-react';
 
 const navigationItems = [
   { name: 'Overview', href: '/', icon: Home },
@@ -10,6 +10,7 @@ const navigationItems = [
   { name: 'Regional', href: '/regional', icon: Globe },
   { name: 'Brand Analytics', href: '/brands', icon: Star },
   { name: 'AI Chat', href: '/chat', icon: Bot },
+  { name: 'Settings', href: '/settings', icon: Settings },
 ];
 
 export const Sidebar: React.FC = () => {
