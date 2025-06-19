@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, ReactNode } from 'react';
+import React, { createContext, useContext, ReactNode, useState, useEffect } from 'react';
 import { MockDataService } from '../services/MockDataService';
 import { RealDataService } from '../services/RealDataService';
 import { getDataConfig } from '../config/dataConfig';
@@ -23,11 +23,29 @@ interface DataProviderProps {
 }
 
 export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
-  const config = getDataConfig();
-  
-  const dataService: DataService = config.mode === 'mock' 
-    ? new MockDataService() 
-    : new RealDataService(config.apiBaseUrl!);
+  const [dataService, setDataService] = useState<DataService>(() => {
+    const config = getDataConfig();
+    return config.mode === 'mock' 
+      ? new MockDataService() 
+      : new RealDataService(config.apiBaseUrl!);
+  });
+
+  useEffect(() => {
+    const handleDataModeChange = () => {
+      const config = getDataConfig();
+      const newService = config.mode === 'mock' 
+        ? new MockDataService() 
+        : new RealDataService(config.apiBaseUrl!);
+      setDataService(newService);
+    };
+
+    // Listen for data mode changes
+    window.addEventListener('dataModeChanged', handleDataModeChange);
+    
+    return () => {
+      window.removeEventListener('dataModeChanged', handleDataModeChange);
+    };
+  }, []);
 
   return (
     <DataContext.Provider value={dataService}>

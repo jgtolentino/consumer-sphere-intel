@@ -4,6 +4,7 @@ import { BarChart3, Bell, Search, Settings, User, Menu, Sun, Moon } from 'lucide
 import { MobileNavigation } from './MobileNavigation';
 import { Button } from "@/components/ui/button";
 import { useTheme } from 'next-themes';
+import { DataModeToggle, DataModeIndicator } from './DataModeToggle';
 
 export const Navbar: React.FC = () => {
   const { theme, setTheme } = useTheme();
@@ -31,7 +32,10 @@ export const Navbar: React.FC = () => {
               </div>
               <div>
                 <h1 className="text-xl font-bold text-[#0A2540] dark:text-[#F5F6FA] font-inter">Scout Analytics</h1>
-                <p className="text-xs text-[#2F3A4F] dark:text-gray-400 hidden sm:block font-medium">Philippine Retail Intelligence</p>
+                <div className="flex items-center space-x-2">
+                  <p className="text-xs text-[#2F3A4F] dark:text-gray-400 hidden sm:block font-medium">Philippine Retail Intelligence</p>
+                  <DataModeIndicator className="hidden sm:flex" />
+                </div>
               </div>
             </div>
           </div>
@@ -45,6 +49,9 @@ export const Navbar: React.FC = () => {
                 className="pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#36CFC9] focus:border-transparent w-48 lg:w-64 bg-white dark:bg-[#2F3A4F] text-[#0A2540] dark:text-[#F5F6FA] text-sm"
               />
             </div>
+            
+            {/* Data Mode Toggle */}
+            <DataModeToggle variant="compact" className="hidden sm:flex" />
             
             {/* Theme Toggle */}
             <Button

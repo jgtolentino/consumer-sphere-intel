@@ -6,7 +6,12 @@ export interface DataConfig {
 }
 
 export const getDataConfig = (): DataConfig => {
-  const mode = (import.meta.env.VITE_DATA_MODE || 'mock') as 'mock' | 'real';
+  // Check localStorage first for runtime mode switching
+  const runtimeMode = localStorage.getItem('dataMode') as 'mock' | 'real' | null;
+  const envMode = (import.meta.env.VITE_DATA_MODE || 'mock') as 'mock' | 'real';
+  
+  // Use runtime mode if available, otherwise fall back to environment
+  const mode = runtimeMode || envMode;
   
   return {
     mode,
