@@ -220,6 +220,60 @@ export class WorkflowOrchestrator implements TaskRouter {
         case 'visualization':
           mockData = await mockService.getCategoryMix();
           break;
+        case 'sql-query':
+          // Mock SQL query response
+          mockData = {
+            question: task.payload?.question || 'Mock query',
+            sql_query: task.payload?.sql_query || 'SELECT * FROM mock_table LIMIT 10',
+            results: [
+              { brand_name: 'Mock Brand A', total_sales: 50000, transaction_count: 250 },
+              { brand_name: 'Mock Brand B', total_sales: 35000, transaction_count: 180 }
+            ],
+            insights: {
+              summary: 'Mock SQL analysis - kill switch active',
+              recommendations: ['Mock recommendation: Review data when kill switch is disabled'],
+              key_findings: ['Kill switch fallback data is simulated']
+            },
+            metadata: {
+              confidence: 0.8,
+              execution_time: 50,
+              row_count: 2
+            }
+          };
+          break;
+        case 'stock-analysis':
+          // Mock stock analysis response
+          mockData = {
+            analysis_type: task.payload?.analysis_type || 'general',
+            sql_analysis: [
+              {
+                analysis: 'Mock demand analysis',
+                sql_query: 'SELECT category, COUNT(*) FROM products GROUP BY category',
+                results: [
+                  { category: 'Beverages', transaction_count: 120, total_quantity: 450 },
+                  { category: 'Food & Grocery', transaction_count: 95, total_quantity: 380 }
+                ],
+                execution_time_ms: 80
+              }
+            ],
+            insights: [
+              {
+                analysis_type: 'Mock analysis',
+                summary: 'Kill switch fallback data for stock analysis',
+                recommendations: ['Verify results when systems are restored'],
+                key_findings: ['Mock data used due to system maintenance']
+              }
+            ],
+            recommendations: [
+              {
+                based_on: 'Mock analysis',
+                recommendations: ['Enable real data once kill switch is disabled'],
+                priority: 'high',
+                estimated_impact: 'medium'
+              }
+            ]
+          };
+          break;
         default:
           mockData = { message: 'Mock response - kill switch active' };
       }

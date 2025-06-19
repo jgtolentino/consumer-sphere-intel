@@ -45,13 +45,43 @@ agents:
       success_rate: 0.95
       last_health_check: "2024-12-20T10:00:00Z"
 
-  - id: "stockbot"
-    name: "Stockbot"
-    description: "Stock analysis, inventory insights, and supply chain optimization"
-    version: "2.0.0"
+  - id: "stockbot-sql"
+    name: "Stockbot SQL"
+    description: "AI-powered stock analysis using Azure OpenAI + direct SQL queries"
+    version: "3.0.0"
     status: "active"
     type: "inventory"
-    priority: 85
+    priority: 90
+    capabilities:
+      task_types:
+        - "stock-analysis"
+        - "insight-generation" 
+        - "data-fetch"
+        - "sql-query"
+      input_schema:
+        analysis_type: "string"
+        question: "string"
+        sql_query: "string"
+        product_filter: "object"
+        time_period: "object"
+      output_schema:
+        stock_insights: "array"
+        inventory_recommendations: "array"
+        substitution_patterns: "array"
+        sql_results: "object"
+      dependencies:
+        - "azure-openai"
+        - "sql-database"
+        - "canonical-schema"
+    service_path: "../src/agents/StockbotSQLAgent"
+    
+  - id: "stockbot"
+    name: "Stockbot (Legacy)"
+    description: "Stock analysis, inventory insights, and supply chain optimization"
+    version: "2.0.0"
+    status: "inactive"
+    type: "inventory"
+    priority: 75
     capabilities:
       task_types:
         - "stock-analysis"
@@ -170,7 +200,11 @@ routing_rules:
     fallback_agents: ["bi-genie"]
     
   - task_type: "stock-analysis"
-    priority_agents: ["stockbot"]
+    priority_agents: ["stockbot-sql", "stockbot"]
+    fallback_agents: ["bi-genie"]
+    
+  - task_type: "sql-query"
+    priority_agents: ["stockbot-sql"]
     fallback_agents: ["bi-genie"]
     
   - task_type: "learning-tutorial"

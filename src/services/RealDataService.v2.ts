@@ -28,20 +28,20 @@ export class RealDataServiceV2 implements DataService {
         store_id,
         total_amount,
         created_at,
-        transaction_items!inner(
+        transaction_items:transaction_items!transaction_id(
           id,
           transaction_id,
           product_id,
           quantity,
           unit_price,
           created_at,
-          products!inner(
+          products:products!product_id(
             id,
             name,
             category,
             brand_id,
             created_at,
-            brands!inner(
+            brands:brands!brand_id(
               id,
               name,
               category,
@@ -50,7 +50,7 @@ export class RealDataServiceV2 implements DataService {
             )
           )
         ),
-        customers!inner(
+        customers:customers!customer_id(
           id,
           age_bracket,
           gender,
@@ -58,7 +58,7 @@ export class RealDataServiceV2 implements DataService {
           payment_method,
           created_at
         ),
-        stores!inner(
+        stores:stores!store_id(
           id,
           name,
           location,
@@ -283,8 +283,8 @@ export class RealDataServiceV2 implements DataService {
         .from('substitutions')
         .select(`
           *,
-          from_products:products!from_product_id(name, brands(name)),
-          to_products:products!to_product_id(name, brands(name))
+          from_products:products!from_product_id(name, category, brands:brands!brand_id(name)),
+          to_products:products!to_product_id(name, category, brands:brands!brand_id(name))
         `);
 
       if (error) throw error;
@@ -292,7 +292,7 @@ export class RealDataServiceV2 implements DataService {
       return data?.map(sub => ({
         from_product: sub.from_products?.name || 'Unknown',
         to_product: sub.to_products?.name || 'Unknown',
-        substitution_count: 1, // Count would need aggregation in real implementation
+        substitution_count: sub.frequency || 1,
         from_brand: sub.from_products?.brands?.name || 'Unknown',
         to_brand: sub.to_products?.brands?.name || 'Unknown',
         category: sub.from_products?.category || 'Unknown'

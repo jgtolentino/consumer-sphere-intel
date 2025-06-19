@@ -11,6 +11,7 @@ import { killSwitch } from '../config/killSwitch';
 // Import all agent services
 import { BiGenieAgent } from '../agents/BiGenieAgent';
 import { StockbotAgent } from '../agents/StockbotAgent';
+import { StockbotSQLAgent } from '../agents/StockbotSQLAgent';
 import { RetailLearnBotAgent } from '../agents/RetailLearnBotAgent';
 import { CesaiAgent } from '../agents/CesaiAgent';
 
@@ -76,11 +77,37 @@ export class AgentRegistryManager {
         servicePath: 'BiGenieAgent'
       },
       {
+        id: 'stockbot-sql',
+        name: 'Stockbot SQL',
+        description: 'AI-powered stock analysis using Azure OpenAI + direct SQL queries',
+        version: '3.0.0',
+        status: 'active',
+        capabilities: {
+          taskTypes: ['stock-analysis', 'insight-generation', 'data-fetch', 'sql-query'],
+          inputSchema: {
+            analysis_type: 'string',
+            question: 'string',
+            sql_query: 'string',
+            product_filter: 'object',
+            time_period: 'object'
+          },
+          outputSchema: {
+            stock_insights: 'array',
+            inventory_recommendations: 'array',
+            substitution_patterns: 'array',
+            sql_results: 'object'
+          },
+          dependencies: ['azure-openai', 'sql-database', 'canonical-schema']
+        },
+        priority: 90,
+        servicePath: 'StockbotSQLAgent'
+      },
+      {
         id: 'stockbot',
-        name: 'Stockbot',
+        name: 'Stockbot (Legacy)',
         description: 'Stock analysis, inventory insights, and supply chain optimization',
         version: '2.0.0',
-        status: 'active',
+        status: 'inactive', // Demoted to legacy status
         capabilities: {
           taskTypes: ['stock-analysis', 'insight-generation', 'data-fetch'],
           inputSchema: {
@@ -95,7 +122,7 @@ export class AgentRegistryManager {
           },
           dependencies: ['product-catalog', 'inventory-system']
         },
-        priority: 85,
+        priority: 75, // Reduced priority
         servicePath: 'StockbotAgent'
       },
       {
@@ -201,6 +228,7 @@ export class AgentRegistryManager {
     const agentClasses = {
       'BiGenieAgent': BiGenieAgent,
       'StockbotAgent': StockbotAgent,
+      'StockbotSQLAgent': StockbotSQLAgent,
       'RetailLearnBotAgent': RetailLearnBotAgent,
       'CesaiAgent': CesaiAgent
     };

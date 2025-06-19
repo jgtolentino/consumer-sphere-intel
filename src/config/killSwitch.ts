@@ -236,8 +236,28 @@ class KillSwitchManager {
 
   private async checkDataServices(): Promise<boolean> {
     try {
-      // Mock basic connectivity check
-      // In real implementation, this would check actual services
+      // Check SQL database connectivity if available
+      if (typeof require !== 'undefined') {
+        try {
+          const { SQLConnector } = await import('../services/SQLConnector');
+          const sqlConnector = new SQLConnector({
+            host: process.env.SQL_HOST || 'localhost',
+            port: parseInt(process.env.SQL_PORT || '5432'),
+            database: process.env.SQL_DATABASE || 'retail_analytics',
+            username: process.env.SQL_USERNAME || 'postgres',
+            password: process.env.SQL_PASSWORD || 'password',
+            schema: 'public',
+            connectionString: process.env.SQL_CONNECTION_STRING || ''
+          });
+          
+          return await sqlConnector.healthCheck();
+        } catch (sqlError) {
+          console.warn('SQL health check failed:', sqlError);
+          return false;
+        }
+      }
+      
+      // Fallback to basic connectivity check
       return true;
     } catch {
       return false;
@@ -247,7 +267,31 @@ class KillSwitchManager {
   private async checkSchemaCompliance(): Promise<boolean> {
     try {
       // Check if schema drift detection is passing
-      // In real implementation, this would validate against canonical schema
+      // Validate that canonical schema types are available
+      if (typeof require !== 'undefined') {
+        try {
+          const schema = await import('../schema');
+          const requiredTypes = [
+            'TransactionWithDetails',
+            'BrandPerformance', 
+            'CategoryMix',
+            'ProductSubstitution'
+          ];
+          
+          for (const typeName of requiredTypes) {
+            if (!(typeName in schema)) {
+              console.warn(`Missing canonical schema type: ${typeName}`);
+              return false;
+            }
+          }
+          
+          return true;
+        } catch (schemaError) {
+          console.warn('Schema compliance check failed:', schemaError);
+          return false;
+        }
+      }
+      
       return true;
     } catch {
       return false;
@@ -257,7 +301,37 @@ class KillSwitchManager {
   private async checkAgentHealth(): Promise<boolean> {
     try {
       // Check if registered agents are responding
-      // In real implementation, this would ping agent health endpoints
+      if (typeof require !== 'undefined') {
+        try {
+          // Import agent registry to check agent health
+          const { agentRegistry } = await import('../orchestration/AgentRegistry');
+          
+          const registeredAgents = agentRegistry.getRegisteredAgents();
+          const activeAgents = agentRegistry.getActiveAgents();
+          
+          // Ensure at least one agent is active
+          if (activeAgents.length === 0) {
+            console.warn('No active agents found');
+            return false;
+          }
+          
+          // Check specific agent health (SQL agents get priority)
+          const sqlAgent = registeredAgents.find(agent => agent.id === 'stockbot-sql');
+          if (sqlAgent && sqlAgent.status === 'active') {
+            const isHealthy = agentRegistry.isAgentHealthy('stockbot-sql');
+            if (!isHealthy) {
+              console.warn('Stockbot SQL agent health check failed');
+              return false;
+            }
+          }
+          
+          return true;
+        } catch (agentError) {
+          console.warn('Agent health check failed:', agentError);
+          return false;
+        }
+      }
+      
       return true;
     } catch {
       return false;

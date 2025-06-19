@@ -281,7 +281,7 @@ export class RetailLearnBotAgent extends AgentService {
       return `Category mix refers to the distribution of sales across different product categories. In our current data, ${data.topCategory.category} leads with ${data.topCategory.percentage_of_total.toFixed(1)}% of total transactions across ${data.totalCategories} categories.`;
     }
 
-    return 'I can help you understand retail analytics concepts. Could you specify which term you'd like me to define?';
+    return 'I can help you understand retail analytics concepts. Could you specify which term you would like me to define?';
   }
 
   private generateHowToResponse(query: string, data: any): string {

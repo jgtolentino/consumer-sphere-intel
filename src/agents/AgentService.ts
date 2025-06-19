@@ -46,7 +46,8 @@ export type AgentTaskType =
   | 'campaign-optimization'
   | 'learning-tutorial'
   | 'schema-validation'
-  | 'health-check';
+  | 'health-check'
+  | 'sql-query';
 
 export interface AgentCapability {
   taskTypes: AgentTaskType[];
