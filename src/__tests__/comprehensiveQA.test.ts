@@ -1,3 +1,4 @@
+
 import { describe, it, expect, beforeAll } from 'vitest';
 import { 
   mockTransactions, 
@@ -90,7 +91,10 @@ describe('Comprehensive QA Audit - 5,000 Mock Records', () => {
     it('should calculate correct total metrics', async () => {
       const allTransactions = await mockDataService.getTransactions();
       
-      const totalRevenue = allTransactions.reduce((sum: number, t: any) => sum + (Number(t.total) || 0), 0);
+      const totalRevenue = allTransactions.reduce((sum: number, t: any) => {
+        const transactionTotal = Number(t.total) || 0;
+        return sum + transactionTotal;
+      }, 0);
       const avgBasketSize = totalRevenue / allTransactions.length;
       const totalItems = allTransactions.reduce((sum: number, t: any) => 
         sum + (t.basket?.reduce((itemSum: number, item: any) => itemSum + (Number(item.units) || 0), 0) || 0), 0
@@ -264,7 +268,8 @@ describe('Comprehensive QA Audit - 5,000 Mock Records', () => {
       
       // Validate all filtered transactions meet criteria
       filtered.forEach((txn: any) => {
-        expect(['NCR', 'CALABARZON']).toContain(String(txn.region));
+        const txnRegion = String(txn.region);
+        expect(['NCR', 'CALABARZON']).toContain(txnRegion);
         
         const hasValidBrand = txn.basket?.some((item: any) => 
           ['Alaska Evaporated Milk', 'Oishi Prawn Crackers'].includes(String(item.brand))
