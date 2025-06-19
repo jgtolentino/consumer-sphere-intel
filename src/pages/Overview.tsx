@@ -8,6 +8,8 @@ import { ShoppingCart, DollarSign, Package, MapPin } from 'lucide-react';
 import { useTransactions } from '../hooks/useTransactions';
 import { useComprehensiveAnalytics } from '../hooks/useComprehensiveAnalytics';
 import { getTopBrands } from '../data/mockData';
+import { ActiveFilters } from '../components/ActiveFilters';
+import { DrillDownBreadcrumb } from '../components/DrillDownBreadcrumb';
 
 const Overview: React.FC = () => {
   console.log('Overview component rendering - START');
@@ -33,14 +35,21 @@ const Overview: React.FC = () => {
       </div>
     );
   }
-  
-  console.log('Real transaction data:', {
-    total: totalTransactions,
-    totalValue: totalRevenue,
-    avgValue: avgBasketSize,
-    isLoading,
-    error
-  });
+
+  if (error) {
+    console.error('Transaction data error:', error);
+    return (
+      <div className="min-h-screen bg-[#F5F6FA] flex items-center justify-center">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 max-w-md">
+          <h3 className="text-red-800 font-semibold">Error Loading Data</h3>
+          <p className="text-red-600 text-sm mt-1">
+            Failed to load transaction data. Please check your connection and try again.
+          </p>
+          <p className="text-red-500 text-xs mt-2">Error: {error?.message}</p>
+        </div>
+      </div>
+    );
+  }
   
   const kpis = [
     {
@@ -84,141 +93,115 @@ const Overview: React.FC = () => {
     { date: '2024-01-07', volume: 298, value: 22400 }
   ];
 
-  console.log('KPIs data:', kpis);
-  console.log('About to render Overview JSX');
-
-  if (isLoading) {
-    return (
-      <div className="space-y-4 xl:space-y-6 w-full max-w-none">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/3 mb-2"></div>
-          <div className="h-4 bg-gray-200 rounded w-1/2 mb-6"></div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 xl:gap-6 mb-6">
-            {[1,2,3,4].map(i => (
-              <div key={i} className="bg-white rounded-xl p-6 shadow-sm">
-                <div className="h-4 bg-gray-200 rounded w-2/3 mb-2"></div>
-                <div className="h-8 bg-gray-200 rounded w-1/2 mb-2"></div>
-                <div className="h-3 bg-gray-200 rounded w-1/3"></div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    console.error('Transaction data error:', error);
-    return (
-      <div className="space-y-4 xl:space-y-6 w-full max-w-none">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <h3 className="text-red-800 font-semibold">Error Loading Data</h3>
-          <p className="text-red-600 text-sm mt-1">
-            Failed to load transaction data. Please check your connection and try again.
-          </p>
-          <p className="text-red-500 text-xs mt-2">Error: {error?.message}</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-[#F5F6FA] p-4 md:p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
-          <div className="min-w-0 flex-1">
-            <h1 className="text-2xl xl:text-3xl font-bold text-gray-900">TBWA Client Dashboard</h1>
-            <p className="text-sm xl:text-base text-gray-600 mt-1">Alaska • Oishi • Peerless • Del Monte • JTI Performance Overview</p>
-          </div>
-          <div className="text-xs xl:text-sm text-gray-500 bg-white px-3 xl:px-4 py-2 rounded-lg border whitespace-nowrap">
-            Last updated: {new Date().toLocaleString('en-PH')}
-          </div>
-        </div>
-
-        {/* KPI Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 xl:gap-6">
-          {kpis.map((kpi, index) => {
-            console.log('Rendering KPI card:', kpi.title);
-            return (
-              <KpiCard key={index} {...kpi} />
-            );
-          })}
-        </div>
-
-        {/* Charts and Insights */}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 xl:gap-6">
-          <div className="xl:col-span-2 min-w-0">
-            <TimeSeriesChart data={timeSeriesData} height={300} />
-          </div>
-          
-          <div className="min-w-0">
-            <AiRecommendationPanel />
-          </div>
-        </div>
-
-        {/* Choropleth Map */}
-        <div className="w-full">
-          <ChoroplethMap />
-        </div>
-
-        {/* TBWA Client Brand Performance */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 xl:p-6">
-          <h3 className="text-base xl:text-lg font-semibold mb-4 text-gray-900">TBWA Client Brand Performance</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 xl:gap-6">
-            <div className="text-center p-3 xl:p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg">
-              <h4 className="font-semibold text-blue-900 text-sm xl:text-base">Alaska Milk</h4>
-              <p className="text-xl xl:text-2xl font-bold text-blue-700 mt-2">₱2.1M</p>
-              <p className="text-xs xl:text-sm text-blue-600">Dairy & Creamer Leader</p>
+    <div className="min-h-screen bg-[#F5F6FA]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="space-y-6 py-6">
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">TBWA Client Dashboard</h1>
+              <p className="text-gray-600 mt-1">
+                Alaska • Oishi • Peerless • Del Monte • JTI Performance Overview
+              </p>
             </div>
-            
-            <div className="text-center p-3 xl:p-4 bg-gradient-to-br from-teal-50 to-teal-100 rounded-lg">
-              <h4 className="font-semibold text-teal-900 text-sm xl:text-base">Oishi</h4>
-              <p className="text-xl xl:text-2xl font-bold text-teal-700 mt-2">₱1.8M</p>
-              <p className="text-xs xl:text-sm text-teal-600">Snacks Market Leader</p>
-            </div>
-            
-            <div className="text-center p-3 xl:p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-lg">
-              <h4 className="font-semibold text-green-900 text-sm xl:text-base">Peerless</h4>
-              <p className="text-xl xl:text-2xl font-bold text-green-700 mt-2">₱1.4M</p>
-              <p className="text-xs xl:text-sm text-green-600">Champion & Calla</p>
-            </div>
-            
-            <div className="text-center p-3 xl:p-4 bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg">
-              <h4 className="font-semibold text-orange-900 text-sm xl:text-base">Del Monte</h4>
-              <p className="text-xl xl:text-2xl font-bold text-orange-700 mt-2">₱1.2M</p>
-              <p className="text-xs xl:text-sm text-orange-600">Juice & Food Products</p>
-            </div>
-            
-            <div className="text-center p-3 xl:p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg">
-              <h4 className="font-semibold text-purple-900 text-sm xl:text-base">JTI</h4>
-              <p className="text-xl xl:text-2xl font-bold text-purple-700 mt-2">₱950K</p>
-              <p className="text-xs xl:text-sm text-purple-600">Winston & Camel</p>
+            <div className="text-sm text-gray-500 bg-white px-4 py-2 rounded-lg border">
+              Last updated: {new Date().toLocaleString('en-PH')}
             </div>
           </div>
-        </div>
 
-        {/* Regional Insights */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 xl:p-6">
-          <h3 className="text-base xl:text-lg font-semibold mb-4 text-gray-900">Top Performing Regions</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 xl:gap-6">
-            <div className="text-center p-3 xl:p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg">
-              <h4 className="font-semibold text-blue-900 text-sm xl:text-base">National Capital Region</h4>
-              <p className="text-xl xl:text-2xl font-bold text-blue-700 mt-2">₱4.2M</p>
-              <p className="text-xs xl:text-sm text-blue-600">23% market share</p>
+          <DrillDownBreadcrumb />
+          <ActiveFilters />
+
+          {/* KPI Cards with Scout styling */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {kpis.map((kpi, index) => {
+              console.log('Rendering KPI card:', kpi.title);
+              return (
+                <KpiCard key={index} {...kpi} />
+              );
+            })}
+          </div>
+
+          {/* Charts and Insights */}
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+            <div className="xl:col-span-2 min-w-0">
+              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Transaction Trends</h3>
+                <TimeSeriesChart data={timeSeriesData} height={300} />
+              </div>
             </div>
             
-            <div className="text-center p-3 xl:p-4 bg-gradient-to-br from-teal-50 to-teal-100 rounded-lg">
-              <h4 className="font-semibold text-teal-900 text-sm xl:text-base">CALABARZON</h4>
-              <p className="text-xl xl:text-2xl font-bold text-teal-700 mt-2">₱3.1M</p>
-              <p className="text-xs xl:text-sm text-teal-600">16% market share</p>
+            <div className="min-w-0">
+              <AiRecommendationPanel />
             </div>
-            
-            <div className="text-center p-3 xl:p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-lg">
-              <h4 className="font-semibold text-green-900 text-sm xl:text-base">Central Luzon</h4>
-              <p className="text-xl xl:text-2xl font-bold text-green-700 mt-2">₱2.8M</p>
-              <p className="text-xs xl:text-sm text-green-600">12% market share</p>
+          </div>
+
+          {/* Choropleth Map with Scout card styling */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Regional Performance</h3>
+            <ChoroplethMap />
+          </div>
+
+          {/* TBWA Client Brand Performance */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <h3 className="text-lg font-semibold mb-4 text-gray-900">TBWA Client Brand Performance</h3>
+            <p className="text-sm text-gray-600 mb-6">
+              All {analytics?.companyAnalytics?.length || 5} client brands - including complete coverage
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
+              <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg border border-blue-200">
+                <h4 className="font-semibold text-blue-900 text-base">Alaska Milk</h4>
+                <p className="text-2xl font-bold text-blue-700 mt-2">₱2.1M</p>
+                <p className="text-sm text-blue-600">Dairy & Creamer Leader</p>
+              </div>
+              
+              <div className="text-center p-4 bg-gradient-to-br from-teal-50 to-teal-100 rounded-lg border border-teal-200">
+                <h4 className="font-semibold text-teal-900 text-base">Oishi</h4>
+                <p className="text-2xl font-bold text-teal-700 mt-2">₱1.8M</p>
+                <p className="text-sm text-teal-600">Snacks Market Leader</p>
+              </div>
+              
+              <div className="text-center p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-lg border border-green-200">
+                <h4 className="font-semibold text-green-900 text-base">Peerless</h4>
+                <p className="text-2xl font-bold text-green-700 mt-2">₱1.4M</p>
+                <p className="text-sm text-green-600">Champion & Calla</p>
+              </div>
+              
+              <div className="text-center p-4 bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg border border-orange-200">
+                <h4 className="font-semibold text-orange-900 text-base">Del Monte</h4>
+                <p className="text-2xl font-bold text-orange-700 mt-2">₱1.2M</p>
+                <p className="text-sm text-orange-600">Juice & Food Products</p>
+              </div>
+              
+              <div className="text-center p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg border border-purple-200">
+                <h4 className="font-semibold text-purple-900 text-base">JTI</h4>
+                <p className="text-2xl font-bold text-purple-700 mt-2">₱950K</p>
+                <p className="text-sm text-purple-600">Winston & Camel</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Regional Insights */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <h3 className="text-lg font-semibold mb-4 text-gray-900">Top Performing Regions</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg border border-blue-200">
+                <h4 className="font-semibold text-blue-900 text-base">National Capital Region</h4>
+                <p className="text-2xl font-bold text-blue-700 mt-2">₱4.2M</p>
+                <p className="text-sm text-blue-600">23% market share</p>
+              </div>
+              
+              <div className="text-center p-4 bg-gradient-to-br from-teal-50 to-teal-100 rounded-lg border border-teal-200">
+                <h4 className="font-semibold text-teal-900 text-base">CALABARZON</h4>
+                <p className="text-2xl font-bold text-teal-700 mt-2">₱3.1M</p>
+                <p className="text-sm text-teal-600">16% market share</p>
+              </div>
+              
+              <div className="text-center p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-lg border border-green-200">
+                <h4 className="font-semibold text-green-900 text-base">Central Luzon</h4>
+                <p className="text-2xl font-bold text-green-700 mt-2">₱2.8M</p>
+                <p className="text-sm text-green-600">12% market share</p>
+              </div>
             </div>
           </div>
         </div>
