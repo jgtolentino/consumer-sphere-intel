@@ -13,7 +13,7 @@ export class RealDataService implements DataService {
         *,
         transaction_items(
           quantity,
-          price,
+          unit_price,
           products(name, category, brands(name, category))
         )
       `);
@@ -77,7 +77,7 @@ export class RealDataService implements DataService {
         category: item.products?.brands?.category || 'Unknown',
         brand: item.products?.brands?.name || 'Unknown',
         units: item.quantity,
-        price: item.price * item.quantity
+        price: item.unit_price * item.quantity
       })) || []
     }));
   }
@@ -144,6 +144,7 @@ export class RealDataService implements DataService {
       .from('transaction_items')
       .select(`
         quantity,
+        unit_price,
         products(name, category, brands(name, category))
       `);
 
@@ -153,7 +154,7 @@ export class RealDataService implements DataService {
       category: item.products?.brands?.category || 'Unknown',
       sku: item.products?.name || 'Unknown',
       units: item.quantity,
-      price: 0 // Price not available in this structure
+      price: item.unit_price || 0
     })) || [];
 
     return {
@@ -321,19 +322,17 @@ export class RealDataService implements DataService {
       .slice(0, 10);
   }
 
-  // Product Mix methods
+  // Product Mix methods - Fixed to use proper field names
   async getCategoryMix(): Promise<any[]> {
     try {
-      // Try to get real category mix data from transactions
+      // Use simpler query to avoid nested relationship issues
       const { data, error } = await supabase
-        .from('transactions')
+        .from('transaction_items')
         .select(`
-          transaction_items (
-            products (
-              category
-            ),
-            quantity,
-            unit_price
+          quantity,
+          unit_price,
+          products (
+            category
           )
         `);
 
@@ -342,17 +341,15 @@ export class RealDataService implements DataService {
       // Process category mix from real data
       const categoryStats: Record<string, { value: number; count: number }> = {};
       
-      data?.forEach((transaction: any) => {
-        transaction.transaction_items?.forEach((item: any) => {
-          const category = item.products?.category || 'Unknown';
-          const value = (item.quantity || 0) * (item.unit_price || 0);
-          
-          if (!categoryStats[category]) {
-            categoryStats[category] = { value: 0, count: 0 };
-          }
-          categoryStats[category].value += value;
-          categoryStats[category].count += item.quantity || 0;
-        });
+      data?.forEach((item: any) => {
+        const category = item.products?.category || 'Unknown';
+        const value = (item.quantity || 0) * (item.unit_price || 0);
+        
+        if (!categoryStats[category]) {
+          categoryStats[category] = { value: 0, count: 0 };
+        }
+        categoryStats[category].value += value;
+        categoryStats[category].count += item.quantity || 0;
       });
 
       const totalValue = Object.values(categoryStats).reduce((sum, cat) => sum + cat.value, 0);
