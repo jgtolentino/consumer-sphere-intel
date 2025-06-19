@@ -4,6 +4,7 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { MapPin } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { philippineRegionsGeoJSON } from '../data/philippineRegions';
 
 interface RegionData {
   region: string;
@@ -114,6 +115,11 @@ export const ChoroplethMap: React.FC = () => {
     return config.colorScale[Math.min(colorIndex, config.colorScale.length - 1)];
   };
 
+  const getRegionValue = (regionName: string): number => {
+    const region = regionData.find(r => r.region === regionName);
+    return region ? region[selectedMetric] : 0;
+  };
+
   useEffect(() => {
     if (!mapContainer.current || map.current) return;
 
@@ -139,7 +145,7 @@ export const ChoroplethMap: React.FC = () => {
 
       map.current.on('load', () => {
         setMapLoaded(true);
-        addChoroplethRegions();
+        addChoroplethLayer();
       });
 
     } catch (error) {
@@ -149,89 +155,112 @@ export const ChoroplethMap: React.FC = () => {
 
   useEffect(() => {
     if (mapLoaded) {
-      addChoroplethRegions();
+      updateChoroplethLayer();
     }
   }, [selectedMetric, mapLoaded]);
 
-  const addChoroplethRegions = () => {
+  const addChoroplethLayer = () => {
     if (!map.current) return;
 
-    // Clear existing markers
-    const existingMarkers = document.querySelectorAll('.choropleth-region');
-    existingMarkers.forEach(marker => marker.remove());
-
-    const config = metricConfigs[selectedMetric];
-
-    // Add colored region markers
-    regionData.forEach((region) => {
-      const value = region[selectedMetric];
-      const color = getColorForValue(value, selectedMetric);
-      
-      // Create region element with choropleth styling
-      const regionEl = document.createElement('div');
-      regionEl.className = 'choropleth-region';
-      regionEl.style.cssText = `
-        width: 90px;
-        height: 70px;
-        background: ${color};
-        border: 2px solid white;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-        position: relative;
-        cursor: default;
-        opacity: 0.9;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: ${selectedMetric === 'totalSales' && value > 3000000 ? 'white' : 'black'};
-        font-size: 11px;
-        font-weight: bold;
-        text-align: center;
-        line-height: 1.1;
-      `;
-
-      // Add region name abbreviation
-      const regionAbbr = region.region.split(' ').map(word => word.charAt(0)).join('').substring(0, 3);
-      regionEl.textContent = regionAbbr;
-
-      // Create popup for detailed information
-      const popup = new mapboxgl.Popup({ 
-        offset: 25,
-        closeButton: false,
-        closeOnClick: false
-      }).setHTML(`
-        <div class="p-3">
-          <h3 class="font-semibold text-gray-900 mb-2">${region.region}</h3>
-          <div class="space-y-1 text-sm">
-            <div class="flex justify-between">
-              <span class="text-gray-600">${config.label}:</span>
-              <span class="font-medium">${config.formatter(value)}</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-gray-600">Rank:</span>
-              <span class="font-medium">#${regionData
-                .sort((a, b) => b[selectedMetric] - a[selectedMetric])
-                .findIndex(r => r.region === region.region) + 1}</span>
-            </div>
-          </div>
-        </div>
-      `);
-
-      // Add marker to map
-      const marker = new mapboxgl.Marker(regionEl)
-        .setLngLat(region.coordinates)
-        .setPopup(popup)
-        .addTo(map.current!);
-
-      // Show popup on hover
-      regionEl.addEventListener('mouseenter', () => {
-        popup.addTo(map.current!);
-      });
-
-      regionEl.addEventListener('mouseleave', () => {
-        popup.remove();
-      });
+    // Add GeoJSON source
+    map.current.addSource('ph-regions', {
+      type: 'geojson',
+      data: philippineRegionsGeoJSON as any
     });
+
+    // Add fill layer
+    map.current.addLayer({
+      id: 'ph-regions-fill',
+      type: 'fill',
+      source: 'ph-regions',
+      paint: {
+        'fill-color': [
+          'case',
+          ...philippineRegionsGeoJSON.features.flatMap(feature => {
+            const regionName = feature.properties.name;
+            const value = getRegionValue(regionName);
+            const color = getColorForValue(value, selectedMetric);
+            return [['==', ['get', 'name'], regionName], color];
+          }),
+          '#cccccc' // fallback color
+        ],
+        'fill-opacity': 0.8
+      }
+    });
+
+    // Add border layer
+    map.current.addLayer({
+      id: 'ph-regions-border',
+      type: 'line',
+      source: 'ph-regions',
+      paint: {
+        'line-color': '#ffffff',
+        'line-width': 2
+      }
+    });
+
+    // Add hover effects and popups
+    const popup = new mapboxgl.Popup({
+      closeButton: false,
+      closeOnClick: false
+    });
+
+    map.current.on('mouseenter', 'ph-regions-fill', (e) => {
+      if (!map.current || !e.features || e.features.length === 0) return;
+
+      map.current.getCanvas().style.cursor = 'pointer';
+      
+      const feature = e.features[0];
+      const regionName = feature.properties?.name;
+      const region = regionData.find(r => r.region === regionName);
+      
+      if (region) {
+        const config = metricConfigs[selectedMetric];
+        const value = region[selectedMetric];
+        
+        popup.setLngLat(e.lngLat)
+          .setHTML(`
+            <div class="p-3">
+              <h3 class="font-semibold text-gray-900 mb-2">${regionName}</h3>
+              <div class="space-y-1 text-sm">
+                <div class="flex justify-between">
+                  <span class="text-gray-600">${config.label}:</span>
+                  <span class="font-medium">${config.formatter(value)}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-600">Rank:</span>
+                  <span class="font-medium">#${regionData
+                    .sort((a, b) => b[selectedMetric] - a[selectedMetric])
+                    .findIndex(r => r.region === regionName) + 1}</span>
+                </div>
+              </div>
+            </div>
+          `)
+          .addTo(map.current);
+      }
+    });
+
+    map.current.on('mouseleave', 'ph-regions-fill', () => {
+      if (!map.current) return;
+      map.current.getCanvas().style.cursor = '';
+      popup.remove();
+    });
+  };
+
+  const updateChoroplethLayer = () => {
+    if (!map.current || !map.current.getSource('ph-regions')) return;
+
+    // Update fill colors based on selected metric
+    map.current.setPaintProperty('ph-regions-fill', 'fill-color', [
+      'case',
+      ...philippineRegionsGeoJSON.features.flatMap(feature => {
+        const regionName = feature.properties.name;
+        const value = getRegionValue(regionName);
+        const color = getColorForValue(value, selectedMetric);
+        return [['==', ['get', 'name'], regionName], color];
+      }),
+      '#cccccc' // fallback color
+    ]);
   };
 
   useEffect(() => {
@@ -248,7 +277,7 @@ export const ChoroplethMap: React.FC = () => {
         <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="text-base xl:text-lg font-semibold text-gray-900">Regional Performance Distribution</h3>
-            <p className="text-xs xl:text-sm text-gray-600">Color-coded performance across major Philippine regions</p>
+            <p className="text-xs xl:text-sm text-gray-600">True choropleth mapping of Philippine regions</p>
           </div>
           <MapPin className="h-5 w-5 text-gray-400" />
         </div>
@@ -289,7 +318,7 @@ export const ChoroplethMap: React.FC = () => {
             <span>High</span>
           </div>
           <div className="text-xs text-gray-500 mt-1">
-            Regions colored by {metricConfigs[selectedMetric].label.toLowerCase()}
+            Regions colored by actual boundaries
           </div>
         </div>
       </div>
