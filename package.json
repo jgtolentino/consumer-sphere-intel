@@ -20,6 +20,7 @@
     "check-drift": "node scripts/check-schema-drift.cjs",
     "check-schema-drift": "node scripts/check-schema-drift.js",
     "auto-attach": "npm run sync-types && npm run check-schema-drift",
+    "audit:mock-imports": "node scripts/audit-mock-imports.js",
     "validate-schema": "npm run check-schema-drift && npm run build",
     "schema:test": "npm test -- src/__tests__/schemaDrift.test.ts",
     "agents:test": "npm test -- src/__tests__/agentContracts.test.ts",

@@ -61,7 +61,7 @@ export const QAAuditPanel: React.FC = () => {
       }
 
       // 2. Data Mode Verification
-      const dataMode = import.meta.env.VITE_DATA_MODE || 'mock';
+      const dataMode = import.meta.env.VITE_DATA_MODE || 'real';
       const expectedCounts = { mock: 5000, real: 18000 };
       const currentCount = auditStats?.recordCount || 0;
       

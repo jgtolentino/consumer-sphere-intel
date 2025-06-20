@@ -1,0 +1,125 @@
+{
+  "timestamp": "2025-06-20T00:18:19.158Z",
+  "overallStatus": "HEALTHY WITH WARNINGS",
+  "successRate": 94,
+  "summary": {
+    "total": 16,
+    "passed": 15,
+    "warnings": 1,
+    "failed": 0
+  },
+  "details": [
+    {
+      "category": "Environment",
+      "test": "Node.js Version",
+      "status": "pass",
+      "message": "Node.js v20.19.2 (compatible)",
+      "details": null
+    },
+    {
+      "category": "Environment",
+      "test": "ESM Configuration",
+      "status": "pass",
+      "message": "Package configured for ES modules",
+      "details": null
+    },
+    {
+      "category": "Environment",
+      "test": "Required Scripts",
+      "status": "pass",
+      "message": "All required npm scripts present",
+      "details": null
+    },
+    {
+      "category": "TypeScript",
+      "test": "Compilation",
+      "status": "pass",
+      "message": "TypeScript compiles without errors",
+      "details": null
+    },
+    {
+      "category": "ESM",
+      "test": "Script: scripts/check-schema-drift.js",
+      "status": "pass",
+      "message": "Properly uses ESM import syntax",
+      "details": null
+    },
+    {
+      "category": "ESM",
+      "test": "Script: scripts/quick-validation.js",
+      "status": "pass",
+      "message": "Properly uses ESM import syntax",
+      "details": null
+    },
+    {
+      "category": "ESM",
+      "test": "Script: scripts/system-validation.js",
+      "status": "pass",
+      "message": "Properly uses ESM import syntax",
+      "details": null
+    },
+    {
+      "category": "Schema",
+      "test": "Drift Detection",
+      "status": "pass",
+      "message": "Schema drift detection completed successfully",
+      "details": null
+    },
+    {
+      "category": "Build",
+      "test": "Production Build",
+      "status": "pass",
+      "message": "Build successful (7 files generated)",
+      "details": null
+    },
+    {
+      "category": "Code Quality",
+      "test": "Mock Import Audit",
+      "status": "warning",
+      "message": "Mock import audit script not available",
+      "details": null
+    },
+    {
+      "category": "Files",
+      "test": "Data Provider",
+      "status": "pass",
+      "message": "File exists",
+      "details": null
+    },
+    {
+      "category": "Files",
+      "test": "Schema Definitions",
+      "status": "pass",
+      "message": "File exists",
+      "details": null
+    },
+    {
+      "category": "Files",
+      "test": "Mock Data Service",
+      "status": "pass",
+      "message": "File exists",
+      "details": null
+    },
+    {
+      "category": "Files",
+      "test": "Real Data Service",
+      "status": "pass",
+      "message": "File exists",
+      "details": null
+    },
+    {
+      "category": "Files",
+      "test": "Environment Configuration",
+      "status": "pass",
+      "message": "File exists",
+      "details": null
+    },
+    {
+      "category": "Files",
+      "test": "Database Migrations",
+      "status": "pass",
+      "message": "Directory exists with 4 files",
+      "details": null
+    }
+  ]
+}
