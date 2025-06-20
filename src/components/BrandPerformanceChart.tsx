@@ -1,31 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
-import { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, ScatterChart, Scatter, LineChart, Line } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '../components/ui/chart';
-
-
-  // TODO: Replace with proper data service call
-  const [brandData, setBrandData] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  
-  useEffect(() => {
-    // Replace this with actual data service call
-    const fetchData = async () => {
-      try {
-        setIsLoading(true);
-        // const data = await dataService.getData();
-        // setBrandData(data);
-        setBrandData([]); // Temporary empty array
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
 
 // Use Scout Analytics brand colors
 const chartConfig = {
@@ -48,6 +24,28 @@ interface BrandPerformanceChartProps {
 }
 
 export const BrandPerformanceChart: React.FC<BrandPerformanceChartProps> = ({ activeTab = 'revenue' }) => {
+  // TODO: Replace with proper data service call
+  const [brandData, setBrandData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  useEffect(() => {
+    // Replace this with actual data service call
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        // const data = await dataService.getData();
+        // setBrandData(data);
+        setBrandData([]); // Temporary empty array
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Unknown error');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
   const renderChart = () => {
     switch (activeTab) {
       case 'revenue':

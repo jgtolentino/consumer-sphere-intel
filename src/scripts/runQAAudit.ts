@@ -1,4 +1,3 @@
-import React from 'react';
 #!/usr/bin/env node
 
 import { mockTransactions } from '../data/mockData';
