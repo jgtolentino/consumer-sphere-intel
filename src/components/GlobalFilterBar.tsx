@@ -1,8 +1,8 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Calendar, X, Filter, RotateCcw, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useFilterStore } from '../state/useFilterStore';
-import { tbwaClientBrands, competitorBrands } from '../data/mockData';
+import { useDataService } from '../providers/DataProvider';
 
 export const GlobalFilterBar: React.FC = () => {
   const { 
@@ -13,6 +13,37 @@ export const GlobalFilterBar: React.FC = () => {
     setFilter, 
     reset 
   } = useFilterStore();
+  
+  const [availableBrands, setAvailableBrands] = useState<{tbwa: string[], competitor: string[]}>({
+    tbwa: [],
+    competitor: []
+  });
+  const dataService = useDataService();
+
+  // Load brand data from data service
+  useEffect(() => {
+    const loadBrands = async () => {
+      try {
+        const brandData = await dataService.getBrandData();
+        const tbwaBrands = brandData.filter(b => b.is_tbwa).map(b => b.brand_name);
+        const competitorBrands = brandData.filter(b => !b.is_tbwa).map(b => b.brand_name);
+        
+        setAvailableBrands({
+          tbwa: tbwaBrands,
+          competitor: competitorBrands
+        });
+      } catch (error) {
+        console.error('Failed to load brands:', error);
+        // Fallback to basic brand list
+        setAvailableBrands({
+          tbwa: ['Alaska', 'Bear Brand', 'Nido'],
+          competitor: ['Oishi', 'Nissin', 'Lucky Me']
+        });
+      }
+    };
+    
+    loadBrands();
+  }, [dataService]);
 
   const hasActiveFilters = dateRange.from || dateRange.to || 
     barangays.length || categories.length || brands.length;
@@ -32,9 +63,9 @@ export const GlobalFilterBar: React.FC = () => {
     'Davao Region', 'SOCCSKSARGEN', 'Caraga', 'CAR', 'BARMM'
   ];
   
-  const allBrands = [...tbwaClientBrands, ...competitorBrands];
-  const brandOptions = [...new Set(allBrands.map(b => b.name))].sort();
-  const categoryOptions = [...new Set(allBrands.map(b => b.category))].sort();
+  const allBrands = [...availableBrands.tbwa, ...availableBrands.competitor];
+  const brandOptions = [...new Set(allBrands)].sort();
+  const categoryOptions = ['Food & Beverages', 'Personal Care', 'Household', 'Electronics'].sort();
 
   const scrollFilters = (direction: 'left' | 'right') => {
     const container = document.getElementById('filter-scroll-container');

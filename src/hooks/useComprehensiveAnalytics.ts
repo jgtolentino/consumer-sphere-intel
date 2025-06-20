@@ -2,7 +2,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useDataService } from '../providers/DataProvider';
 import { useFilterStore } from '../state/useFilterStore';
-import { regions, tbwaClientBrands, competitorBrands } from '../data/mockData';
 
 export const useComprehensiveAnalytics = () => {
   const dataService = useDataService();

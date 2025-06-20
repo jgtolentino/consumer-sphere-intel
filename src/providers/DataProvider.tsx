@@ -33,12 +33,16 @@ interface DataProviderProps {
 export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
   const [dataService, setDataService] = useState<DataService>(() => {
     const config = getDataConfig();
-    // Check kill switch state for data mode decision
-    const useRealData = !killSwitch.enabled && config.mode === 'real';
+    // Default to real data unless kill switch is enabled or explicitly set to mock
+    const useRealData = !killSwitch.enabled && (config.mode === 'real' || !config.mode || config.mode === 'live');
     
-    return useRealData 
-      ? new RealDataServiceV2(config.apiBaseUrl!) 
-      : new MockDataServiceV2();
+    if (useRealData) {
+      console.log('🚀 Initializing LIVE data service (Supabase) - Default mode');
+      return new RealDataServiceV2(config.apiBaseUrl!);
+    } else {
+      console.log('🧪 Initializing MOCK data service (fallback/development)');
+      return new MockDataServiceV2();
+    }
   });
 
   // 🚀 AUTO-ATTACH: Enable realtime sync for real data mode
@@ -57,7 +61,8 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
     
     const handleDataModeChange = () => {
       const config = getDataConfig();
-      const useRealData = !killSwitch.enabled && config.mode === 'real';
+      // Default to real data unless explicitly set to mock or kill switch enabled
+      const useRealData = !killSwitch.enabled && (config.mode === 'real' || !config.mode || config.mode === 'live');
       
       const newService = useRealData 
         ? new RealDataServiceV2(config.apiBaseUrl!) 
@@ -65,7 +70,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
       
       setDataService(newService);
       
-      console.log(`🔄 Data mode changed to: ${useRealData ? 'real' : 'mock'}`);
+      console.log(`🔄 Data mode changed to: ${useRealData ? 'LIVE (default)' : 'MOCK (explicit)'}`);
       console.log(`${useRealData ? '✅ Realtime sync enabled' : '⏰ Mock data + agent fallback enabled'}`);
     };
 

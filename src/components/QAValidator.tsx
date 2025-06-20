@@ -2,9 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
-import { mockTransactions } from '../data/mockData';
 import { DataIntegrityValidator, validateKpiSums } from '../utils/dataIntegrityValidator';
-import { MockDataService } from '../services/MockDataService';
+import { useDataService } from '../providers/DataProvider';
 
 interface QAStats {
   totalTransactions: number;
@@ -34,29 +33,38 @@ export const QAValidator: React.FC<QAValidatorProps> = ({
   const [qaStats, setQaStats] = useState<QAStats | null>(null);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [isValidating, setIsValidating] = useState(false);
+  const [allTransactions, setAllTransactions] = useState<any[]>([]);
   
   const validator = new DataIntegrityValidator();
-  const mockDataService = new MockDataService();
+  const dataService = useDataService();
 
   const runValidation = async () => {
     setIsValidating(true);
     const errors: string[] = [];
     
     try {
+      // Load all transactions from data service if not already loaded
+      if (!allTransactions.length) {
+        const transactions = await dataService.getTransactions();
+        setAllTransactions(transactions);
+      }
+      
+      const baseTransactions = allTransactions.length ? allTransactions : await dataService.getTransactions();
+      
       // 1. Validate base data integrity
-      const baseValidation = validator.validateTransactions(mockTransactions);
+      const baseValidation = validator.validateTransactions(baseTransactions);
       if (!baseValidation.isValid) {
         errors.push(...baseValidation.errors.slice(0, 3));
       }
       
       // 2. Validate filtered data if provided
-      let currentData = filteredData || mockTransactions;
+      let currentData = filteredData || baseTransactions;
       if (currentFilters) {
-        currentData = await mockDataService.getTransactions(currentFilters);
+        currentData = await dataService.getTransactions(currentFilters);
       }
       
       // 3. Validate summation across different groupings
-      const regionValidation = validateKpiSums(mockTransactions, currentData, 'region');
+      const regionValidation = validateKpiSums(baseTransactions, currentData, 'region');
       if (!regionValidation.isValid) {
         errors.push(`Regional summation mismatch: ${regionValidation.details.mismatch} transactions`);
       }
@@ -77,27 +85,36 @@ export const QAValidator: React.FC<QAValidatorProps> = ({
       
       // 5. Validate payment methods sum to total
       const paymentValidation = validateKpiSums(
-        mockTransactions, 
+        baseTransactions, 
         currentData, 
-        (txn) => txn.consumer_profile.payment
+        (txn) => txn.customers?.payment_method || txn.consumer_profile?.payment || 'unknown'
       );
       if (!paymentValidation.isValid) {
         errors.push('Payment method summation error');
       }
       
-      // 6. Calculate client percentage
-      const clientTxns = currentData.filter(t => 
-        t.basket.some(item => 
-          mockTransactions.some(mt => 
-            mt.basket.some(bi => bi.brand === item.brand && bi.category === item.category)
-          )
-        )
-      );
+      // 6. Calculate client percentage (TBWA brands)
+      const clientTxns = currentData.filter(t => {
+        if (t.transaction_items) {
+          // Real data structure
+          return t.transaction_items.some(item => 
+            item.products?.brands?.is_tbwa || false
+          );
+        } else if (t.basket) {
+          // Mock data structure
+          return t.basket.some(item => 
+            baseTransactions.some(mt => 
+              mt.basket?.some(bi => bi.brand === item.brand && bi.category === item.category)
+            )
+          );
+        }
+        return false;
+      });
       
       const stats: QAStats = {
-        totalTransactions: mockTransactions.length,
+        totalTransactions: baseTransactions.length,
         filteredTransactions: currentData.length,
-        clientPercentage: (clientTxns.length / currentData.length) * 100,
+        clientPercentage: currentData.length > 0 ? (clientTxns.length / currentData.length) * 100 : 0,
         summationValid: regionValidation.isValid && paymentValidation.isValid,
         lastValidation: new Date()
       };

@@ -4,7 +4,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { MapPin } from 'lucide-react';
 import { useFilterStore } from '../state/useFilterStore';
 import { useDrillDownStore } from '../state/useDrillDownStore';
-import { regions, mockTransactions } from '../data/mockData';
+import { useDataService } from '../providers/DataProvider';
 
 interface RegionData {
   location: string;
@@ -59,6 +59,11 @@ const mockRegionData: RegionData[] = [
 export const GeoMap: React.FC = () => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
+  const [transactions, setTransactions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const dataService = useDataService();
+
   const [mapLoaded, setMapLoaded] = useState(false);
   const { barangays, setFilter } = useFilterStore();
   const { drillPath, drillDown, getCurrentContext } = useDrillDownStore();
