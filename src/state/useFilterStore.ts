@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 import { create } from 'zustand';
 import { tbwaClientBrands, competitorBrands, regions } from '../data/mockData';
@@ -83,4 +81,3 @@ export const useFilterStore = create<FilterState>((set, get) => ({
     };
   }
 }));
-

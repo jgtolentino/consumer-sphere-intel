@@ -1,6 +1,4 @@
-
 import React, { useState, useEffect } from 'react';
-import { useState, useEffect } from 'react';
 import { Package, TrendingUp, ShoppingBag, Star, BarChart3, ArrowRightLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useFilterStore } from '../state/useFilterStore';
@@ -26,7 +24,6 @@ const ProductMix: React.FC = () => {
     setFilter('categories', [category]);
     navigate('/trends');
   };
-
   
   // TODO: Replace with proper data service call
   const [kpiData, setKpiData] = useState([]);

@@ -1,7 +1,4 @@
-
-
 import React, { useEffect } from 'react';
-import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useFilterStore } from '../state/useFilterStore';
 
@@ -54,4 +51,3 @@ export const useSyncFilters = () => {
     }
   }, []);
 };
-

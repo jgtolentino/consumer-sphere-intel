@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 import { X } from 'lucide-react';
 import { useFilterStore } from '../state/useFilterStore';
@@ -103,4 +101,3 @@ export const ActiveFilters: React.FC = () => {
     </div>
   );
 };
-
