@@ -27,7 +27,10 @@
     "agents:validate-all": "npm run agents:validate && npm run check-schema-drift",
     "audit:mock-imports": "node scripts/audit-mock-imports.js || echo '⚠️ Mock audit (when available)'",
     "enterprise:validate": "npm run check-schema-drift && npm run build && npm run test:run",
-    "branch:validate": "npm run enterprise:validate && npm run audit:mock-imports"
+    "branch:validate": "npm run enterprise:validate && npm run audit:mock-imports",
+    "fix:all": "node scripts/auto-fix-all-issues.js",
+    "audit:comprehensive": "node scripts/comprehensive-fix-all.js",
+    "validate:complete": "npm run check-schema-drift && npm run build && npm run test:run && npm run audit:comprehensive"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",

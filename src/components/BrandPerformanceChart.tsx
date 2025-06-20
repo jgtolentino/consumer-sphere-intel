@@ -1,15 +1,30 @@
 
-import React from 'react';
+import { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, ScatterChart, Scatter, LineChart, Line } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '../components/ui/chart';
 
-const brandData = [
-  { name: 'Alaska', marketShare: 28, growth: 15, revenue: 4200000 },
-  { name: 'Oishi', marketShare: 22, growth: 24, revenue: 3100000 },
-  { name: 'Del Monte', marketShare: 18, growth: 12, revenue: 2800000 },
-  { name: 'Champion', marketShare: 12, growth: 8, revenue: 1200000 },
-  { name: 'Winston', marketShare: 20, growth: 5, revenue: 700000 }
-];
+
+  // TODO: Replace with proper data service call
+  const [brandData, setBrandData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  useEffect(() => {
+    // Replace this with actual data service call
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        // const data = await dataService.getData();
+        // setBrandData(data);
+        setBrandData([]); // Temporary empty array
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Unknown error');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
 // Use Scout Analytics brand colors
 const chartConfig = {

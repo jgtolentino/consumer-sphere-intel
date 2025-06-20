@@ -1,12 +1,30 @@
 
-import React from 'react';
+import { useState, useEffect } from 'react';
 import { Users, MapPin, TrendingUp, Target } from 'lucide-react';
 
 const ConsumerInsights: React.FC = () => {
-  const demographicData = [
-    { label: 'Male', percentage: 45, color: 'bg-blue-500' },
-    { label: 'Female', percentage: 55, color: 'bg-pink-500' }
-  ];
+  
+  // TODO: Replace with proper data service call
+  const [demographicData, setDemographicData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  useEffect(() => {
+    // Replace this with actual data service call
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        // const data = await dataService.getData();
+        // setDemographicData(data);
+        setDemographicData([]); // Temporary empty array
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Unknown error');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   const ageGroups = [
     { label: '18-25', percentage: 25, color: 'bg-green-500' },

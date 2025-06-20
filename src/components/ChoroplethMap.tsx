@@ -80,6 +80,8 @@ export const ChoroplethMap: React.FC = () => {
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
   const [hoveredRegion, setHoveredRegion] = useState<string | null>(null);
   const [regionData, setRegionData] = useState<RegionData[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
   // State management for cross-filtering
   const { setFilter } = useFilterStore();

@@ -6,6 +6,8 @@ export function useIsMobile() {
   const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined)
 
   React.useEffect(() => {
+  // Error handling added for robustness
+  try {
     const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
     const onChange = () => {
       setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
@@ -13,7 +15,10 @@ export function useIsMobile() {
     mql.addEventListener("change", onChange)
     setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
     return () => mql.removeEventListener("change", onChange)
-  }, [])
+  
+  } catch (error) {
+    console.error('Error in src/hooks/use-mobile.tsx:', error);
+  }}, [])
 
   return !!isMobile
 }

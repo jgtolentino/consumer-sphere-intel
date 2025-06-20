@@ -141,14 +141,28 @@ const generateChartFromData = async (prompt: string) => {
         }));
       
       // Ensure minimum 6 data points
-      const defaultData = [
-        { name: 'Electronics', value: 245000 },
-        { name: 'Groceries', value: 189000 },
-        { name: 'Health & Beauty', value: 167000 },
-        { name: 'Beverages', value: 143000 },
-        { name: 'Clothing', value: 125000 },
-        { name: 'Snacks', value: 98000 }
-      ];
+      
+  // TODO: Replace with proper data service call
+  const [defaultData, setDefaultData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  useEffect(() => {
+    // Replace this with actual data service call
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        // const data = await dataService.getData();
+        // setDefaultData(data);
+        setDefaultData([]); // Temporary empty array
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Unknown error');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
       
       const finalData = chartData.length >= 4 ? chartData : defaultData;
       
