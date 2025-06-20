@@ -1,4 +1,5 @@
 
+import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase, withLimit } from '../lib/supabase';
 import { useFilterStore } from '../state/useFilterStore';

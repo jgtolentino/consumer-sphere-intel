@@ -1,5 +1,6 @@
 // Intelligent data imputation utilities for professional dashboard display
 
+import React, { useState, useEffect } from 'react';
 export interface ImputationResult {
   data: any;
   source: 'real' | 'imputed_from_partial' | 'imputed_baseline';

@@ -1,5 +1,6 @@
 // Comprehensive mock data based on TBWA client brands and Philippine market structure
 
+import React from 'react';
 export interface Region {
   code: string;
   name: string;

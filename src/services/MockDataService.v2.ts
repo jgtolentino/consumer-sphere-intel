@@ -1,4 +1,5 @@
 /**
+import React from 'react';
  * MockDataService V2 - Schema Compliant
  * Mirrors Supabase schema exactly - no drift allowed
  */

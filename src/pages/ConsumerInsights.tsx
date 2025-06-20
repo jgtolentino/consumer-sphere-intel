@@ -1,4 +1,5 @@
 
+import React, { useState, useEffect } from 'react';
 import { useState, useEffect } from 'react';
 import { Users, MapPin, TrendingUp, Target } from 'lucide-react';
 

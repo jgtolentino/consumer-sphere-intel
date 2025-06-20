@@ -1,4 +1,5 @@
 /**
+import React from 'react';
  * RealDataService V2 - Schema Compliant  
  * Uses canonical schema types - must mirror MockDataService exactly
  */

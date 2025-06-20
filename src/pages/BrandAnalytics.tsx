@@ -1,4 +1,5 @@
 
+import React, { useState, useEffect } from 'react';
 import { useState, useEffect } from 'react';
 import { Star, Award, TrendingUp, Target } from 'lucide-react';
 import { BrandPerformanceChart } from '../components/BrandPerformanceChart';

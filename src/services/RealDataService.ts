@@ -1,4 +1,5 @@
 
+import React from 'react';
 import { supabase } from '../integrations/supabase/client';
 import { DataService } from '../providers/DataProvider';
 import { SUPABASE_LIMITS } from '../config/supabase-limits';

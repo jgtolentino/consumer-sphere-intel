@@ -2,6 +2,7 @@
 // src/utils/regionNormalizer.ts
 
 // 1. Canonical region name map for PH (edit/add as needed)
+import React from 'react';
 export const REGION_NAME_MAP: Record<string, string> = {
   'ncr': 'National Capital Region',
   'nationalcapitalregion': 'National Capital Region',

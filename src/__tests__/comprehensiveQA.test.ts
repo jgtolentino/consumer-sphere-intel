@@ -1,3 +1,4 @@
+import React from 'react';
 import { describe, it, expect, beforeAll } from 'vitest';
 import { 
   mockTransactions, 
