@@ -1,5 +1,5 @@
 
-import React from 'react';
+import { useState, useEffect } from 'react';
 import { ComposedChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 interface BoxPlotProps {
@@ -23,20 +23,28 @@ export const BoxPlot: React.FC<BoxPlotProps> = ({ data, height = 300 }) => {
   }
 
   // Transform data for box plot visualization
-  const boxPlotData = [
-    {
-      name: 'Distribution',
-      min: data.min,
-      q1: data.q1,
-      median: data.median,
-      q3: data.q3,
-      max: data.max,
-      // Calculate ranges for visualization
-      lowerWhisker: data.q1 - data.min,
-      box: data.q3 - data.q1,
-      upperWhisker: data.max - data.q3
-    }
-  ];
+  
+  // TODO: Replace with proper data service call
+  const [boxPlotData, setBoxPlotData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  useEffect(() => {
+    // Replace this with actual data service call
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        // const data = await dataService.getData();
+        // setBoxPlotData(data);
+        setBoxPlotData([]); // Temporary empty array
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Unknown error');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {

@@ -60,6 +60,8 @@ export const GeoMap: React.FC = () => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { barangays, setFilter } = useFilterStore();
   const { drillPath, drillDown, getCurrentContext } = useDrillDownStore();
 

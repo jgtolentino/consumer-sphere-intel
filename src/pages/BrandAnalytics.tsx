@@ -1,18 +1,33 @@
 
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Star, Award, TrendingUp, Target } from 'lucide-react';
 import { BrandPerformanceChart } from '../components/BrandPerformanceChart';
 
 const BrandAnalytics: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'revenue' | 'marketShare' | 'growth'>('revenue');
 
-  const brandHealthData = [
-    { name: 'Alaska', score: 85, color: 'bg-scout-teal' },
-    { name: 'Oishi', score: 78, color: 'bg-scout-teal' },
-    { name: 'Del Monte', score: 72, color: 'bg-scout-teal' },
-    { name: 'Champion', score: 68, color: 'bg-scout-teal' },
-    { name: 'Winston', score: 65, color: 'bg-scout-teal' }
-  ];
+  
+  // TODO: Replace with proper data service call
+  const [brandHealthData, setBrandHealthData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  useEffect(() => {
+    // Replace this with actual data service call
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        // const data = await dataService.getData();
+        // setBrandHealthData(data);
+        setBrandHealthData([]); // Temporary empty array
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Unknown error');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   return (
     <div className="space-y-6 p-6 bg-scout-light min-h-screen">

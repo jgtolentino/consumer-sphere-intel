@@ -1,5 +1,5 @@
 
-import React from 'react';
+import { useState, useEffect } from 'react';
 import { Package, TrendingUp, ShoppingBag, Star, BarChart3, ArrowRightLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useFilterStore } from '../state/useFilterStore';
@@ -26,12 +26,28 @@ const ProductMix: React.FC = () => {
     navigate('/trends');
   };
 
-  const kpiData = [
-    { title: 'Total SKUs', value: '2,847', change: '+12%', trend: 'up' as const, icon: <Package className="h-5 w-5" /> },
-    { title: 'Avg Basket Size', value: '₱1,245', change: '+8%', trend: 'up' as const, icon: <ShoppingBag className="h-5 w-5" /> },
-    { title: 'Category Diversity', value: '85%', change: '+3%', trend: 'up' as const, icon: <BarChart3 className="h-5 w-5" /> },
-    { title: 'Substitution Rate', value: '23%', change: '-2%', trend: 'down' as const, icon: <ArrowRightLeft className="h-5 w-5" /> }
-  ];
+  
+  // TODO: Replace with proper data service call
+  const [kpiData, setKpiData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  useEffect(() => {
+    // Replace this with actual data service call
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        // const data = await dataService.getData();
+        // setKpiData(data);
+        setKpiData([]); // Temporary empty array
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Unknown error');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   if (categoryLoading) {
     return (

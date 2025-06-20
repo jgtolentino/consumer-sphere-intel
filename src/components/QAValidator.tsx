@@ -245,6 +245,8 @@ export const QAValidator: React.FC<QAValidatorProps> = ({
 // Debug component for development
 export const QADebugPanel: React.FC<{ data: any[] }> = ({ data }) => {
   const [debugInfo, setDebugInfo] = useState<any>({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
   useEffect(() => {
     if (data && data.length > 0) {

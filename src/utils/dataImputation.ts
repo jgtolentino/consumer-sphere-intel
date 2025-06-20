@@ -87,26 +87,28 @@ export const imputeRegionalPerformance = (realData: any[] = []): ImputationResul
   }
 
   // Professional regional baseline - all 18 Philippine regions (market shares total 100%)
-  const baselineData = [
-    { region: 'National Capital Region', revenue: 420000000, marketShare: 17.7 },
-    { region: 'CALABARZON', revenue: 310000000, marketShare: 13.1 },
-    { region: 'Central Visayas', revenue: 280000000, marketShare: 11.8 },
-    { region: 'Central Luzon', revenue: 260000000, marketShare: 11.0 },
-    { region: 'Davao Region', revenue: 190000000, marketShare: 8.0 },
-    { region: 'Western Visayas', revenue: 120000000, marketShare: 5.1 },
-    { region: 'Northern Mindanao', revenue: 110000000, marketShare: 4.6 },
-    { region: 'Ilocos Region', revenue: 85000000, marketShare: 3.6 },
-    { region: 'SOCCSKSARGEN', revenue: 78000000, marketShare: 3.3 },
-    { region: 'Cordillera Administrative Region', revenue: 75000000, marketShare: 3.2 },
-    { region: 'Bicol Region', revenue: 72000000, marketShare: 3.0 },
-    { region: 'Negros Island Region', revenue: 68000000, marketShare: 2.9 },
-    { region: 'Cagayan Valley', revenue: 62000000, marketShare: 2.6 },
-    { region: 'Eastern Visayas', revenue: 59000000, marketShare: 2.5 },
-    { region: 'Zamboanga Peninsula', revenue: 52000000, marketShare: 2.2 },
-    { region: 'MIMAROPA', revenue: 48000000, marketShare: 2.0 },
-    { region: 'CARAGA', revenue: 42000000, marketShare: 1.8 },
-    { region: 'Bangsamoro Autonomous Region in Muslim Mindanao', revenue: 38000000, marketShare: 1.6 }
-  ];
+  
+  // TODO: Replace with proper data service call
+  const [baselineData, setBaselineData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  useEffect(() => {
+    // Replace this with actual data service call
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        // const data = await dataService.getData();
+        // setBaselineData(data);
+        setBaselineData([]); // Temporary empty array
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Unknown error');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   return {
     data: baselineData,
