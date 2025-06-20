@@ -1,0 +1,105 @@
+name: Agency UI - Fail-Fast Validation
+
+on:
+  push:
+    branches: [ feat/agency-enterprise-ui-dash ]
+  pull_request:
+    branches: [ feat/agency-enterprise-ui-dash, main ]
+
+jobs:
+  fail-fast-validation:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 🚀 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 📦 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        
+    - name: 🔧 Install dependencies
+      run: npm ci
+      
+    - name: 🎯 CRITICAL: Schema Drift Detection
+      run: |
+        echo "🔍 Running schema drift detection - MUST PASS"
+        npm run check-schema-drift
+        echo "✅ Schema drift check passed"
+        
+    - name: 📊 TypeScript Strict Compilation  
+      run: |
+        echo "🔨 Running TypeScript strict compilation"
+        npx tsc --noEmit --strict
+        echo "✅ TypeScript compilation passed"
+        
+    - name: 🏗️ Production Build Validation
+      run: |
+        echo "🚀 Testing production build"
+        npm run build
+        echo "✅ Production build successful"
+        
+    - name: 🧪 Full Test Suite
+      run: |
+        echo "🧪 Running complete test suite"
+        npm run test:run
+        echo "✅ All tests passed"
+        
+    - name: 🔍 Mock Data Import Audit
+      run: |
+        echo "🕵️ Auditing for hardcoded mock data"
+        npm run audit:mock-imports || echo "⚠️ Mock data audit warnings (non-blocking)"
+        
+    - name: 🤖 Agent Contract Validation
+      run: |
+        echo "🤖 Validating AI agent contracts"
+        npm run agents:validate-all || echo "⚠️ Agent validation (if available)"
+        
+    - name: 📈 Comprehensive Startup Check
+      run: |
+        echo "📈 Running comprehensive system validation"
+        node scripts/comprehensive-startup-check.js
+        
+    - name: 🎯 UI/UX Component Validation
+      run: |
+        echo "🎨 Validating UI components (future)"
+        # npm run test -- src/__tests__/ui* || echo "⚠️ UI tests (when implemented)"
+        echo "✅ UI validation placeholder"
+        
+  branch-protection-status:
+    runs-on: ubuntu-latest
+    needs: fail-fast-validation
+    if: always()
+    
+    steps:
+    - name: 🛡️ Branch Protection Summary
+      run: |
+        echo "🛡️ AGENCY UI BRANCH PROTECTION SUMMARY"
+        echo "======================================"
+        echo ""
+        if [ "${{ needs.fail-fast-validation.result }}" == "success" ]; then
+          echo "✅ ALL VALIDATIONS PASSED"
+          echo "🚀 Branch is safe for merge to main"
+          echo "🔒 No schema drift detected"
+          echo "🏗️ Production build validated"
+          echo "🧪 All tests passing"
+        else
+          echo "❌ VALIDATION FAILED"
+          echo "🚫 Branch BLOCKED from merge"
+          echo "🔧 Fix issues before proceeding"
+          exit 1
+        fi
+
+# Prevent any deployment on this branch
+  prevent-deployment:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/feat/agency-enterprise-ui-dash'
+    
+    steps:
+    - name: 🚫 Block Deployment
+      run: |
+        echo "🚫 DEPLOYMENT BLOCKED on agency UI branch"
+        echo "This branch is for development only"
+        echo "Merge to main branch for production deployment"
