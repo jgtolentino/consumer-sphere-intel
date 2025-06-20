@@ -25,24 +25,27 @@ export class RealDataServiceV2 implements DataService {
       .from('transactions')
       .select(`
         id,
-        customer_id,
-        store_id,
         total_amount,
         created_at,
-        transaction_items!inner(
+        customer_age,
+        customer_gender,
+        store_location,
+        store_id,
+        payment_method,
+        transaction_items!transaction_items_transaction_id_fkey(
           id,
           transaction_id,
           product_id,
           quantity,
           unit_price,
           created_at,
-          products!inner(
+          products!transaction_items_product_id_fkey(
             id,
             name,
             category,
             brand_id,
             created_at,
-            brands!inner(
+            brands!products_brand_id_fkey(
               id,
               name,
               category,
@@ -50,23 +53,6 @@ export class RealDataServiceV2 implements DataService {
               created_at
             )
           )
-        ),
-        customers!inner(
-          id,
-          age_bracket,
-          gender,
-          inferred_income,
-          payment_method,
-          created_at
-        ),
-        stores!inner(
-          id,
-          name,
-          location,
-          region,
-          city,
-          barangay,
-          created_at
         )
       `);
 
@@ -78,7 +64,10 @@ export class RealDataServiceV2 implements DataService {
       baseQuery = baseQuery.lte('created_at', filters.dateRange.to.toISOString());
     }
     if (filters?.regions?.length) {
-      baseQuery = baseQuery.in('stores.region', filters.regions);
+      // Filter by store_location containing any of the regions
+      const regionFilter = filters.regions.map(region => `store_location.ilike.${region}%`).join(',');
+      // Use 'or' filter for multiple regions
+      baseQuery = baseQuery.or(regionFilter);
     }
 
     // Use pagination to handle large datasets
@@ -112,52 +101,70 @@ export class RealDataServiceV2 implements DataService {
     }
 
     // Transform to match canonical schema exactly
-    const transformedData: TransactionWithDetails[] = allData.slice(0, maxRecords).map(transaction => ({
-      id: transaction.id,
-      customer_id: transaction.customer_id,
-      store_id: transaction.store_id,
-      total_amount: transaction.total_amount,
-      created_at: transaction.created_at,
-      transaction_items: transaction.transaction_items.map((item: any) => ({
-        id: item.id,
-        transaction_id: item.transaction_id,
-        product_id: item.product_id,
-        quantity: item.quantity,
-        unit_price: item.unit_price,
-        created_at: item.created_at,
-        products: {
-          id: item.products.id,
-          name: item.products.name,
-          category: item.products.category,
-          brand_id: item.products.brand_id,
-          created_at: item.products.created_at,
-          brands: {
-            id: item.products.brands.id,
-            name: item.products.brands.name,
-            category: item.products.brands.category,
-            is_tbwa: item.products.brands.is_tbwa,
-            created_at: item.products.brands.created_at
+    const transformedData: TransactionWithDetails[] = allData.slice(0, maxRecords).map(transaction => {
+      // Parse store location into components (format: "Region, City, Barangay, ...")
+      const locationParts = (transaction.store_location || '').split(', ');
+      const region = locationParts[0] || 'Unknown';
+      const city = locationParts[1] || 'Unknown';
+      const barangay = locationParts[2] || 'Unknown';
+      
+      // Determine age bracket from customer_age
+      const getAgeBracket = (age: number | null): string => {
+        if (!age) return 'Unknown';
+        if (age < 25) return '18-24';
+        if (age < 35) return '25-34';
+        if (age < 45) return '35-44';
+        if (age < 55) return '45-54';
+        return '55+';
+      };
+
+      return {
+        id: transaction.id,
+        customer_id: `customer_${transaction.id}`, // Generate virtual customer ID
+        store_id: transaction.store_id || `store_${region}_${city}`,
+        total_amount: transaction.total_amount,
+        created_at: transaction.created_at,
+        transaction_items: (transaction.transaction_items || []).map((item: any) => ({
+          id: item.id,
+          transaction_id: item.transaction_id,
+          product_id: item.product_id,
+          quantity: item.quantity,
+          unit_price: item.unit_price,
+          created_at: item.created_at,
+          products: {
+            id: item.products?.id || 0,
+            name: item.products?.name || 'Unknown Product',
+            category: item.products?.category || 'Unknown',
+            brand_id: item.products?.brand_id || 0,
+            created_at: item.products?.created_at || item.created_at,
+            brands: {
+              id: item.products?.brands?.id || 0,
+              name: item.products?.brands?.name || 'Unknown Brand',
+              category: item.products?.brands?.category || 'Unknown',
+              is_tbwa: item.products?.brands?.is_tbwa || false,
+              created_at: item.products?.brands?.created_at || item.created_at
+            }
           }
+        })),
+        customers: {
+          id: `customer_${transaction.id}`,
+          age_bracket: getAgeBracket(transaction.customer_age),
+          gender: transaction.customer_gender || 'Unknown',
+          inferred_income: 'Unknown', // Not available in current schema
+          payment_method: transaction.payment_method || 'Unknown',
+          created_at: transaction.created_at
+        },
+        stores: {
+          id: transaction.store_id || `store_${region}_${city}`,
+          name: `Store ${city}`, // Generate store name
+          location: transaction.store_location || 'Unknown',
+          region: region,
+          city: city,
+          barangay: barangay,
+          created_at: transaction.created_at
         }
-      })),
-      customers: {
-        id: transaction.customers.id,
-        age_bracket: transaction.customers.age_bracket,
-        gender: transaction.customers.gender,
-        inferred_income: transaction.customers.inferred_income,
-        payment_method: transaction.customers.payment_method,
-        created_at: transaction.customers.created_at
-      },
-      stores: {
-        id: transaction.stores.id,
-        name: transaction.stores.name,
-        location: transaction.stores.location,
-        region: transaction.stores.region,
-        city: transaction.stores.city,
-        barangay: transaction.stores.barangay,
-        created_at: transaction.stores.created_at
-      }
-    }));
+      };
+    });
 
     // Apply brand filters after data transformation
     let filteredData = transformedData;
@@ -284,19 +291,19 @@ export class RealDataServiceV2 implements DataService {
         .from('substitutions')
         .select(`
           *,
-          from_products:products!from_product_id(name, brands(name)),
-          to_products:products!to_product_id(name, brands(name))
+          original_products:original_product_id(name, brands!products_brand_id_fkey(name)),
+          substitute_products:substitute_product_id(name, brands!products_brand_id_fkey(name))
         `);
 
       if (error) throw error;
 
       return data?.map(sub => ({
-        from_product: sub.from_products?.name || 'Unknown',
-        to_product: sub.to_products?.name || 'Unknown',
+        from_product: sub.original_products?.name || 'Unknown',
+        to_product: sub.substitute_products?.name || 'Unknown',
         substitution_count: 1, // Count would need aggregation in real implementation
-        from_brand: sub.from_products?.brands?.name || 'Unknown',
-        to_brand: sub.to_products?.brands?.name || 'Unknown',
-        category: sub.from_products?.category || 'Unknown'
+        from_brand: sub.original_products?.brands?.name || 'Unknown',
+        to_brand: sub.substitute_products?.brands?.name || 'Unknown',
+        category: sub.original_products?.category || 'Unknown'
       })) || [];
       
     } catch (error) {
