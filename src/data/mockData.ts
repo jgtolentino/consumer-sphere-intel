@@ -1,6 +1,7 @@
 // Comprehensive mock data based on TBWA client brands and Philippine market structure
 
 import React from 'react';
+import { safeToFixed } from '../utils/numberUtils';
 export interface Region {
   code: string;
   name: string;
@@ -413,10 +414,10 @@ export const getRegionalData = () => {
     
     return {
       region: region.name,
-      revenue: `₱${(revenue / 1000000).toFixed(1)}M`,
+      revenue: `₱${safeToFixed(revenue  / 1000000, 1)}M`,
       transactions: transactions.toLocaleString(),
-      growth: `${growth > 0 ? '+' : ''}${growth.toFixed(1)}%`,
-      marketShare: `${(region.weight * 100).toFixed(1)}%`
+      growth: `${growth > 0 ? '+' : ''}${safeToFixed(growth, 1)}%`,
+      marketShare: `${(region.weight * safeToFixed(100), 1)}%`
     };
   });
   

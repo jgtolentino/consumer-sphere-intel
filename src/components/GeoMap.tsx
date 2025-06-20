@@ -5,6 +5,7 @@ import { MapPin } from 'lucide-react';
 import { useFilterStore } from '../state/useFilterStore';
 import { useDrillDownStore } from '../state/useDrillDownStore';
 import { regions, mockTransactions } from '../data/mockData';
+import { safeToFixed } from '../utils/numberUtils';
 
 interface RegionData {
   location: string;
@@ -194,7 +195,7 @@ export const GeoMap: React.FC = () => {
           <div class="space-y-1 text-sm">
             <div class="flex justify-between">
               <span class="text-gray-600">Revenue:</span>
-              <span class="font-medium">₱${(region.revenue / 1000000).toFixed(1)}M</span>
+              <span class="font-medium">₱${((region.revenue || 0) / safeToFixed(1000000), 1)}M</span>
             </div>
             <div class="flex justify-between">
               <span class="text-gray-600">Transactions:</span>

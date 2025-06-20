@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { MapPin, TrendingUp } from 'lucide-react';
+import { safeToFixed } from '../utils/numberUtils';
 
 interface RegionHeatmapData {
   region: string;
@@ -100,7 +101,7 @@ export const GeoHeatmap: React.FC = () => {
                 <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
                   <div className="bg-black text-white text-xs rounded-lg px-3 py-2 whitespace-nowrap">
                     <div className="font-semibold">{region.region}</div>
-                    <div>₱{(region.value / 1000000).toFixed(1)}M ({region.percentage}%)</div>
+                    <div>₱{safeToFixed((region.value || 0) / 1000000, 1)}M ({region.percentage}%)</div>
                     <div className="text-green-300">+{region.growth}% growth</div>
                     <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-black"></div>
                   </div>
@@ -151,7 +152,7 @@ export const GeoHeatmap: React.FC = () => {
                     </div>
                     <div>
                       <div className="text-sm font-medium text-gray-900">{region.region}</div>
-                      <div className="text-xs text-gray-600">₱{(region.value / 1000000).toFixed(1)}M revenue</div>
+                      <div className="text-xs text-gray-600">₱{safeToFixed((region.value || 0) / 1000000, 1)}M revenue</div>
                     </div>
                   </div>
                   <div className="text-right">

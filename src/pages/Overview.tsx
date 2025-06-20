@@ -10,6 +10,7 @@ import { useComprehensiveAnalytics } from '../hooks/useComprehensiveAnalytics';
 import { coordinatedImputation } from '../utils/dataImputation';
 import { ActiveFilters } from '../components/ActiveFilters';
 import { DrillDownBreadcrumb } from '../components/DrillDownBreadcrumb';
+import { safeToFixed } from '../utils/numberUtils';
 
 const Overview: React.FC = () => {
   console.log('Overview component rendering - START');
@@ -68,7 +69,7 @@ const Overview: React.FC = () => {
     },
     {
       title: 'Gross Peso Value',
-      value: `₱${(totalRevenue / 1000000).toFixed(1)}M`,
+      value: `₱${safeToFixed(totalRevenue  / 1000000, 1)}M`,
       change: '+8.2%',
       trend: 'up' as const,
       icon: <DollarSign className="h-4 w-4 xl:h-5 xl:w-5" />
@@ -148,10 +149,10 @@ const Overview: React.FC = () => {
               {analytics.companyAnalytics.length} client brands - performance overview
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
-              {analytics.companyAnalytics.slice(0, 5).map((brand, index) => (
+              {analytics.companyAnalytics.slice(0, 5).map((brand, index) => safeToFixed(
                 <div key={index} className="text-center p-4 bg-white rounded-lg border border-gray-200 hover:border-tbwa-yellow transition-colors">
                   <h4 className="font-semibold text-black text-base">{brand.name}</h4>
-                  <p className="text-2xl font-bold text-black mt-2">₱{(brand.revenue / 1000000).toFixed(1)}M</p>
+                  <p className="text-2xl font-bold text-black mt-2">₱{(brand.revenue  / 1000000, 1)}M</p>
                   <p className="text-sm text-gray-600">{brand.category}</p>
                 </div>
               ))}
@@ -165,10 +166,10 @@ const Overview: React.FC = () => {
               {analytics.regionalAnalytics.length} regional insights - market performance overview
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {analytics.regionalAnalytics.slice(0, 3).map((region, index) => (
+              {analytics.regionalAnalytics.slice(0, 3).map((region, index) => safeToFixed(
                 <div key={index} className="text-center p-4 bg-white rounded-lg border border-gray-200 hover:border-tbwa-yellow transition-colors">
                   <h4 className="font-semibold text-black text-base">{region.region}</h4>
-                  <p className="text-2xl font-bold text-black mt-2">₱{(region.revenue / 1000000).toFixed(1)}M</p>
+                  <p className="text-2xl font-bold text-black mt-2">₱{(region.revenue  / 1000000, 1)}M</p>
                   <p className="text-sm text-gray-600">{region.marketShare}% market share</p>
                 </div>
               ))}

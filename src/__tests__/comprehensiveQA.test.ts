@@ -14,6 +14,7 @@ import {
 } from '../data/mockData';
 import { MockDataService } from '../services/MockDataService';
 import { DataIntegrityValidator, validateKpiSums } from '../utils/dataIntegrityValidator';
+import { safeToFixed } from '../utils/numberUtils';
 
 describe('Comprehensive QA Audit - 5,000 Mock Records', () => {
   let validator: DataIntegrityValidator;
@@ -34,7 +35,7 @@ describe('Comprehensive QA Audit - 5,000 Mock Records', () => {
       
       console.log('Data Integrity Report:');
       console.log(`Total Transactions: ${result.stats.totalTransactions}`);
-      console.log(`Client Transactions: ${result.stats.clientTransactions} (${result.stats.clientPercentage.toFixed(1)}%)`);
+      console.log(`Client Transactions: ${result.stats.clientTransactions} (${safeToFixed(result.stats.clientPercentage, 1)}%)`);
       console.log(`Competitor Transactions: ${result.stats.competitorTransactions}`);
       console.log(`Total Revenue: ₱${result.stats.totalRevenue.toLocaleString()}`);
       console.log(`Unique Regions: ${result.stats.uniqueRegions}`);

@@ -3,6 +3,7 @@ import React from 'react';
 import { Filter, ChevronDown } from 'lucide-react';
 import { useFilterStore } from '../state/useFilterStore';
 import { useComprehensiveAnalytics } from '../hooks/useComprehensiveAnalytics';
+import { safeToFixed } from '../utils/numberUtils';
 
 export const ComprehensiveFilterPanel: React.FC = () => {
   const { 
@@ -69,7 +70,7 @@ export const ComprehensiveFilterPanel: React.FC = () => {
                   <div className="font-medium text-sm">{region}</div>
                   <div className="text-xs text-gray-600">
                     {regionData?.transactions || 0} transactions
-                    {regionData?.revenue ? ` • ₱${(regionData.revenue / 1000).toFixed(1)}K` : ' • ₱0'}
+                    {regionData?.revenue ? ` • ₱${safeToFixed(regionData.revenue  / 1000, 1)}K` : ' • ₱0'}
                   </div>
                 </button>
               );
@@ -103,7 +104,7 @@ export const ComprehensiveFilterPanel: React.FC = () => {
                   <div className="font-medium text-sm">{brand}</div>
                   <div className="text-xs text-gray-600">
                     {brandData?.transactions || 0} transactions
-                    {brandData?.revenue ? ` • ₱${(brandData.revenue / 1000).toFixed(1)}K` : ' • ₱0'}
+                    {brandData?.revenue ? ` • ₱${safeToFixed(brandData.revenue  / 1000, 1)}K` : ' • ₱0'}
                   </div>
                 </button>
               );
@@ -150,7 +151,7 @@ export const ComprehensiveFilterPanel: React.FC = () => {
         </div>
 
         {/* Summary Stats */}
-        {analytics && (
+        {analytics && safeToFixed(
           <div className="bg-gray-50 rounded-lg p-4">
             <h4 className="font-medium text-gray-900 mb-2">Current Filter Results</h4>
             <div className="grid grid-cols-3 gap-4 text-sm">
@@ -159,11 +160,11 @@ export const ComprehensiveFilterPanel: React.FC = () => {
                 <div className="text-gray-600">Transactions</div>
               </div>
               <div>
-                <div className="font-medium text-gray-900">₱{(analytics.totalMetrics.totalRevenue / 1000).toFixed(1)}K</div>
+                <div className="font-medium text-gray-900">₱{(analytics.totalMetrics.totalRevenue  / 1000, 1)}K</div>
                 <div className="text-gray-600">Revenue</div>
               </div>
               <div>
-                <div className="font-medium text-gray-900">₱{analytics.totalMetrics.avgTransactionValue.toFixed(0)}</div>
+                <div className="font-medium text-gray-900">₱{safeToFixed(analytics.totalMetrics.avgTransactionValue, 0)}</div>
                 <div className="text-gray-600">Avg Transaction</div>
               </div>
             </div>

@@ -8,6 +8,7 @@ import { DrillDownPanel } from '../components/DrillDownPanel';
 import { ComprehensiveFilterPanel } from '../components/ComprehensiveFilterPanel';
 import { useComprehensiveAnalytics } from '../hooks/useComprehensiveAnalytics';
 import { useDrillDownStore } from '../state/useDrillDownStore';
+import { safeToFixed } from '../utils/numberUtils';
 
 const Regional: React.FC = () => {
   const { data: analytics, isLoading } = useComprehensiveAnalytics();
@@ -69,7 +70,7 @@ const Regional: React.FC = () => {
                 <div>
                   <p className="text-sm font-medium text-gray-600">Total Revenue</p>
                   <p className="text-2xl font-bold text-gray-900">
-                    ₱{(totalRevenue / 1000000).toFixed(1)}M
+                    ₱{safeToFixed(totalRevenue  / 1000000, 1)}M
                   </p>
                   <p className="text-sm text-green-600">
                     All regions included
@@ -94,7 +95,7 @@ const Regional: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Avg Transaction</p>
-                  <p className="text-2xl font-bold text-gray-900">₱{avgTransactionValue.toFixed(0)}</p>
+                  <p className="text-2xl font-bold text-gray-900">₱{safeToFixed(avgTransactionValue, 0)}</p>
                   <p className="text-sm text-green-600">Complete coverage</p>
                 </div>
                 <BarChart3 className="h-8 w-8 text-purple-600" />
@@ -140,13 +141,13 @@ const Regional: React.FC = () => {
                           {region.transactions.toLocaleString()}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          ₱{(region.revenue / 1000).toFixed(1)}K
+                          ₱{safeToFixed(region.revenue  / 1000, 1)}K
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {region.marketShare.toFixed(1)}%
+                          {safeToFixed(region.marketShare, 1)}%
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          ₱{region.avgTransactionValue.toFixed(0)}
+                          ₱{safeToFixed(region.avgTransactionValue, 0)}
                         </td>
                       </tr>
                     ))}
@@ -179,12 +180,12 @@ const Regional: React.FC = () => {
                     <p className={`text-xl font-bold mt-2 ${
                       company.isClient ? 'text-blue-700' : 'text-gray-700'
                     }`}>
-                      ₱{(company.revenue / 1000).toFixed(1)}K
+                      ₱{safeToFixed(company.revenue  / 1000, 1)}K
                     </p>
                     <p className={`text-xs ${
                       company.isClient ? 'text-blue-600' : 'text-gray-600'
                     }`}>
-                      {company.transactions} transactions • {company.marketShare.toFixed(1)}% share
+                      {company.transactions} transactions • {safeToFixed(company.marketShare, 1)}% share
                     </p>
                   </div>
                 ))}

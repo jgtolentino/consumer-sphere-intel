@@ -8,6 +8,7 @@ import { useFilterStore } from '../state/useFilterStore';
 import { useDrillDownStore } from '../state/useDrillDownStore';
 import { getCanonicalRegionName, debugRegionMappings } from '../utils/regionNormalizer';
 import { useDataService } from '../providers/DataProvider';
+import { safeToFixed } from '../utils/numberUtils';
 
 interface RegionData {
   region: string;
@@ -34,7 +35,7 @@ const metricConfigs: Record<MetricType, MetricConfig> = {
   totalSales: {
     label: 'Total Sales',
     unit: '₱',
-    formatter: (value) => `₱${(value / 1000000).toFixed(1)}M`,
+    formatter: (value) => `₱${safeToFixed(value  / 1000000, 1)}M`,
     colorStops: [
       [0, '#F5F6FA'],           // Scout Light
       [500000, '#E8F4F8'],      // Light Scout Teal
@@ -47,7 +48,7 @@ const metricConfigs: Record<MetricType, MetricConfig> = {
   transactions: {
     label: 'Transactions',
     unit: '',
-    formatter: (value) => `${(value / 1000).toFixed(1)}K`,
+    formatter: (value) => `${safeToFixed(value  / 1000, 1)}K`,
     colorStops: [
       [0, '#F5F6FA'],           // Scout Light
       [8000, '#E8F4F8'],        // Light Scout Teal

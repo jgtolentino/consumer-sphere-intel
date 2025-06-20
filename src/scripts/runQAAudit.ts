@@ -3,6 +3,7 @@
 import { mockTransactions } from '../data/mockData';
 import { MockDataService } from '../services/MockDataService';
 import { DataIntegrityValidator } from '../utils/dataIntegrityValidator';
+import { safeToFixed } from '../utils/numberUtils';
 
 console.log('🔍 Consumer Sphere Intel - Comprehensive QA Audit');
 console.log('================================================\n');
@@ -32,17 +33,17 @@ async function runQAAudit() {
   // 2. Data Statistics
   console.log('2️⃣  DATA STATISTICS');
   console.log('------------------');
-  console.log(`Client Transactions: ${validationResult.stats.clientTransactions} (${validationResult.stats.clientPercentage.toFixed(1)}%)`);
+  console.log(`Client Transactions: ${validationResult.stats.clientTransactions} (${safeToFixed(validationResult.stats.clientPercentage, 1)}%)`);
   console.log(`Competitor Transactions: ${validationResult.stats.competitorTransactions}`);
   console.log(`Total Revenue: ₱${validationResult.stats.totalRevenue.toLocaleString()}`);
-  console.log(`Average Transaction: ₱${(validationResult.stats.totalRevenue / validationResult.stats.totalTransactions).toFixed(2)}`);
+  console.logsafeToFixed(`Average Transaction: ₱${(validationResult.stats.totalRevenue  / validationResult.stats.totalTransactions, 2)}`);
   console.log(`Unique Regions: ${validationResult.stats.uniqueRegions}/17`);
   console.log(`Unique Cities: ${validationResult.stats.uniqueCities}`);
   console.log(`Unique Barangays: ${validationResult.stats.uniqueBarangays}`);
   console.log(`Unique Brands: ${validationResult.stats.uniqueBrands}`);
   console.log(`Unique SKUs: ${validationResult.stats.uniqueSkus}`);
-  console.log(`Substitutions: ${validationResult.stats.substitutionCount} (${(validationResult.stats.substitutionCount / validationResult.stats.totalTransactions * 100).toFixed(1)}%)`);
-  console.log(`AI Recommendations: ${validationResult.stats.aiRecommendationCount} (${(validationResult.stats.aiRecommendationCount / validationResult.stats.totalTransactions * 100).toFixed(1)}%)\n`);
+  console.logsafeToFixed(`Substitutions: ${validationResult.stats.substitutionCount} (${(validationResult.stats.substitutionCount / validationResult.stats.totalTransactions * safeToFixed(100, 1)}%)`);
+  console.logsafeToFixed(`AI Recommendations: ${validationResult.stats.aiRecommendationCount} (${(validationResult.stats.aiRecommendationCount / validationResult.stats.totalTransactions * safeToFixed(100, 1)}%)\n`);
   
   // 3. Filter Testing
   console.log('3️⃣  FILTER VALIDATION');
@@ -93,7 +94,7 @@ async function runQAAudit() {
   
   console.log('Payment Methods:');
   paymentCounts.forEach((count, method) => {
-    console.log(`  ${method}: ${count} (${(count / 5000 * 100).toFixed(1)}%)`);
+    console.logsafeToFixed(`  ${method}: ${count} (${(count / 5000 * safeToFixed(100, 1)}%)`);
   });
   
   const totalPayments = Array.from(paymentCounts.values()).reduce((sum, count) => sum + count, 0);
@@ -127,12 +128,12 @@ async function runQAAudit() {
   
   console.log('Gender Distribution:');
   consumerData.genderMix.forEach(g => {
-    console.log(`  ${g.name}: ${g.value} (${g.percentage.toFixed(1)}%)`);
+    console.log(`  ${g.name}: ${g.value} (${safeToFixed(g.percentage, 1)}%)`);
   });
   
   console.log('Age Distribution:');
   consumerData.ageMix.forEach(a => {
-    console.log(`  ${a.name}: ${a.value} (${a.percentage.toFixed(1)}%)`);
+    console.log(`  ${a.name}: ${a.value} (${safeToFixed(a.percentage, 1)}%)`);
   });
   
   // 7. Behavioral Analytics
@@ -142,13 +143,13 @@ async function runQAAudit() {
   const behavioralData = await mockDataService.getBehavioralData();
   console.log('Request Types:');
   behavioralData.requestTypes.forEach(rt => {
-    console.log(`  ${rt.type}: ${rt.count} (${rt.percentage.toFixed(1)}%)`);
+    console.log(`  ${rt.type}: ${rt.count} (${safeToFixed(rt.percentage, 1)}%)`);
   });
   
   console.log(`\nStorekeeper Influence:`);
   console.log(`  Total suggestions: ${behavioralData.storekeperInfluence.totalSuggestions}`);
   console.log(`  Accepted: ${behavioralData.storekeperInfluence.acceptedSuggestions}`);
-  console.log(`  Acceptance rate: ${behavioralData.storekeperInfluence.acceptanceRate.toFixed(1)}%`);
+  console.log(`  Acceptance rate: ${safeToFixed(behavioralData.storekeperInfluence.acceptanceRate, 1)}%`);
   console.log(`  Average duration: ${behavioralData.averageDuration} seconds`);
   
   // 8. Performance Check
@@ -165,7 +166,7 @@ async function runQAAudit() {
   const perfEnd = Date.now();
   const avgTime = (perfEnd - perfStart) / 10;
   
-  console.log(`Average filter operation time: ${avgTime.toFixed(2)}ms ${avgTime < 100 ? '✅' : '⚠️'}`);
+  console.log(`Average filter operation time: ${safeToFixed(avgTime, 2)}ms ${avgTime < 100 ? '✅' : '⚠️'}`);
   
   // Final Summary
   console.log('\n' + '='.repeat(50));

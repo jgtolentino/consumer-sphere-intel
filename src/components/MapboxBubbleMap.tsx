@@ -4,6 +4,7 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { MapPin } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { safeToFixed } from '../utils/numberUtils';
 
 interface RegionData {
   region: string;
@@ -77,12 +78,12 @@ const metricConfigs: Record<MetricType, MetricConfig> = {
   totalSales: {
     label: 'Total Sales',
     unit: '₱',
-    formatter: (value) => `₱${(value / 1000000).toFixed(1)}M`
+    formatter: (value) => `₱${safeToFixed(value  / 1000000, 1)}M`
   },
   transactions: {
     label: 'Transactions',
     unit: '',
-    formatter: (value) => `${(value / 1000).toFixed(1)}K`
+    formatter: (value) => `${safeToFixed(value  / 1000, 1)}K`
   },
   marketShare: {
     label: 'Market Share',

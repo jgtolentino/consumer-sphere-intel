@@ -8,6 +8,7 @@ import {
   competitorBrands,
   brands
 } from '../data/mockData';
+import { safeToFixed } from '../utils/numberUtils';
 
 export interface ValidationResult {
   isValid: boolean;
@@ -210,7 +211,7 @@ export class DataIntegrityValidator {
     // Validate client/competitor split (should be approximately 60/40)
     const clientPercentage = stats.clientPercentage;
     if (clientPercentage < 55 || clientPercentage > 65) {
-      warnings.push(`Client transaction percentage is ${clientPercentage.toFixed(1)}%, expected ~60%`);
+      warnings.push(`Client transaction percentage is ${safeToFixed(clientPercentage, 1)}%, expected ~60%`);
     }
     
     // Validate all regions are represented

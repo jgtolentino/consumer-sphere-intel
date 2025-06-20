@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, ScatterChart, Scatter, LineChart, Line } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '../components/ui/chart';
+import { safeToFixed } from '../utils/numberUtils';
 
 // Use Scout Analytics brand colors
 const chartConfig = {
@@ -56,13 +57,13 @@ export const BrandPerformanceChart: React.FC<BrandPerformanceChartProps> = ({ ac
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                 <XAxis dataKey="name" stroke="#64748b" fontSize={12} />
                 <YAxis 
-                  tickFormatter={(value) => `₱${(value / 1000000).toFixed(1)}M`} 
+                  tickFormatter={(value) => `₱${safeToFixed(value  / 1000000, 1)}M`} 
                   stroke="#64748b" 
                   fontSize={12}
                 />
                 <ChartTooltip 
                   content={<ChartTooltipContent />}
-                  formatter={(value: any) => [`₱${(value / 1000000).toFixed(1)}M`, 'Revenue']}
+                  formatter={(value: any) => [`₱${safeToFixed(value  / 1000000, 1)}M`, 'Revenue']}
                 />
                 <Bar dataKey="revenue" fill="#2F3A4F" />
               </BarChart>

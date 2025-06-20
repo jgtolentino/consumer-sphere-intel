@@ -5,6 +5,7 @@ import { AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
 import { mockTransactions } from '../data/mockData';
 import { DataIntegrityValidator, validateKpiSums } from '../utils/dataIntegrityValidator';
 import { MockDataService } from '../services/MockDataService';
+import { safeToFixed } from '../utils/numberUtils';
 
 interface QAStats {
   totalTransactions: number;
@@ -201,7 +202,7 @@ export const QAValidator: React.FC<QAValidatorProps> = ({
           </div>
           <div>
             <span className="text-gray-500">Client %:</span>
-            <span className="ml-1 font-semibold">{qaStats.clientPercentage.toFixed(1)}%</span>
+            <span className="ml-1 font-semibold">{safeToFixed(qaStats.clientPercentage || 0, 1)}%</span>
           </div>
           <div>
             <span className="text-gray-500">Sum Valid:</span>

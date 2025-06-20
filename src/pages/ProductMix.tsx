@@ -11,6 +11,7 @@ import { ActiveFilters } from '../components/ActiveFilters';
 import { DrillDownBreadcrumb } from '../components/DrillDownBreadcrumb';
 import { useCategoryMix } from '../hooks/useCategoryMix';
 import { useProductSubstitution } from '../hooks/useProductSubstitution';
+import { safeToFixed } from '../utils/numberUtils';
 
 const ProductMix: React.FC = () => {
   const navigate = useNavigate();
@@ -116,8 +117,8 @@ const ProductMix: React.FC = () => {
                   {index === 1 && <ShoppingBag className="h-5 w-5 text-teal-600" />}
                   {index === 2 && <Star className="h-5 w-5 text-purple-600" />}
                 </div>
-                <p className="text-2xl font-bold text-gray-900">₱{(category.value / 1000000).toFixed(1)}M</p>
-                <p className="text-green-600 text-sm font-medium">{category.percentage.toFixed(1)}% market share</p>
+                <p className="text-2xl font-bold text-gray-900">₱{safeToFixed((category.value || 0) / 1000000, 1)}M</p>
+                <p className="text-green-600 text-sm font-medium">{safeToFixed(category.percentage || 0, 1)}% market share</p>
               </div>
             ))}
           </div>
